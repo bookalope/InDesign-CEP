@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionList>
+  <Extension Id="com.bookalope.panel">
+    <HostList>
+      <Host Name="IDSN" Port="8001"/>
+    </HostList>
+  </Extension>
+</ExtensionList>

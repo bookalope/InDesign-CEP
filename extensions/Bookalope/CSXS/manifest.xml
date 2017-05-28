@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="5.0" ExtensionBundleId="com.bookalope" ExtensionBundleVersion="0.9.3" ExtensionBundleName="Bookalope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Author>Jens Troeger, Bookalope</Author>
+    <Abstract>Adobe CEP extension for InDesign to use the Bookalope cloud services.</Abstract>
+    <ExtensionList>
+        <Extension Id="com.bookalope.panel" Version="0.9.3" />
+    </ExtensionList>
+    <ExecutionEnvironment>
+        <HostList>
+             <Host Name="IDSN" Version="[11.0,12.9]" />
+        </HostList>
+        <LocaleList>
+            <Locale Code="All" />
+        </LocaleList>
+        <RequiredRuntimeList>
+            <RequiredRuntime Name="CSXS" Version="5.0" />
+        </RequiredRuntimeList>
+    </ExecutionEnvironment>
+    <DispatchInfoList>
+        <Extension Id="com.bookalope.panel">
+            <DispatchInfo >
+                <Resources>
+                    <MainPath>./index.html</MainPath>
+                    <ScriptPath>./jsx/bookalope.jsx</ScriptPath>
+                    <!-- Can I not list multiple jsx scripts here? -->
+                </Resources>
+                <Lifecycle>
+                    <AutoVisible>true</AutoVisible>
+                </Lifecycle>
+                <UI>
+                    <Type>Panel</Type>
+                    <Menu>Bookalope</Menu>
+                    <Geometry>
+                        <Size>
+                            <Width>400</Width>
+                            <Height>260</Height>
+                        </Size>
+                        <MinSize>
+                            <Width>400</Width>
+                            <Height>260</Height>
+                        </MinSize>
+                        <MaxSize>
+                            <Width>400</Width>
+                            <Height>260</Height>
+                        </MaxSize>
+                    </Geometry>
+                    <Icons>
+                      <!--
+                        <Icon Type="Normal">./icons/iconNormal.png</Icon>
+                        <Icon Type="RollOver">./icons/iconRollover.png</Icon>
+                        <Icon Type="Disabled">./icons/iconDisabled.png</Icon>
+                        <Icon Type="DarkNormal">./icons/iconDarkNormal.png</Icon>
+                        <Icon Type="DarkRollOver">./icons/iconDarkRollover.png</Icon>
+                      -->
+                    </Icons>
+                </UI>
+            </DispatchInfo>
+        </Extension>
+    </DispatchInfoList>
+</ExtensionManifest>

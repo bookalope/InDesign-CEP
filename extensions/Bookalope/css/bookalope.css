@@ -1,0 +1,185 @@
+
+/* Those classes will be edited at runtime with values specified by the settings of the CC application */
+
+.hostFontColor {
+}
+
+.hostFontFamily {
+}
+
+.hostFontSize {
+}
+
+.hostFont {
+}
+
+.hostBgd {
+}
+
+.hostBgdLight {
+}
+
+.hostBgdDark {
+}
+
+.hostElt {
+}
+
+/* Panel styling */
+
+@font-face {
+  font-family: "Noto Sans";
+  src: url("../font/NotoSans-Regular.ttf");
+}
+@font-face {
+  font-family: "Noto Serif";
+  src: url("../font/NotoSerif-Regular.ttf");
+}
+
+body {
+  color: #d6d6d6;
+  background-color: #494949;
+  font: normal 12px "Noto Sans", Helvetica, Arial, sans-serif;
+  padding: 10px;
+ /* Enable for browser testing.
+  width: 400px;
+  height: 290px;
+ */
+}
+
+:focus {
+  outline: none;
+}
+
+#content {
+  width: 100%;
+  height: 100%;
+}
+#content,
+#content * {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+#bookalope-upload {
+  display: none;
+}
+
+#bookalope-update {
+  display: none;
+}
+
+div.form-row:nth-child(n+0):nth-child(-n+3) {
+  padding-bottom: 5px;
+}
+
+.form-row {
+  overflow: auto;
+}
+
+.buttons-row {
+  margin-top: 10px;
+  padding-left: 25%;
+}
+
+label {
+  float: left;
+  width: 25%;
+  padding-right: 10px;
+  text-align: right;
+}
+
+.input-wrapper {
+  width: 75%;
+  float: left;
+}
+
+.file-wrapper {
+}
+
+.p-wrapper{
+}
+
+.checkbox-radiobutton-wrapper {
+  margin-left: 25%;
+}
+.checkbox-radiobutton-wrapper label {
+  float: none;
+}
+
+.status-message-box {
+  position: absolute;
+  bottom: 0;
+  padding-bottom: 5px;
+}
+.status-type-info {
+  color: #d6d6d6;
+}
+.status-type-error {
+  color: #ec514e;
+}
+.error-row {
+  border: solid 1px red;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 2px;
+  border: 1px solid #272727;
+  background-color: #a2a2a2;
+  font: normal 12px "Noto Sans", Helvetica, Arial, sans-serif;
+}
+
+input[type="file"] {
+  font: normal 12px "Noto Sans", Helvetica, Arial, sans-serif;
+}
+
+input[type="checkbox"] {
+}
+
+input[type="radio"] {
+}
+
+button {
+  border: 1px solid #272727;
+  background-color: #a2a2a2;
+  font: normal 12px "Noto Sans", Helvetica, Arial, sans-serif;
+}
+button:hover {
+  background-color: #737373;
+  cursor: pointer;
+}
+
+hr {
+  border-top-color: #343434;
+  border-left-color: #737373;
+  border-bottom-color: #737373;
+  border-right-color: #343434;
+}
+
+a {
+  color: #737373;
+  text-decoration: none;
+}
+a:hover {
+  color: #d6d6d6;
+  text-decoration: underline;
+}
+
+#spinner {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+#spinner > img {
+  position: absolute;
+  left: 180px;
+  top: 110px;
+  width: 40px;
+  height: 40px;
+}

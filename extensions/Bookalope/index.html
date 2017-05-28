@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/reset.css"/>
+    <link rel="stylesheet" href="css/bookalope.css"/>
+</head>
+<body class="hostElt">
+
+    <div id="content">
+        <div class="form-row">
+            <label for="input-bookalope-token">API Token:</label>
+            <div class="input-wrapper">
+                <input type="text" name="input-bookalope-token" id="input-bookalope-token">
+            </div>
+        </div>
+
+        <hr/>
+
+        <div id="bookalope-upload">
+            <div class="form-row">
+                <label for="input-file">Document:</label>
+                <div class="input-wrapper file-wrapper">
+                    <input type="file" name="input-file" id="input-file" value="Choose a file"/>
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="input-book-name">Book Name:</label>
+                <div class="input-wrapper">
+                    <input type="text" name="input-book-name" id="input-book-name">
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="input-book-author">Book Author:</label>
+                <div class="input-wrapper">
+                    <input type="text" name="input-book-author" id="input-book-author">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-wrapper checkbox-radiobutton-wrapper">
+                    <input type="checkbox" name="input-book-version" id="input-book-version" disabled="true">
+                    <label for="input-book-version">Full version (paid)</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-wrapper checkbox-radiobutton-wrapper">
+                    <input type="checkbox" name="input-book-autoclean" id="input-book-autoclean" checked="true" disabled="true">
+                    <label for="auto_clean">Automatic cleanup</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-wrapper checkbox-radiobutton-wrapper">
+                    <input type="checkbox" name="input-book-highlight-issues" id="input-book-highlight-issues" disabled="true">
+                    <label for="input-book-highlight-issues">Highlight issues</label>
+                </div>
+            </div>
+            <div class="buttons-row">
+                <button id="button-send">Upload and convert</button>
+            </div>
+        </div>
+
+        <div id="bookalope-update">
+            <div class="form-row">
+                <label>Document:</label>
+                <div class="input-wrapper p-wrapper">
+                    <p>Open Bookflow in <a href="#" id="a-bookalope">Bookalope</a></p>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Download:</label>
+                <div class="input-wrapper p-wrapper">
+                    <p>
+                        <a href="#" id="a-bookalope-epub">EPUB</a> or
+                        <a href="#" id="a-bookalope-mobi">MOBI</a> or
+                        <a href="#" id="a-bookalope-pdf">PDF</a>
+                    </p>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-wrapper checkbox-radiobutton-wrapper">
+                    <input type="checkbox" name="full_version" id="update_full_version" disabled>
+                    <label for="update_full_version">Full version (paid)</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row status-message-box status-type-info" id="status-message-box">
+            <p></p>
+        </div>
+    </div>
+
+    <div id="spinner">
+        <img src="images/ring-alt.svg"/>
+    </div>
+
+    <script src="js/CEP/AgoraLib-7.0.0.js"></script>
+    <script src="js/CEP/CSInterface-7.0.0.js"></script>
+    <script src="js/CEP/Vulcan-7.0.0.js"></script>
+    <script src="js/uses/BookalopeClient.js"></script>
+    <script src="js/bookalope.js"></script>
+
+</body>
+</html>
