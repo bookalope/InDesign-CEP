@@ -16,7 +16,7 @@
 //
 // Note: So far all native file i/o functions are synchronous, and aynchronous file i/o is TBD.
 
-/** Version v4.1.0 */
+/** Version v8.0.0 */
 
 /*jslint vars: true, plusplus: true, devel: true, browser: true, nomen: true, indent: 4, forin: true, maxerr: 50, regexp: true */
 /*global define, native */

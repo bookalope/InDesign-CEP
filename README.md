@@ -4,20 +4,20 @@
 
 [Adobe CEP](https://github.com/Adobe-CEP), or Common Extensibility Platform, provides a framework to extend Adobe applications like [InDesign](http://www.adobe.com/products/indesign.html) with custom user interfaces and functionality. There is a wealth of useful extensions available on [Adobe’s Add-On Marketplace](https://creative.adobe.com/addons).
 
-This repository contains the complete source code for [Bookalope](https://bookalope.net/)’s InDesign extension. The extension uses the [Bookalope REST API](https://github.com/jenstroeger/Bookalope/blob/master/API.md) and its [Javascript wrapper](https://github.com/jenstroeger/Bookalope/blob/master/clients/javascript/bookalope.js) to integrate the Bookalope toolset into InDesign. For more information on Bookalope and its services, please refer the the website.
+This repository contains the complete source code for [Bookalope](https://bookalope.net/)’s InDesign extension. The extension uses the [Bookalope REST API](https://github.com/jenstroeger/Bookalope/blob/master/API.md) and its [Javascript wrapper](https://github.com/jenstroeger/Bookalope/blob/master/clients/javascript/bookalope.js) to integrate the Bookalope toolset into InDesign. For more information on Bookalope and its services, please refer to the [Bookalope](https://bookalope.net) website.
 
 ## Requirements
 
-The extension currently requires Adobe InDesign version 11 or 12. However, the extension may run on older versions that provide CEP support, but that hasn’t been tested.
+The extension requires and supports Adobe InDesign versions 11–13. However, the extension may run on older versions that provide CEP support, but that hasn’t been tested.
 
 ## Coding
 
-Read a general introduction to writing an Adobe CEP extension [here](http://www.adobe.com/devnet/creativesuite/articles/a-short-guide-to-HTML5-extensions.html). For more information on the Bookalope API please refer to the [documentation on Github](https://github.com/jenstroeger/Bookalope).
+Read a general introduction to writing an Adobe CEP extension [here](http://www.adobe.com/devnet/creativesuite/articles/a-short-guide-to-HTML5-extensions.html). For more information on the Bookalope API please refer to its [documentation on Github](https://github.com/jenstroeger/Bookalope).
 
 InDesign does not load an extension unless the extension has been cryptographically signed. Therefore, in order to run the Bookalope extension from source, you need to switch InDesign to _PlayerDebugMode_:
 
- - On Mac, open the file `~/Library/Preferences/com.adobe.CSXS.4.plist` and add a row with key `PlayerDebugMode` of type String and value `1`.
- - On Windows, open the registry key `HKEY_CURRENT_USER/Software/Adobe/CSXS.4` and add a key named `PlayerDebugMode` of type String and value `1`.
+ - On Mac, open the file `~/Library/Preferences/com.adobe.CSXS.8.plist` and add a row with key `PlayerDebugMode` of type String and value `1`. You can edit `.plist` files using [Xcode](https://developer.apple.com/xcode/), [PList Edit](https://www.fatcatsoftware.com/plisteditpro/) or other applications suited to edit [Property Lists](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/PropertyLists/Introduction/Introduction.html).
+ - On Windows, using its [registry editor](https://support.microsoft.com/en-au/help/4027573/windows-open-registry-editor-in-windows-10) open the registry key `HKEY_CURRENT_USER/Software/Adobe/CSXS.8` and add a key named `PlayerDebugMode` of type String and value `1`.
 
 If you have multiple CSXS versions installed, add the `PlayerDebugMode` to all of them.
 
@@ -75,8 +75,9 @@ From here, you can open the document on the Bookalope website to revisit and adj
 
 Writing an Adobe CEP extension requires documentation which is not always readily available. However, some useful resources are:
 
- - The Adobe CEP resources on Github is [here](https://github.com/Adobe-CEP/CEP-Resources),
- - The ExtendScript documentation is [here](http://www.indesignjs.de/extendscriptAPI/indesign-latest/),
- - Davide Barranca’s [blog](https://www.davidebarranca.com/category/code/) contains useful tips.
+ - The Adobe CEP resources on Github is [here](https://github.com/Adobe-CEP/CEP-Resources);
+ - The ExtendScript documentation is [here](http://www.indesignjs.de/extendscriptAPI/indesign-latest/);
+ - Davide Barranca’s [blog](https://www.davidebarranca.com/category/code/) contains useful tips;
+ - Adobe CEP extensions’s UI should be styled using [CEP Spectrum Boilerplate](https://github.com/Hennamann/CEP-Spectrum-Boilerplate) or [Topcoat](https://github.com/topcoat/topcoat).
 
 In addition to the above, the [InDesign Scripting Forum](https://forums.adobe.com/community/indesign/indesign_scripting) might be useful, or the [#cep channel on Slack](https://adobedevs.slack.com/messages/C1FKLQ63F) is a playground to many experienced developers.

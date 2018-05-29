@@ -201,7 +201,7 @@ function showStatus(text) {
  */
 
 function showStatusOk() {
-    showStatus("Ok (β 0.9.3)");
+    showStatus("Ok (β 0.9.4)");
 }
 
 
