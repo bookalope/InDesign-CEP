@@ -40,6 +40,11 @@ function getConfiguration() {
 
 function setDefaultStyle(doc) {
 
+    // Set the measurement units and ruler origin for the document to points.
+    doc.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.points;
+    doc.viewPreferences.verticalMeasurementUnits = MeasurementUnits.points;
+    doc.viewPreferences.rulerOrigin = RulerOrigin.pageOrigin;
+
     /**
      * Helper function: get (if exists) or create (if doesn't exist) a named paragraph
      * style for this document. This function is currently unused.
@@ -52,10 +57,7 @@ function setDefaultStyle(doc) {
 
     function getParagraphStyle(name) {
         var paragraphStyle = doc.paragraphStyles.item(name);
-        try {
-            var  n = paragraphStyle.name;
-        }
-        catch (error) {
+        if (!paragraphStyle.isValid) {
             paragraphStyle = doc.paragraphStyles.add({name: name});
         }
         return paragraphStyle;
@@ -65,61 +67,85 @@ function setDefaultStyle(doc) {
     // Get a reference to the master spread.
     var masterSpread = doc.masterSpreads.item(0);
 
-    // Get left (verso) and right (recto) pages.
+    // Get the left (verso) page of the document and set it up...
     var masterLeftPage = masterSpread.pages.item(0);
+
+    // ...page margins, ...
+    masterLeftPage.marginPreferences.properties = {
+        left: 84,
+        top: 70,
+        right: 70,
+        bottom: 78,
+    };
+
+    // ...footer with an automatically incrementing page number, ...
+    var footer = masterLeftPage.textFrames.add();
+    footer.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
+    footer.properties = {
+        // label: "",
+        geometricBounds: [728, 70, 742, 528],
+        contents: SpecialCharacters.autoPageNumber,
+    };
+    footer.parentStory.characters.item(0).properties = {
+        pointSize: 11,
+        leading: 14,
+        justification: Justification.leftAlign,
+    };
+
+    // ...main text frame to flow the page content.
+    var textFrame = masterLeftPage.textFrames.add();
+    textFrame.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
+    //textFrame.textFramePreferences.textColumnCount =
+    //textFrame.textFramePreferences.textColumnGutter =
+    textFrame.properties = {
+        label: "BodyTextFrame",
+        geometricBounds: [70, 70, 714, 528],
+    };
+
+    // Get the right (recto) page of the document and set it up...
     var masterRightPage = masterSpread.pages.item(1);
 
-    // Set up left (verso) and right (recto) page elements, and link the text
-    // frame of both pages together to flow their content.
-    with (masterLeftPage) {
-        marginPreferences.left = 84;
-        marginPreferences.top = 70;
-        marginPreferences.right = 70;
-        marginPreferences.bottom = 78;
+    // ...page margins, ...
+    masterRightPage.marginPreferences.properties = {
+        left: 84,
+        top: 70,
+        right: 70,
+        bottom: 78,
+    };
 
-        var footer = textFrames.add();
-        footer.geometricBounds = [728, 70, 742, 528];
-        footer.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
-        footer.contents = SpecialCharacters.autoPageNumber;
-        footer.parentStory.characters.item(0).pointSize = 11;
-        footer.parentStory.characters.item(0).leading = 14;
+    // ...footer with an automatically incrementing page number, ...
+    footer = masterRightPage.textFrames.add();
+    footer.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
+    footer.properties = {
+        // label: "",
+        geometricBounds: [728, 84, 742, 542],
+        contents: SpecialCharacters.autoPageNumber,
+    };
+    footer.parentStory.characters.item(0).properties = {
+        pointSize: 11,
+        leading: 14,
+        justification: Justification.rightAlign,
+    };
 
-        var textFrame = textFrames.add();
-        textFrame.geometricBounds = [70, 70, 714, 528];
-        textFrame.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
-        //textFrame.textFramePreferences.textColumnCount =
-        //textFrame.textFramePreferences.textColumnGutter =
-        textFrame.label = "BodyTextFrame";
-    }
-    with (masterRightPage) {
-        marginPreferences.left = 84;
-        marginPreferences.top = 70;
-        marginPreferences.right = 70;
-        marginPreferences.bottom = 78;
+    // ...main text frame to flow the page content.
+    textFrame = masterRightPage.textFrames.add();
+    textFrame.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
+    //textFrame.textFramePreferences.textColumnCount =
+    //textFrame.textFramePreferences.textColumnGutter =
+    textFrame.properties = {
+        label: "BodyTextFrame",
+        geometricBounds: [70, 84, 714, 542],
+    };
 
-        var footer = textFrames.add();
-        footer.geometricBounds = [728, 84, 742, 542];
-        footer.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
-        footer.contents = SpecialCharacters.autoPageNumber;
-        footer.parentStory.characters.item(0).pointSize = 11;
-        footer.parentStory.characters.item(0).leading = 14;
-        footer.parentStory.characters.item(0).justification = Justification.rightAlign;
-
-        var textFrame = textFrames.add();
-        textFrame.geometricBounds = [70, 84, 714, 542];
-        textFrame.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
-        //textFrame.textFramePreferences.textColumnCount =
-        //textFrame.textFramePreferences.textColumnGutter =
-        textFrame.label = "BodyTextFrame";
-    }
+    // Link the main text frames on both pages together.
     masterLeftPage.textFrames.item(0).nextTextFrame = masterRightPage.textFrames.item(0);
 
     // Set a baseline grid for the document.
-    with (doc.gridPreferences) {
-        baselineDivision = 14;
-        baselineStart = 70;
-        baselineGridShown = true;
-    }
+    doc.gridPreferences.properties = {
+        baselineDivision: 14,
+        baselineStart: 70,
+        baselineGridShown: true,
+    };
 }
 
 
@@ -221,13 +247,16 @@ function bookalopeCreateDocument(icmlFileName, bookId, bookflowId) {
     // Create and add a new document.
     var bookalopeDocument = app.documents.add();
 
-    // Set the measurement units and ruler origin for the document to points.
-    bookalopeDocument.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.points;
-    bookalopeDocument.viewPreferences.verticalMeasurementUnits = MeasurementUnits.points;
-    bookalopeDocument.viewPreferences.rulerOrigin = RulerOrigin.pageOrigin;
+    // Save the current view preferences of the document. (Does this create a deep copy
+    // of the preferences or just keep a reference, in which case the next lines might
+    // still trash the properties!)
+    var currentViewPrefs = bookalopeDocument.viewPreferences.properties;
 
     // Set the styling of the master spread of this document.
     setDefaultStyle(bookalopeDocument);
+
+    // Restore the saved view preferences.
+    bookalopeDocument.viewPreferences.properties = currentViewPrefs;
 
     // New page and text frame in the document based on the master spread.
     var masterSpread = bookalopeDocument.masterSpreads.item(0);
