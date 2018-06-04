@@ -201,7 +201,7 @@ function showStatus(text) {
  */
 
 function showStatusOk() {
-    showStatus("Ok (β 0.9.4)");
+    showStatus("Ok (β 0.9.5)");
 }
 
 
@@ -232,51 +232,77 @@ function clearErrors() {
  * @returns {Promise}
  */
 
-function saveBookflowFile(bookflow, format, filename) {
+function saveBookflowFile(bookflow, format, style, version, filename) {
 
     // Create and return a new Promise.
     return new Promise(function (resolve, reject) {
 
         // Call the Bookflow's convert function, which itself returns a Promise. The returned
-        // Promise is fulfilled with a Blob containing the converted document, or rejected
-        // with a BookalopeError.
-        bookflow.convert(format)
-        .then(function (blob) {
+        // Promise is fulfilled with the Booklow ready for waiting, or rejected with a BookalopeError.
+        bookflow.convert(format, style, version)
+        .then(function (bookflow) {
 
-            // Read the Blob's data as a data URL: a MIME header with Base64 encoded content.
-            var reader = new FileReader();
-            reader.addEventListener("loadend", function () {
+            // Conversion is triggered on the server, now check periodically the status of the
+            // conversion until it has succeeded or failed.
+            var intervalID = setInterval(function (bookflow) {
+                bookflow.convert_status(format, style, version)
+                .then(function (status_) {
 
-                // If an error occurred we reject the Promise we made, else we carry on saving the file..
-                if (reader.error) {
-                    reject("Failed to read Bookalope data (" + reader.error.name + ")");
-                } else {
+                    // Conversion succeeded, now download and save the converted file.
+                    if (status_ === "ok") {
+                        clearInterval(intervalID);
+                        bookflow.convert_download(format, style, version)
+                        .then(function (blob) {
 
-                    // A returned data URL must match this pattern.
-                    var matches = reader.result.match(/data:(.*);base64,(.*)/);
-                    if (matches) {
+                            // Read the Blob's data as a data URL: a MIME header with Base64 encoded content.
+                            var reader = new FileReader();
+                            reader.addEventListener("loadend", function () {
 
-                        // Get the MIME type of the content, and the Base64 encoded content data.
-                        var mime = matches[1];
-                        var data = matches[2];
+                                // If an error occurred we reject the Promise we made, else we carry on saving the file..
+                                if (reader.error) {
+                                    reject("Failed to read Bookalope data (" + reader.error.name + ")");
+                                } else {
 
-                        // Write the content data. If all goes well, fulfill the Promise we made
-                        // or reject it if writing failed.
-                        var result = window.cep.fs.writeFile(filename, data, window.cep.encoding.Base64);
-                        if (result.err) {
-                            reject("Failed to write file (" + result.err + ")");
-                        } else {
-                            resolve(filename);
-                        }
+                                    // A returned data URL must match this pattern.
+                                    var matches = reader.result.match(/data:(.*);base64,(.*)/);
+                                    if (matches) {
+
+                                        // Get the MIME type of the content, and the Base64 encoded content data.
+                                        var mime = matches[1];
+                                        var data = matches[2];
+
+                                        // Write the content data. If all goes well, fulfill the Promise we made
+                                        // or reject it if writing failed.
+                                        var result = window.cep.fs.writeFile(filename, data, window.cep.encoding.Base64);
+                                        if (result.err) {
+                                            reject("Failed to write file (" + result.err + ")");
+                                        } else {
+                                            resolve(filename);
+                                        }
+                                    } else {
+                                        reject("Malformed data returned from Bookalope");
+                                    }
+                                }
+                            });
+                            reader.readAsDataURL(blob);
+                        })
+                        .catch(function (error) {
+                            reject(error);
+                        });
+                    } else if (status_ === "failed" || status_ === "na") {
+                        clearInterval(intervalID);
+                        reject(new BookalopeError("Failed to convert document to " + format + "/" + style + "(" + version + ")"));
                     } else {
-                        reject("Malformed data returned from Bookalope");
+                        // Do nothing and keep waiting.
                     }
-                }
-            });
-            reader.readAsDataURL(blob);
+                })
+                .catch(function (error) {
+                  reject(error);
+                });
+            }, 5000, bookflow);
         })
         .catch(function (error) {
-            reject(error.message);
+            reject(error);
         });
     });
 }
@@ -291,7 +317,7 @@ function saveBookflowFile(bookflow, format, filename) {
  * @param {string} format - Convert the given document to this format.
  */
 
-function askSaveBookflowFile(bookflow, format) {
+function askSaveBookflowFile(bookflow, format, style, version) {
     showStatus("Converting and downloading Bookalope file");
     showSpinner();
 
@@ -305,7 +331,7 @@ function askSaveBookflowFile(bookflow, format) {
     } else {
 
         // Save the downloaded file to the local host filesystem.
-        saveBookflowFile(bookflow, format, result.data)
+        saveBookflowFile(bookflow, format, style, version, result.data)
         .then(function (filename) {
             showStatusOk();
             hideSpinner();
@@ -387,15 +413,15 @@ function askSaveBookflowFile(bookflow, format) {
             return false;
         });
         addClickListener(document.getElementById("a-bookalope-epub"), function () {
-            askSaveBookflowFile(bookflow, "epub");
+            askSaveBookflowFile(bookflow, "epub", "default", "test");
             return false;
         });
         addClickListener(document.getElementById("a-bookalope-mobi"), function () {
-            askSaveBookflowFile(bookflow, "mobi");
+            askSaveBookflowFile(bookflow, "mobi", "default", "test");
             return false;
         });
         addClickListener(document.getElementById("a-bookalope-pdf"), function () {
-            askSaveBookflowFile(bookflow, "pdf");
+            askSaveBookflowFile(bookflow, "pdf", "default", "test");
             return false;
         });
     }
@@ -420,7 +446,7 @@ function askSaveBookflowFile(bookflow, format) {
         var fname = "idsn-" + time.toString(16).slice(-8) + "-" + rnd.toString(16).slice(-8);
 
         // Convert the given Bookflow's document to ICML, and save it as a temporary file.
-        saveBookflowFile(bookflow, "icml", config.tmp + "/" + fname + ".icml")
+        saveBookflowFile(bookflow, "icml", "default", "test", config.tmp + "/" + fname + ".icml")
         .then(function (filename) {
             showStatus("Building InDesign document");
 
@@ -455,7 +481,9 @@ function askSaveBookflowFile(bookflow, format) {
     /**
      * Given the Bookflow, read and upload the document file and some additional Bookflow
      * information to Bookalope. Uploading will trigger the analysis and content extraction.
-     * Once that's succeeded, continue to download the ICML for this document.
+     * Then wait until the Bookflow step changes from 'processing' to 'convert' which indicates
+     * successful analysis; 'processing-failed' would indicate that the analysis failed. Once
+     * the analysis succeeded, continue to convert and download the ICML for this document.
      *
      * @param {Bookflow} bookflow - The Bookflow.
      *
@@ -476,7 +504,30 @@ function askSaveBookflowFile(bookflow, format) {
             // it (again) before shipping it off to the server.
             bookflow.setDocument(bookFile.name, atob(result.data))
             .then(function (bookflow) {
-                convert(bookflow);
+
+                // Periodically poll the Bookalope server to update the Bookflow. Then check
+                // the step property for the current processing status of the Bookalope, and
+                // act accordingly.
+                var intervalID = setInterval(function (bookflow) {
+                    bookflow.update()
+                    .then(function (bookflow) {
+                        if (bookflow.step === "processing") {
+                            // Bookalope is still processing, keep waiting.
+                        } else if (bookflow.step === "processing_failed") {
+                            clearInterval(intervalID);
+                            showServerError("Bookalope failed to process the document");
+                            hideSpinner();
+                        } else if (bookflow.step === "convert") {
+                            clearInterval(intervalID);
+                            convert(bookflow);
+                        }
+                    })
+                    .catch(function (error) {
+                        clearInterval(intervalID);
+                        showServerError(error.message);
+                        hideSpinner();
+                    });
+                }, 5000, bookflow);
             })
             .catch(function (error) {
                 showServerError(error.message);
@@ -542,7 +593,7 @@ function askSaveBookflowFile(bookflow, format) {
         if (bookFile === undefined) {
             showElementError(document.getElementById("input-file"), "Field is required");
         }
-        else if (bookFile.size > 12582912) { // 12MiB
+        else if (bookFile.size > 268435456) { // 256MiB
             showElementError(document.getElementById("input-file"), "File size exceeded 12Mb");
         }
         else if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {
