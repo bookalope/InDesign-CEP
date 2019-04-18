@@ -1066,7 +1066,7 @@ Bookflow.prototype.getDocument = function() {
  * @returns {Promise}
  */
 
-Bookflow.prototype.setDocument = function(filename, file) {
+Bookflow.prototype.setDocument = function(filename, file, filetype="doc") {
   var bookflow = this;
   var bookalope = bookflow._bookalope;
 
@@ -1077,7 +1077,7 @@ Bookflow.prototype.setDocument = function(filename, file) {
       var url = bookflow.url + "/files/document";
       var params = {
         filename: filename,
-        filetype: "doc",
+        filetype: filetype,
         file: btoa(file)
       };
       bookalope.httpPOST(url, params)
