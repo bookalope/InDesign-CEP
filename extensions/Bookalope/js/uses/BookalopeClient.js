@@ -1066,9 +1066,11 @@ Bookflow.prototype.getDocument = function() {
  * @returns {Promise}
  */
 
-Bookflow.prototype.setDocument = function(filename, file, filetype="doc") {
+Bookflow.prototype.setDocument = function(filename, file, filetype) {
   var bookflow = this;
   var bookalope = bookflow._bookalope;
+
+  filetype = filetype || "doc";
 
   return new Promise(function(resolve, reject) {
     if (bookflow.step !== "files") {

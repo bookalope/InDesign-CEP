@@ -88,15 +88,21 @@ function setBookalopeAPIToken(token) {
 function showUpload() {
 
     // Reset configuration fields.
+    document.getElementById("input-bookalope-beta").checked = false;
     document.getElementById("input-file").value = "";
     document.getElementById("input-book-name").value = "";
     document.getElementById("input-book-author").value = "";
+    document.getElementById("input-book-language").value = "";
+    document.getElementById("input-book-copyright").value = "";
+    document.getElementById("input-book-pubdate").valueAsDate = new Date();
+    document.getElementById("input-book-isbn").value = "";
+    document.getElementById("input-book-publisher").value = "";
     document.getElementById("input-book-version").checked = false;
     document.getElementById("input-book-autoclean").checked = true;
     document.getElementById("input-book-highlight-issues").checked = false;
 
-    document.getElementById("bookalope-upload").style.display = "block";
-    document.getElementById("bookalope-update").style.display = "none";
+    document.getElementById("bookalope-upload").classList.remove("hidden");
+    document.getElementById("bookalope-update").classList.add("hidden");
 }
 
 
@@ -110,8 +116,8 @@ function showUpload() {
  */
 
 function showUpdate() {
-    document.getElementById("bookalope-upload").style.display = "none";
-    document.getElementById("bookalope-update").style.display = "block";
+    document.getElementById("bookalope-upload").classList.add("hidden");
+    document.getElementById("bookalope-update").classList.remove("hidden");
 }
 
 
@@ -120,7 +126,7 @@ function showUpdate() {
  */
 
 function showSpinner() {
-    document.getElementById("spinner").style.display = "block";
+    document.getElementById("spinner").classList.remove("hidden");
 }
 
 
@@ -129,7 +135,7 @@ function showSpinner() {
  */
 
 function hideSpinner() {
-    document.getElementById("spinner").style.display = "none";
+    document.getElementById("spinner").classList.add("hidden");
 }
 
 
@@ -138,14 +144,14 @@ function hideSpinner() {
  * a given message of the given class into that message box.
  *
  * @param {string} message - The message to be displayed.
- * @param {string} msgClass - One of two CSS class names, "status-type-info" or "status-type-error".
+ * @param {string} msgClass - One of two CSS class names, "spectrum-StatusLight--celery" or "spectrum-StatusLight--negative".
  */
 
 function showMessage(message, msgClass) {
     var messageBox = document.getElementById("status-message-box");
-    messageBox.classList.remove("status-type-info", "status-type-error");
+    messageBox.classList.remove("spectrum-StatusLight--celery", "spectrum-StatusLight--negative");
     messageBox.classList.add(msgClass);
-    messageBox.children[0].innerHTML = message;
+    messageBox.innerHTML = message;
 }
 
 
@@ -158,8 +164,8 @@ function showMessage(message, msgClass) {
  */
 
 function showElementError(element, text) {
-    element.closest(".form-row").classList.add("error-row");
-    showMessage("Error: " + text, "status-type-error");
+    element.classList.add("is-invalid");
+    showMessage("Error: " + text, "spectrum-StatusLight--negative");
 }
 
 
@@ -170,7 +176,7 @@ function showElementError(element, text) {
  */
 
 function showClientError(text) {
-    showMessage("InDesign client error: " + text, "status-type-error");
+    showMessage("InDesign client error: " + text, "spectrum-StatusLight--negative");
 }
 
 
@@ -181,7 +187,7 @@ function showClientError(text) {
  */
 
 function showServerError(text) {
-    showMessage("Bookalope server error: " + text, "status-type-error");
+    showMessage("Bookalope server error: " + text, "spectrum-StatusLight--negative");
 }
 
 
@@ -192,7 +198,7 @@ function showServerError(text) {
  */
 
 function showStatus(text) {
-    showMessage("Status: " + text, "status-type-info");
+    showMessage("Status: " + text, "spectrum-StatusLight--celery");
 }
 
 
@@ -213,9 +219,9 @@ function showStatusOk() {
 function clearErrors() {
     // Grumble. No .forEach() for HTMLCollections, but instead we need to iterate the olden ways.
     // https://stackoverflow.com/questions/22754315/for-loop-for-htmlcollection-elements#22754453
-    var elements = document.getElementsByClassName("form-row");
+    var elements = document.getElementsByClassName("is-invalid");
     for (var count = 0; count < elements.length; count += 1) {
-        elements[count].classList.remove("error-row");
+        elements[count].classList.remove("is-invalid");
     }
     showStatusOk();
 }
@@ -297,7 +303,7 @@ function saveBookflowFile(bookflow, format, style, version, filename) {
                     }
                 })
                 .catch(function (error) {
-                  reject(error);
+                    reject(error);
                 });
             }, 5000, bookflow);
         })
@@ -353,8 +359,14 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
     // Tis where we keep the current inputs from the panel.
     var bookFile;
+    var bookVersionBeta;
     var bookName;
     var bookAuthor;
+    var bookLanguage;
+    var bookCopyright;
+    var bookPubDate;
+    var bookIsbn;
+    var bookPublisher;
     var bookVersion;
     var bookAutoClean;
     var bookHighlightIssues;
@@ -369,7 +381,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
     function getBookalope() {
         if (bookalope === undefined) {
-            bookalope = new BookalopeClient(bookalopeToken);
+            bookalope = new BookalopeClient(bookalopeToken, bookVersionBeta);
         }
         return bookalope;
         // bookalope || bookalope = new BookalopeClient(bookalopeToken)
@@ -412,18 +424,13 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             }
             return false;
         });
-        addClickListener(document.getElementById("a-bookalope-epub"), function () {
-            askSaveBookflowFile(bookflow, "epub", "default", "test");
+
+        addClickListener(document.getElementById("button-download"), function () {
+            var bookDownload = document.getElementById("input-book-download").value;
+            askSaveBookflowFile(bookflow, bookDownload, "default", "test");
             return false;
         });
-        addClickListener(document.getElementById("a-bookalope-mobi"), function () {
-            askSaveBookflowFile(bookflow, "mobi", "default", "test");
-            return false;
-        });
-        addClickListener(document.getElementById("a-bookalope-pdf"), function () {
-            askSaveBookflowFile(bookflow, "pdf", "default", "test");
-            return false;
-        });
+
     }
 
 
@@ -549,18 +556,19 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         // Get the BookalopeClient object.
         var bookalope = getBookalope();
 
+
         // Create a new Book, which then contains an empty Bookflow. That is the
         // Bookfow we'll work with. Note that the user will see both Book and Bookflow
         // when she logs into the website.
-        bookalope.createBook(bookName)
-        .then(function (book) {
-            var bookflow = book.bookflows[0];
-            uploadFile(bookflow);
-        })
-        .catch(function (error) {
-            showServerError(error.message);
-            hideSpinner();
-        });
+        // bookalope.createBook(bookName)
+        // .then(function (book) {
+        //     var bookflow = book.bookflows[0];
+        //     uploadFile(bookflow);
+        // })
+        // .catch(function (error) {
+        //     showServerError(error.message);
+        //     hideSpinner();
+        // });
     }
 
 
@@ -578,9 +586,15 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         setBookalopeAPIToken(bookalopeToken);
 
         // Get the values from the form fields.
+        bookVersionBeta = document.getElementById("input-bookalope-beta").checked;
         bookFile = document.getElementById("input-file").files[0];
         bookName = document.getElementById("input-book-name").value;
         bookAuthor = document.getElementById("input-book-author").value;
+        bookCopyright = document.getElementById("input-book-copyright").value;
+        bookLanguage = document.getElementById("input-book-language").value;
+        bookPubDate = document.getElementById("input-book-pubdate").value;
+        bookIsbn = document.getElementById("input-book-isbn").value;
+        bookPublisher = document.getElementById("input-book-publisher").value;
         bookVersion = document.getElementById("input-book-version").checked;
         bookAutoClean = document.getElementById("input-book-autoclean").checked;
         bookHighlightIssues = document.getElementById("input-book-highlight-issues").checked;
@@ -590,21 +604,26 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         // Check for errors of the input fields. If everything is good then
         // upload the document to Bookalope for conversion.
-        if (bookFile === undefined) {
+        if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {
+            showElementError(document.getElementById("input-bookalope-token"), "Field is required");
+            document.getElementById("input-bookalope-token").scrollIntoView(false);
+        }
+        else if (bookFile === undefined) {
             showElementError(document.getElementById("input-file"), "Field is required");
+            document.getElementById("input-book-name").scrollIntoView(false);
         }
         else if (bookFile.size > 268435456) { // 256MiB
             showElementError(document.getElementById("input-file"), "File size exceeded 12Mb");
-        }
-        else if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {
-            showElementError(document.getElementById("input-bookalope-token"), "Field is required");
+            document.getElementById("input-book-name").scrollIntoView(false);
         }
         else if (bookName.length === 0) {
             showElementError(document.getElementById("input-book-name"), "Field is required");
+            document.getElementById("input-book-name").scrollIntoView(false);
         }
-
-        // No errors, proceed.
-        createBook();
+        else {
+            // No errors, proceed.
+            createBook();
+        }
     }
 
 
@@ -660,22 +679,13 @@ function askSaveBookflowFile(bookflow, format, style, version) {
     }
 
 
-    /**
-     * Stub handler that is called when the user switches the InDesign color scheme.
-     *
-     * @param {Event} csEvent
-     */
-
-    function themeColorChangedEventHandler(csEvent) {
-        var hostEnv = window.__adobe_cep__.getHostEnvironment();
-        var skinInfo = JSON.parse(hostEnv).appSkinInfo;
-        // TODO Handle the theme manager event.
-    }
-
-
     // First things first: get some configuration information from the InDesign side.
     var config;
     var csInterface = new CSInterface();
+
+    // ThemeManager the InDesign color scheme
+    themeManager.init(csInterface);
+
     csInterface.evalScript("getConfiguration();", function (result) {
         config = JSON.parse(result);
 
@@ -705,7 +715,6 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             csInterface.addEventListener("documentAfterActivate", function (csEvent) {
                 switchPanel();
             });
-            csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, themeColorChangedEventHandler);
 
             // Register the callback for the Convert button.
             document.getElementById("button-send").addEventListener("click", function () {

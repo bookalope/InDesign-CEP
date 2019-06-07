@@ -33,15 +33,15 @@
                     <Geometry>
                         <Size>
                             <Width>400</Width>
-                            <Height>260</Height>
+                            <Height>360</Height>
                         </Size>
                         <MinSize>
                             <Width>400</Width>
-                            <Height>260</Height>
+                            <Height>360</Height>
                         </MinSize>
                         <MaxSize>
                             <Width>400</Width>
-                            <Height>260</Height>
+                            <Height>360</Height>
                         </MaxSize>
                     </Geometry>
                     <Icons>
