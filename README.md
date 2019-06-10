@@ -12,7 +12,7 @@ The extension requires and supports Adobe InDesign versions 11–13. However, th
 
 ## Coding
 
-Read a general introduction to writing an Adobe CEP extension [here](http://www.adobe.com/devnet/creativesuite/articles/a-short-guide-to-HTML5-extensions.html). For more information on the Bookalope API please refer to its [documentation on Github](https://github.com/jenstroeger/Bookalope).
+Read a general introduction to writing an Adobe CEP extension [here](http://www.adobe.com/devnet/creativesuite/articles/a-short-guide-to-HTML5-extensions.html), and a more in-depth documentation provides the [CEP Extension Cookbook](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_9.x/Documentation/CEP%209.0%20HTML%20Extension%20Cookbook.md). For more information on the Bookalope API please refer to its [documentation on Github](https://github.com/jenstroeger/Bookalope).
 
 InDesign does not load an extension unless the extension has been cryptographically signed. Therefore, in order to run the Bookalope extension from source, you need to switch InDesign to _PlayerDebugMode_:
 
