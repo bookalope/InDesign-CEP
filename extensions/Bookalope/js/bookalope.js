@@ -207,7 +207,7 @@ function showStatus(text) {
  */
 
 function showStatusOk() {
-    showStatus("Ok (β 0.9.5)");
+    showStatus("Ok (v1.0.0)");
 }
 
 
@@ -381,8 +381,10 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
     function getBookalope() {
         if (bookalope === undefined) {
-            bookalope = new BookalopeClient(bookalopeToken, bookVersionBeta);
+            bookalope = new BookalopeClient(bookalopeToken);
         }
+        bookalope.setToken(bookalopeToken);
+        bookalope.setHost(bookVersionBeta);
         return bookalope;
         // bookalope || bookalope = new BookalopeClient(bookalopeToken)
     }
@@ -560,15 +562,15 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         // Create a new Book, which then contains an empty Bookflow. That is the
         // Bookfow we'll work with. Note that the user will see both Book and Bookflow
         // when she logs into the website.
-        // bookalope.createBook(bookName)
-        // .then(function (book) {
-        //     var bookflow = book.bookflows[0];
-        //     uploadFile(bookflow);
-        // })
-        // .catch(function (error) {
-        //     showServerError(error.message);
-        //     hideSpinner();
-        // });
+        bookalope.createBook(bookName)
+        .then(function (book) {
+            var bookflow = book.bookflows[0];
+            uploadFile(bookflow);
+        })
+        .catch(function (error) {
+            showServerError(error.message);
+            hideSpinner();
+        });
     }
 
 
