@@ -2,15 +2,8 @@
 	display: none !important;
 }
 
-@font-face {
-	font-family: 'Noto Sans';
-	src: url("../font/NotoSans-Regular.ttf") format("truetype");
-	font-weight: normal;
-	font-style: normal;
-}
-
 body {
-	font-family: adobe-clean, "Noto Sans", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-family: adobe-clean, "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /*! Layout */
@@ -82,7 +75,7 @@ html, body {
 
 /*! Customize Components of the Spectrum-CSS */
 .spectrum {
-	font-family: adobe-clean, "Noto Sans", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-family: adobe-clean, "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .spectrum-Form {
@@ -104,7 +97,7 @@ html, body {
 
 .spectrum-Form--small {
 	border-spacing: 0 5px;
-	margin: 0;
+	margin: 0px 0;
 }
 
 .spectrum-Form-itemLabel {
@@ -287,8 +280,9 @@ html, body {
 	background-color: #080808;
 }
 
-.spectrum--light .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected), .spectrum--lightest .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected) {
-	background-color: #fff;
+.spectrum--light .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected),
+.spectrum--lightest .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected) {
+	background-color: white;
 }
 
 .spectrum-Menu-item.is-selected {
@@ -297,7 +291,8 @@ html, body {
 }
 
 /*! Components */
-.form__text, .form__nav {
+.form__text,
+.form__nav {
 	padding: 10px 0;
 }
 
