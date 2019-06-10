@@ -277,7 +277,7 @@ governing permissions and limitations under the License.
         dropdownItemLabel: 'spectrum-Menu-itemLabel',
         dropdownMenuDivider: 'spectrum-Menu-divider',
         dropdownTrigger: 'spectrum-Dropdown-trigger',
-        dropdownLabel: 'spectrum-Dropdown-label',
+        dropdownLabel: 'spectrum-Dropdown-label'
     };
 
     var STATE = {
@@ -285,7 +285,7 @@ governing permissions and limitations under the License.
         isSelected: 'is-selected',
         isDisabled: 'is-disabled',
         isOpen: 'is-open',
-        isDropUp: 'is-dropup',
+        isDropUp: 'is-dropup'
     };
 
     // Quick aliases and polyfills if needed
@@ -350,8 +350,11 @@ governing permissions and limitations under the License.
     }
 
 
-    function toggleOpenDropdown(dropdown) {
-      
+    function toggleOpenDropdown(dropdown, viewport) {
+
+        viewport = viewport || 'body';
+
+        var viewportEl = typeof viewport == 'object' ? viewport : dropdown.closest(viewport);
 
         if (dropdown.classList.contains(STATE.isOpen)) {
             closeDropdown(dropdown);
@@ -362,9 +365,8 @@ governing permissions and limitations under the License.
             closeAllDropdown(dropdown);
 
             var dropdownPopover = dropdown.querySelector('.' + CLASS_NAMES.dropdownPopover + '');
-            
-            var heightBody = query('body').offsetHeight;
-            var limit = dropdown.offsetTop + dropdown.offsetHeight + getHeight(dropdownPopover) > heightBody;
+
+            var limit = dropdown.offsetTop + dropdown.offsetHeight + getHeight(dropdownPopover) > viewportEl.offsetHeight + viewportEl.scrollTop && dropdown.offsetTop > getHeight(dropdownPopover);
 
             if (limit) dropdown.classList.add(STATE.isDropUp);
 
@@ -389,7 +391,8 @@ governing permissions and limitations under the License.
         }
     }
 
-    function initSelect(select) {
+    function initSelect(select, options) {
+
         var selectOptions = select.children,
             selectedIndex = select.selectedIndex,
             selectPlaceholder = select.getAttribute('data-placeholder') || 'Choose';
@@ -435,7 +438,7 @@ governing permissions and limitations under the License.
 
         dropdownTriggerHTML = '<button class="spectrum-FieldButton ' + CLASS_NAMES.dropdownTrigger + '" aria-haspopup="true">' +
             '<span class="spectrum-Dropdown-label is-placeholder">' + selectPlaceholder + '</span>' +
-            '<svg class="spectrum-Icon spectrum-UIIcon-ChevronDownMedium spectrum-Dropdown-icon" focusable="false" aria-hidden="true">' +
+            '<svg class="spectrum-Icon spectrum-UIIcon-ChevronDownMedium spectrum-Dropdown-icon" focusable="false">' +
             '<use xlink:href="#icon-ChevronDownMedium"/></svg></button>';
 
         dropdownHTML += dropdownTriggerHTML += dropdownPopoverHTML += '</div>';
@@ -516,19 +519,21 @@ governing permissions and limitations under the License.
         dropdownTrigger.addEventListener('click', function (ev) {
             ev.preventDefault();
             ev.stopPropagation();
-            toggleOpenDropdown(this.parentNode);
+            toggleOpenDropdown(this.parentNode, options.viewport);
         });
 
     }
 
 
     return {
-        init: function (selector) {
+        init: function (selector, options) {
+
+            options = options || {};
 
             var selectAll = typeof selector == 'object' ? selector : queryAll(selector);
 
             for (var count = 0; count < selectAll.length; count++) {
-                initSelect(selectAll[count]);
+                initSelect(selectAll[count], options);
             }
 
             // Clicking outside of the styled select box closes any open styled select boxes
