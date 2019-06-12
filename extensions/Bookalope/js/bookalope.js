@@ -636,7 +636,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         }
         else {
             // No errors, proceed.
-            //createBook();
+            createBook();
         }
     }
 
