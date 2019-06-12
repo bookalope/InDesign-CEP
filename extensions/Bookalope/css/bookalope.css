@@ -220,6 +220,11 @@ html, body {
 	opacity: 1;
 }
 
+.spectrum-Datepicker .spectrum-Datefield.is-invalid, .spectrum-Datepicker .spectrum-Datefield:invalid {
+	background-position: calc(100% - 35px) 50%;
+	padding-right: 60px;
+}
+
 .spectrum-Datepicker .spectrum-Datefield::-webkit-calendar-picker-indicator {
 	background: rgba(0, 0, 0, 0);
 	opacity: 0;
@@ -239,10 +244,6 @@ html, body {
 }
 
 .spectrum-Datepicker .spectrum-Datefield ::-webkit-inner-spin-button {
-	display: none;
-}
-
-.spectrum-Datepicker .spectrum-Datefield::-ms-clear {
 	display: none;
 }
 
@@ -314,22 +315,12 @@ html, body {
 	margin-top: 5px;
 }
 
-.spectrum--dark .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected) {
-	background-color: #252525;
-}
-
-.spectrum--darkest .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected) {
-	background-color: #080808;
-}
-
-.spectrum--light .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected),
-.spectrum--lightest .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected) {
-	background-color: white;
+.spectrum-Dropdown:not(.is-invalid) .spectrum-UIIcon-Alert {
+	display: none;
 }
 
 .spectrum-Menu-item.is-selected {
 	cursor: default;
-	pointer-events: none;
 }
 
 /*! Components */
@@ -372,6 +363,11 @@ html, body {
 	flex-shrink: 0;
 }
 
+.file__wrapper .spectrum-Dropdown-icon {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 .file__btn {
 	width: 100%;
 	display: -webkit-box;
@@ -393,14 +389,6 @@ html, body {
 	overflow: hidden;
 	position: absolute;
 	z-index: -1;
-}
-
-.file__input:invalid ~ .file__label, .file__input.is-invalid ~ .file__label {
-	padding-right: 42px;
-	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' height='18' viewBox='0 0 18 18' width='18'%3E%3Cpath style='fill:rgb%28227%2C 72%2C 80%29' d='M8.564 1.289L.2 16.256A.5.5 0 0 0 .636 17h16.728a.5.5 0 0 0 .5-.5.494.494 0 0 0-.064-.244L9.436 1.289a.5.5 0 0 0-.872 0zM10 14.75a.25.25 0 0 1-.25.25h-1.5a.25.25 0 0 1-.25-.25v-1.5a.25.25 0 0 1 .25-.25h1.5a.25.25 0 0 1 .25.25zm0-3a.25.25 0 0 1-.25.25h-1.5a.25.25 0 0 1-.25-.25v-6a.25.25 0 0 1 .25-.25h1.5a.25.25 0 0 1 .25.25z'/%3E%3C/svg%3E");
-	background-repeat: no-repeat;
-	background-size: 18px 18px;
-	background-position: calc(100% - 12px) 50%;
 }
 
 .file__loader {

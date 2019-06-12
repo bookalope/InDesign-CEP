@@ -165,6 +165,19 @@ function showMessage(message, msgClass) {
 
 function showElementError(element, text) {
     element.classList.add("is-invalid");
+    if (element.classList.contains('spectrum-Dropdown-input') === true || element.classList.contains('spectrum-Dropdown-select') === true) {
+        var controlDropdown = element.classList.contains('spectrum-Dropdown-input') === true ? element.closest('.spectrum-Dropdown') : element.nextSibling;
+        if (controlDropdown !== null) {
+            controlDropdown.classList.add("is-invalid");
+            controlDropdown.querySelector('.spectrum-Dropdown-trigger').classList.add("is-invalid");
+        }
+    }
+    else if (element.classList.contains('spectrum-Checkbox-input') === true) {
+        var controlCheckbox = element.closest('.spectrum-Checkbox');
+        if (controlCheckbox !== null) {
+            controlCheckbox.classList.add("is-invalid");
+        }
+    }
     showMessage("Error: " + text, "spectrum-StatusLight--negative");
 }
 
@@ -603,7 +616,6 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         // Hide error messages and clear out highlighted fields, if there are any.
         clearErrors();
-
         // Check for errors of the input fields. If everything is good then
         // upload the document to Bookalope for conversion.
         if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {
@@ -624,7 +636,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         }
         else {
             // No errors, proceed.
-            createBook();
+            //createBook();
         }
     }
 

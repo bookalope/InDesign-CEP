@@ -122,6 +122,24 @@
     CustomEvent.prototype = window.Event.prototype;
     window.CustomEvent = CustomEvent;
 
+
+    // See https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
+    if (!Element.prototype.matches) {
+        Element.prototype.matches = Element.prototype.msMatchesSelector ||
+            Element.prototype.webkitMatchesSelector;
+    }
+    if (!Element.prototype.closest) {
+        Element.prototype.closest = function (s) {
+            var el = this;
+
+            do {
+                if (el.matches(s)) return el;
+                el = el.parentElement || el.parentNode;
+            } while (el !== null && el.nodeType === 1);
+            return null;
+        };
+    }
+
     // Return true if any ancestor matches selector
     // Borrowed from ancestorMatches() from agave.js (MIT)
     function isAncestorOf(element, selector, includeSelf) {
@@ -170,9 +188,11 @@
 
     function toggleOpenDropdown(dropdown, viewport) {
 
-        viewport = viewport || 'body';
+        viewport = viewport || query('body');
 
         var viewportEl = typeof viewport == 'object' ? viewport : dropdown.closest(viewport);
+
+        if (viewportEl == null)viewportEl = query('body');
 
         if (dropdown.classList.contains(STATE.isOpen)) {
             closeDropdown(dropdown);
@@ -194,13 +214,16 @@
     }
 
     function closeDropdown(dropdown) {
-        dropdown.classList.remove('is-open');
-        dropdown.classList.remove('is-dropup');
-        dropdown.querySelector('.spectrum-Dropdown-popover').classList.remove('is-open');
+        dropdown.classList.remove(STATE.isOpen);
+        dropdown.classList.remove(STATE.isDropUp);
+        var dropdownPopover = dropdown.querySelector('.' + CLASS_NAMES.dropdownPopover + '');
+        if (dropdownPopover !== null) {
+            dropdownPopover.classList.remove(STATE.isOpen);
+        }
     }
 
     function closeAllDropdown(exception) {
-        var dropdownAll = queryAll('.spectrum-Dropdown');
+        var dropdownAll = queryAll('.' + CLASS_NAMES.dropdown + '');
         for (var i = 0; i < dropdownAll.length; i++) {
             var dropdown = dropdownAll[i];
             if (dropdown !== exception) {
@@ -217,13 +240,7 @@
 
         var id = select.getAttribute('id') || Math.random().toString(36).substr(2, 9);
 
-        // Even though the element is display: none, a11y users should still see it.
-        // According to http://www.w3.org/TR/wai-aria/states_and_properties#aria-hidden
-        // some browsers may have bugs with this but future implementation may improve
-        select.style.display = "none";
-        select.setAttribute('aria-hidden', "false");
-
-
+        select.classList.add('hidden');
 
         var dropdownHTML, dropdownPopoverHTML, dropdownTriggerHTML;
 
@@ -243,7 +260,7 @@
                 itemHTML = '';
 
             if (isPlaceholder) cssClass += ' ' + STATE.isPlaceholder;
-            if (option.selected === true) cssClass += ' ' +  STATE.isSelected;
+            if (option.selected === true) cssClass += ' ' + STATE.isSelected;
             if (option.disabled === true) cssClass += ' ' + STATE.isDisabled;
             if (!isDivider) itemHTML = '<span class="' + CLASS_NAMES.dropdownItemLabel + '">' + optionText + "</span>";
 
@@ -255,7 +272,8 @@
         dropdownPopoverHTML += '</ul></div>';
 
         dropdownTriggerHTML = '<button class="spectrum-FieldButton ' + CLASS_NAMES.dropdownTrigger + '" aria-haspopup="true">' +
-            '<span class="spectrum-Dropdown-label is-placeholder">' + selectPlaceholder + '</span>' +
+            '<span class="' + CLASS_NAMES.dropdownLabel + ' ' + STATE.isPlaceholder + '">' + selectPlaceholder + '</span>' +
+            '<svg class="spectrum-Icon spectrum-Icon--sizeS spectrum-UIIcon-Alert" focusable="false"><use xlink:href="#icon-AlertMedium"></use></svg>' +
             '<svg class="spectrum-Icon spectrum-UIIcon-ChevronDownMedium spectrum-Dropdown-icon" focusable="false">' +
             '<use xlink:href="#icon-ChevronDownMedium"/></svg></button>';
 
@@ -268,7 +286,10 @@
         var dropdown = query('.' + CLASS_NAMES.dropdown + '[data-id="' + id + '"]'),
             dropdownPopover = dropdown.querySelector('.' + CLASS_NAMES.dropdownPopover + ''),
             dropdownItems = dropdown.querySelectorAll('.' + CLASS_NAMES.dropdownItem + ''),
-            dropdownLabel = dropdown.querySelector('.' + CLASS_NAMES.dropdownLabel + '');
+            dropdownLabel = dropdown.querySelector('.' + CLASS_NAMES.dropdownLabel + ''),
+            dropdownTrigger = dropdown.querySelector('.' + CLASS_NAMES.dropdownTrigger + '');
+
+        if (select.disabled === true)dropdownTrigger.classList.add(STATE.isDisabled);
 
         var changeDropdownLabel = function (newValue, newLabel, isPlaceholder) {
                 dropdownLabel.textContent = newLabel;
@@ -281,6 +302,7 @@
                 dropdown.classList.remove(STATE.isOpen);
                 dropdownPopover.classList.remove(STATE.isOpen);
 
+                if (select.value === newValue)return;
 
                 var isPlaceholderValue = false;
 
@@ -304,7 +326,6 @@
                 // Send 'change' event to real select - to trigger any change event listeners
                 var changeEvent = new CustomEvent('change');
                 select.dispatchEvent(changeEvent);
-                select.dispatchEvent(changeEvent);
             };
 
 
@@ -323,7 +344,7 @@
                     newValue = target.getAttribute('data-value'),
                     newLabel = target.textContent;
 
-                changeSelectValue(newValue, newLabel)
+                changeSelectValue(newValue, newLabel);
             });
 
             var value = dropdownItem.getAttribute('data-value');
@@ -333,15 +354,14 @@
         }
 
         // Bind click handler function to dropdownTrigger
-        var dropdownTrigger = dropdown.querySelector('.' + CLASS_NAMES.dropdownTrigger + '');
         dropdownTrigger.addEventListener('click', function (ev) {
             ev.preventDefault();
             ev.stopPropagation();
-            toggleOpenDropdown(this.parentNode, options.viewport);
+            if (this.classList.contains(STATE.isDisabled) === false) {
+                toggleOpenDropdown(this.parentNode, options.viewport);
+            }
         });
-
     }
-
 
     return {
         init: function (selector, options) {

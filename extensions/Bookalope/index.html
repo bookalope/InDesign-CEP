@@ -59,15 +59,18 @@
 								</svg>
 							</label>
 							<div class="spectrum-Form-itemField">
-								<div class="file__wrapper">
-									<label class="file__btn" for="input-file">
+								<div class="file__wrapper spectrum-Dropdown">
+									<label class="file__btn spectrum-Dropdown-trigger" for="input-file">
 										<input type="file" name="input-book-file" id="input-file"
-										       class="file__input spectrum-Textfield" aria-invalid="false"
+										       class="file__input spectrum-Dropdown-input" aria-invalid="false"
 										       placeholder="Choose File">
-										<svg class="spectrum-Icon spectrum-Icon--sizeS" focusable="false">
+										<svg class="spectrum-Icon spectrum-Icon--sizeS spectrum-Dropdown-icon" focusable="false">
 											<use xlink:href="#icon-Attach"/>
 										</svg>
 										<span class="file__label spectrum-Dropdown-label is-placeholder">Choose File</span>
+										<svg class="spectrum-Icon spectrum-Icon--sizeS spectrum-UIIcon-Alert" focusable="false">
+											<use xlink:href="#icon-AlertMedium"></use>
+										</svg>
 									</label>
 								</div>
 							</div>
@@ -130,7 +133,7 @@
 								     aria-readonly="false" aria-required="false" aria-haspopup="true">
 									<input type="date" name="input-book-pubdate" id="input-book-pubdate"
 									       class="spectrum-Textfield spectrum-Datefield"
-									       aria-invalid="false" value="" placeholder="Choose a date">
+									       aria-invalid="false" placeholder="E.g. 16/01/2019">
 									<svg class="spectrum-Icon spectrum-Icon--sizeS spectrum-Datepicker-Icon"
 									     focusable="false">
 										<use xlink:href="#icon-Datepicker"/>
@@ -224,7 +227,6 @@
 						</button>
 					</div>
 				</div>
-
 
 				<div id="bookalope-update" class="hidden">
 					<div class="form__nav">
