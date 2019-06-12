@@ -369,10 +369,10 @@ function askSaveBookflowFile(bookflow, format, style, version) {
     // The BookalopeClient object that helps us talk to the server, and the Bookalope API token.
     var bookalope;
     var bookalopeToken;
+    var bookalopeBetaHost;
 
     // Tis where we keep the current inputs from the panel.
     var bookFile;
-    var bookVersionBeta;
     var bookName;
     var bookAuthor;
     var bookLanguage;
@@ -397,7 +397,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             bookalope = new BookalopeClient(bookalopeToken);
         }
         bookalope.setToken(bookalopeToken);
-        bookalope.setHost(bookVersionBeta);
+        bookalope.setHost(bookalopeBetaHost);
         return bookalope;
         // bookalope || bookalope = new BookalopeClient(bookalopeToken)
     }
@@ -605,8 +605,9 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         bookalopeToken = document.getElementById("input-bookalope-token").value.toLowerCase();
         setBookalopeAPIToken(bookalopeToken);
 
+        bookalopeBetaHost = document.getElementById("input-bookalope-beta").checked;
+
         // Get the values from the form fields.
-        bookVersionBeta = document.getElementById("input-bookalope-beta").checked;
         bookFile = document.getElementById("input-file").files[0];
         bookName = document.getElementById("input-book-name").value;
         bookAuthor = document.getElementById("input-book-author").value;
