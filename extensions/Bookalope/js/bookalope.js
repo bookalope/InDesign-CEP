@@ -446,6 +446,11 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             return false;
         });
 
+        addClickListener(document.getElementById("button-refresh"), function () {
+            convert(bookflow);
+            return false;
+        });
+
     }
 
 
@@ -579,10 +584,12 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         .then(function (book) {
             var bookflow = book.bookflows[0];
             uploadFile(bookflow);
+            console.log('then')
         })
         .catch(function (error) {
             showServerError(error.message);
             hideSpinner();
+            console.log('error', error)
         });
     }
 
