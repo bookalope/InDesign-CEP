@@ -165,6 +165,19 @@ function showMessage(message, msgClass) {
 
 function showElementError(element, text) {
     element.classList.add("is-invalid");
+    if (element.classList.contains('spectrum-Dropdown-input') === true || element.classList.contains('spectrum-Dropdown-select') === true) {
+        var controlDropdown = element.classList.contains('spectrum-Dropdown-input') === true ? element.closest('.spectrum-Dropdown') : element.nextSibling;
+        if (controlDropdown !== null) {
+            controlDropdown.classList.add("is-invalid");
+            controlDropdown.querySelector('.spectrum-Dropdown-trigger').classList.add("is-invalid");
+        }
+    }
+    else if (element.classList.contains('spectrum-Checkbox-input') === true) {
+        var controlCheckbox = element.closest('.spectrum-Checkbox');
+        if (controlCheckbox !== null) {
+            controlCheckbox.classList.add("is-invalid");
+        }
+    }
     showMessage("Error: " + text, "spectrum-StatusLight--negative");
 }
 
@@ -207,7 +220,7 @@ function showStatus(text) {
  */
 
 function showStatusOk() {
-    showStatus("Ok (β 0.9.5)");
+    showStatus("Ok (v1.0.0)");
 }
 
 
@@ -356,10 +369,10 @@ function askSaveBookflowFile(bookflow, format, style, version) {
     // The BookalopeClient object that helps us talk to the server, and the Bookalope API token.
     var bookalope;
     var bookalopeToken;
+    var bookalopeBetaHost;
 
     // Tis where we keep the current inputs from the panel.
     var bookFile;
-    var bookVersionBeta;
     var bookName;
     var bookAuthor;
     var bookLanguage;
@@ -381,8 +394,10 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
     function getBookalope() {
         if (bookalope === undefined) {
-            bookalope = new BookalopeClient(bookalopeToken, bookVersionBeta);
+            bookalope = new BookalopeClient(bookalopeToken);
         }
+        bookalope.setToken(bookalopeToken);
+        bookalope.setHost(bookalopeBetaHost);
         return bookalope;
         // bookalope || bookalope = new BookalopeClient(bookalopeToken)
     }
@@ -428,6 +443,11 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         addClickListener(document.getElementById("button-download"), function () {
             var bookDownload = document.getElementById("input-book-download").value;
             askSaveBookflowFile(bookflow, bookDownload, "default", "test");
+            return false;
+        });
+
+        addClickListener(document.getElementById("button-refresh"), function () {
+            convert(bookflow);
             return false;
         });
 
@@ -560,15 +580,15 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         // Create a new Book, which then contains an empty Bookflow. That is the
         // Bookfow we'll work with. Note that the user will see both Book and Bookflow
         // when she logs into the website.
-        // bookalope.createBook(bookName)
-        // .then(function (book) {
-        //     var bookflow = book.bookflows[0];
-        //     uploadFile(bookflow);
-        // })
-        // .catch(function (error) {
-        //     showServerError(error.message);
-        //     hideSpinner();
-        // });
+        bookalope.createBook(bookName)
+        .then(function (book) {
+            var bookflow = book.bookflows[0];
+            uploadFile(bookflow);
+        })
+        .catch(function (error) {
+            showServerError(error.message);
+            hideSpinner();
+        });
     }
 
 
@@ -585,8 +605,9 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         bookalopeToken = document.getElementById("input-bookalope-token").value.toLowerCase();
         setBookalopeAPIToken(bookalopeToken);
 
+        bookalopeBetaHost = document.getElementById("input-bookalope-beta").checked;
+
         // Get the values from the form fields.
-        bookVersionBeta = document.getElementById("input-bookalope-beta").checked;
         bookFile = document.getElementById("input-file").files[0];
         bookName = document.getElementById("input-book-name").value;
         bookAuthor = document.getElementById("input-book-author").value;
@@ -601,7 +622,6 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         // Hide error messages and clear out highlighted fields, if there are any.
         clearErrors();
-
         // Check for errors of the input fields. If everything is good then
         // upload the document to Bookalope for conversion.
         if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {

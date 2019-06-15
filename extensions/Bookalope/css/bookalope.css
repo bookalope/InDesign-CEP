@@ -1,186 +1,107 @@
-/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
-html {
-	line-height: 1.15;
-	-webkit-text-size-adjust: 100%
-}
-
-body {
-	margin: 0
-}
-
-main {
-	display: block
-}
-
-h1 {
-	font-size: 2em;
-	margin: 0.67em 0
-}
-
-hr {
-	-webkit-box-sizing: content-box;
-	box-sizing: content-box;
-	height: 0;
-	overflow: visible
-}
-
-pre {
-	font-family: monospace, monospace;
-	font-size: 1em
-}
-
-a {
-	background-color: transparent
-}
-
-abbr[title] {
-	border-bottom: none;
-	text-decoration: underline;
-	-webkit-text-decoration: underline dotted;
-	text-decoration: underline dotted
-}
-
-b, strong {
-	font-weight: bolder
-}
-
-code, kbd, samp {
-	font-family: monospace, monospace;
-	font-size: 1em
-}
-
-small {
-	font-size: 80%
-}
-
-sub, sup {
-	font-size: 75%;
-	line-height: 0;
-	position: relative;
-	vertical-align: baseline
-}
-
-sub {
-	bottom: -0.25em
-}
-
-sup {
-	top: -0.5em
-}
-
-img {
-	border-style: none
-}
-
-button, input, optgroup, select, textarea {
-	font-family: inherit;
-	font-size: 100%;
-	line-height: 1.15;
-	margin: 0
-}
-
-button, input {
-	overflow: visible
-}
-
-button, select {
-	text-transform: none
-}
-
-button, [type="button"], [type="reset"], [type="submit"] {
-	-webkit-appearance: button
-}
-
-button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="reset"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner {
-	border-style: none;
-	padding: 0
-}
-
-button:-moz-focusring, [type="button"]:-moz-focusring, [type="reset"]:-moz-focusring, [type="submit"]:-moz-focusring {
-	outline: 1px dotted ButtonText
-}
-
-fieldset {
-	padding: 0.35em 0.75em 0.625em
-}
-
-legend {
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	color: inherit;
-	display: table;
-	max-width: 100%;
-	padding: 0;
-	white-space: normal
-}
-
-progress {
-	vertical-align: baseline
-}
-
-textarea {
-	overflow: auto
-}
-
-[type="checkbox"], [type="radio"] {
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 0
-}
-
-[type="number"]::-webkit-inner-spin-button, [type="number"]::-webkit-outer-spin-button {
-	height: auto
-}
-
-[type="search"] {
-	-webkit-appearance: textfield;
-	outline-offset: -2px
-}
-
-[type="search"]::-webkit-search-decoration {
-	-webkit-appearance: none
-}
-
-::-webkit-file-upload-button {
-	-webkit-appearance: button;
-	font: inherit
-}
-
-details {
-	display: block
-}
-
-summary {
-	display: list-item
-}
-
-template {
-	display: none
-}
-
-[hidden] {
-	display: none
-}
-
-.hidden {
-	display: none !important
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 200;
+	font-style: normal;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-ExtraLight.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-ExtraLight.otf.woff") format("woff");
 }
 
 @font-face {
-	font-family: 'Noto Sans';
-	src: url("../font/NotoSans-Regular.ttf") format("truetype");
-	font-weight: normal;
-	font-style: normal
+	font-family: 'Source Sans Pro';
+	font-weight: 200;
+	font-style: italic;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-ExtraLightIt.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-ExtraLightIt.otf.woff") format("woff");
 }
 
-body {
-	font-family: adobe-clean, "Noto Sans", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 300;
+	font-style: normal;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-Light.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-Light.otf.woff") format("woff");
+}
+
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 300;
+	font-style: italic;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-LightIt.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-LightIt.otf.woff") format("woff");
+}
+
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 400;
+	font-style: normal;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-Regular.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-Regular.otf.woff") format("woff");
+}
+
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 400;
+	font-style: italic;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-It.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-It.otf.woff") format("woff");
+}
+
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 600;
+	font-style: normal;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-Semibold.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-Semibold.otf.woff") format("woff");
+}
+
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 600;
+	font-style: italic;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-SemiboldIt.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-SemiboldIt.otf.woff") format("woff");
+}
+
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 700;
+	font-style: normal;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-Bold.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-Bold.otf.woff") format("woff");
+}
+
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 700;
+	font-style: italic;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-BoldIt.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-BoldIt.otf.woff") format("woff");
+}
+
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 900;
+	font-style: normal;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-Black.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-Black.otf.woff") format("woff");
+}
+
+@font-face {
+	font-family: 'Source Sans Pro';
+	font-weight: 900;
+	font-style: italic;
+	font-stretch: normal;
+	src: url("../fonts/source-sans-pro/WOFF2/SourceSansPro-BlackIt.ttf.woff2") format("woff2"), url("../fonts/source-sans-pro/WOFF/SourceSansPro-BlackIt.otf.woff") format("woff");
+}
+
+.hidden {
+	display: none !important;
 }
 
 /*! Layout */
 html, body {
 	height: 100%;
-	position: relative
+	position: relative;
 }
 
 .panel {
@@ -195,7 +116,7 @@ html, body {
 	-webkit-box-orient: vertical;
 	-webkit-box-direction: normal;
 	-ms-flex-direction: column;
-	flex-direction: column
+	flex-direction: column;
 }
 
 .panel__body {
@@ -205,121 +126,84 @@ html, body {
 	overflow: hidden;
 	overflow-y: auto;
 	padding: 10px;
-	padding-bottom: 20px
+	padding-bottom: 20px;
 }
 
 .panel__body::-webkit-scrollbar {
-	width: 10px
+	width: 10px;
 }
 
 .panel__body::-webkit-scrollbar-track {
-	background: #f1f1f1
+	background: #f1f1f1;
 }
 
 .panel__body::-webkit-scrollbar-thumb {
-	background: #888
+	background: #888;
 }
 
 .panel__body::-webkit-scrollbar-thumb:hover {
-	background: #555
+	background: #555;
 }
 
 .panel__footer-rule {
-	margin: 0
+	margin: 0;
 }
 
 .panel__footer-status {
 	padding: 5px 10px;
-	height: auto;
-	line-height: normal;
-	font-weight: 500;
-	font-size: 12px
+	min-height: 0;
+	font-size: 13px;
 }
 
 .panel__footer-status:empty {
-	display: none
+	display: none;
 }
 
 .panel__footer-status:before {
-	margin-left: 0
+	margin-left: 0;
 }
 
 /*! Customize Components of the Spectrum-CSS */
-.spectrum {
-	font-family: adobe-clean, "Noto Sans", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif
-}
-
 .spectrum-Form {
 	width: 100%;
 	table-layout: fixed;
 	border-spacing: 0 10px;
-	margin: calc(5px * -1) 0
+	margin: -5px 0;
 }
 
-.spectrum-Form-itemField .spectrum-Dropdown-popover, .spectrum-Form-itemField .spectrum-Textfield, .spectrum-Form-itemField .spectrum-Dropdown {
-	width: 100%
+.spectrum-Form-itemField .spectrum-Dropdown-popover,
+.spectrum-Form-itemField .spectrum-Textfield,
+.spectrum-Form-itemField .spectrum-Dropdown {
+	width: 100%;
 }
 
 .spectrum-Form-itemField .spectrum-Dropdown-popover {
-	max-width: 100%
+	max-width: 100%;
 }
 
 .spectrum-Form--small {
 	border-spacing: 0 5px;
-	margin: calc(0px * -1) 0
+	margin: 0px 0;
 }
 
 .spectrum-Form-itemLabel {
-	font-weight: 500
+	letter-spacing: 0.1px;
 }
 
 .spectrum-FieldLabel--right, .spectrum-FieldLabel--left {
-	width: 35%
+	width: 30%;
 }
 
 .spectrum-FieldLabel--right + .spectrum-Form-itemField, .spectrum-FieldLabel--left + .spectrum-Form-itemField {
-	width: 65%
+	width: 70%;
 }
 
 .spectrum-Textfield {
-	height: 32px;
-	font-size: 13px;
-	font-weight: 500;
-	font-family: inherit
-}
-
-.spectrum-Textfield::-webkit-input-placeholder {
-	font-size: 13px;
-	font-weight: 400;
-	font-style: italic
-}
-
-.spectrum-Textfield::-moz-placeholder {
-	font-size: 13px;
-	font-weight: 400;
-	font-style: italic
-}
-
-.spectrum-Textfield:-ms-input-placeholder {
-	font-size: 13px;
-	font-weight: 400;
-	font-style: italic
-}
-
-.spectrum-Textfield::-ms-input-placeholder {
-	font-size: 13px;
-	font-weight: 400;
-	font-style: italic
-}
-
-.spectrum-Textfield::placeholder {
-	font-size: 13px;
-	font-weight: 400;
-	font-style: italic
+	font-family: inherit;
 }
 
 .spectrum-Datepicker {
-	position: relative
+	position: relative;
 }
 
 .spectrum-Datepicker-Icon {
@@ -329,11 +213,16 @@ html, body {
 	-webkit-transform: translateY(-50%);
 	-ms-transform: translateY(-50%);
 	transform: translateY(-50%);
-	opacity: .7
+	opacity: .7;
 }
 
 .spectrum-Datepicker:hover .spectrum-Datepicker-Icon {
-	opacity: 1
+	opacity: 1;
+}
+
+.spectrum-Datepicker .spectrum-Datefield.is-invalid, .spectrum-Datepicker .spectrum-Datefield:invalid {
+	background-position: calc(100% - 35px) 50%;
+	padding-right: 60px;
 }
 
 .spectrum-Datepicker .spectrum-Datefield::-webkit-calendar-picker-indicator {
@@ -344,63 +233,48 @@ html, body {
 	right: 0;
 	top: 0;
 	height: 100%;
-	z-index: 99;
-	width: 40px
+	z-index: 8;
+	width: 40px;
 }
 
 .spectrum-Datepicker .spectrum-Datefield::-webkit-clear-button {
-	position: absolute;
-	right: 60px
+	position: relative;
+	right: 30px;
+	z-index: 9;
 }
 
 .spectrum-Datepicker .spectrum-Datefield ::-webkit-inner-spin-button {
-	display: none
-}
-
-.spectrum-Datepicker .spectrum-Datefield::-ms-clear {
-	display: none
-}
-
-.spectrum-Button {
-	height: 32px
+	display: none;
 }
 
 .spectrum-Button--small {
-	font-size: 14px
+	font-size: 14px;
 }
 
 .spectrum-InputGroup {
-	min-width: 100%
+	min-width: 100%;
 }
 
 .spectrum-InputGroup .spectrum-FieldButton {
-	min-width: 44px
+	min-width: 44px;
 }
 
 .spectrum-FieldGroup-Button {
-	margin: 0 8px
+	margin: 0 8px;
 }
 
 .spectrum-FieldGroup-Button:last-child {
-	margin-right: 0
+	margin-right: 0;
 }
 
 .spectrum-FieldGroup--horizontal .spectrum-FieldGroup-Button {
 	-webkit-box-flex: 0;
 	-ms-flex: none;
-	flex: none
-}
-
-.spectrum-Dropdown-label {
-	font-size: 13px
-}
-
-.spectrum-Dropdown-label.is-placeholder {
-	font-size: 13px
+	flex: none;
 }
 
 .spectrum-Dropdown-label + .spectrum-Dropdown-label {
-	margin-left: 8px
+	margin-left: 8px;
 }
 
 .spectrum-Dropdown-popover {
@@ -409,15 +283,15 @@ html, body {
 	overflow: hidden;
 	overflow-y: auto;
 	margin-bottom: 5px;
-	display: none
+	display: none;
 }
 
 .spectrum-Dropdown-popover.is-open {
-	display: block
+	display: block;
 }
 
 .spectrum-Dropdown-popover .spectrum-Menu {
-	display: block
+	display: block;
 }
 
 .spectrum-Dropdown .spectrum-Dropdown-icon {
@@ -425,46 +299,38 @@ html, body {
 	transition: -webkit-transform 130ms ease-in-out;
 	-o-transition: transform 130ms ease-in-out;
 	transition: transform 130ms ease-in-out;
-	transition: transform 130ms ease-in-out, -webkit-transform 130ms ease-in-out
+	transition: transform 130ms ease-in-out, -webkit-transform 130ms ease-in-out;
 }
 
 .spectrum-Dropdown.is-open .spectrum-Dropdown-icon {
 	-webkit-transform: rotate(-180deg);
 	-ms-transform: rotate(-180deg);
-	transform: rotate(-180deg)
+	transform: rotate(-180deg);
 }
 
 .spectrum-Dropdown.is-dropup .spectrum-Dropdown-popover {
 	top: auto;
 	bottom: 100%;
 	margin-bottom: 0;
-	margin-top: 5px
+	margin-top: 5px;
 }
 
-.spectrum--dark .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected) {
-	background-color: #252525
-}
-
-.spectrum--darkest .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected) {
-	background-color: #080808
-}
-
-.spectrum--light .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected), .spectrum--lightest .spectrum-Dropdown-trigger:not(:active):not(:hover):not(.is-selected) {
-	background-color: #fff
+.spectrum-Dropdown:not(.is-invalid) .spectrum-UIIcon-Alert {
+	display: none;
 }
 
 .spectrum-Menu-item.is-selected {
 	cursor: default;
-	pointer-events: none
 }
 
 /*! Components */
-.form__text, .form__nav {
-	padding: 10px 0
+.form__text,
+.form__nav {
+	padding: 10px 0;
 }
 
 .form__nav {
-	text-align: right
+	text-align: right;
 }
 
 .spinner__wrapper {
@@ -474,7 +340,7 @@ html, body {
 	top: 0;
 	width: 100%;
 	height: 100%;
-	background: rgba(0, 0, 0, 0.6)
+	background: rgba(0, 0, 0, 0.6);
 }
 
 .spinner__wrapper .spinner {
@@ -483,18 +349,23 @@ html, body {
 	left: 50%;
 	-webkit-transform: translate(-50%, -50%);
 	-ms-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%)
+	transform: translate(-50%, -50%);
 }
 
 .file__wrapper {
 	position: relative;
-	max-width: 100%
+	max-width: 100%;
 }
 
 .file__wrapper .spectrum-Icon {
 	max-height: 100%;
 	-ms-flex-negative: 0;
-	flex-shrink: 0
+	flex-shrink: 0;
+}
+
+.file__wrapper .spectrum-Dropdown-icon {
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 .file__btn {
@@ -508,7 +379,7 @@ html, body {
 	-webkit-box-align: center;
 	-ms-flex-align: center;
 	align-items: center;
-	cursor: pointer
+	cursor: pointer;
 }
 
 .file__input {
@@ -517,19 +388,11 @@ html, body {
 	opacity: 0;
 	overflow: hidden;
 	position: absolute;
-	z-index: -1
-}
-
-.file__input:invalid ~ .file__label, .file__input.is-invalid ~ .file__label {
-	padding-right: 42px;
-	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' height='18' viewBox='0 0 18 18' width='18'%3E%3Cpath style='fill:rgb%28227%2C 72%2C 80%29' d='M8.564 1.289L.2 16.256A.5.5 0 0 0 .636 17h16.728a.5.5 0 0 0 .5-.5.494.494 0 0 0-.064-.244L9.436 1.289a.5.5 0 0 0-.872 0zM10 14.75a.25.25 0 0 1-.25.25h-1.5a.25.25 0 0 1-.25-.25v-1.5a.25.25 0 0 1 .25-.25h1.5a.25.25 0 0 1 .25.25zm0-3a.25.25 0 0 1-.25.25h-1.5a.25.25 0 0 1-.25-.25v-6a.25.25 0 0 1 .25-.25h1.5a.25.25 0 0 1 .25.25z'/%3E%3C/svg%3E");
-	background-repeat: no-repeat;
-	background-size: 18px 18px;
-	background-position: calc(100% - 12px) 50%
+	z-index: -1;
 }
 
 .file__loader {
-	display: none
+	display: none;
 }
 
 .file__loader {
@@ -538,5 +401,5 @@ html, body {
 	top: 50%;
 	-webkit-transform: translateY(-50%);
 	-ms-transform: translateY(-50%);
-	transform: translateY(-50%)
+	transform: translateY(-50%);
 }
