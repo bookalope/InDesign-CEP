@@ -789,4 +789,13 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         }
     });
 
+    // Load all SVG icons used by the extension so that they become available to the <svg> elements.
+    loadIcons("images/sprite-icons.svg");
+
+    // Once the DOM has been loaded, finish off a few elements.
+    document.addEventListener("DOMContentLoaded", function () {
+        selectCustomStyle.init(".spectrum-Dropdown-select", {viewport: ".panel__body"});
+        inputFileCustomStyle.init(".file__input");
+    });
+
 }());
