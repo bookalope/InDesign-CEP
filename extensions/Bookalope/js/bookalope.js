@@ -699,12 +699,52 @@ function askSaveBookflowFile(bookflow, format, style, version) {
     }
 
 
+    /**
+     * Given a skin info compute the matching color scheme and, if it has changed compared
+     * to the application's current scheme change to the new scheme.
+     */
+
+    function updateThemeWithAppSkinInfo(appSkinInfo) {
+
+        // Update the theme of the extension panel.
+        var theme = undefined;
+        var sentinelColor = appSkinInfo.panelBackgroundColor.color.red;
+        if (sentinelColor > 200) {
+            theme = "lightest";
+        } else if (sentinelColor > 180) {
+            theme = "light";
+        } else if (sentinelColor > 67) {
+            theme = "dark";
+        } else {
+            theme = "darkest";
+        }
+
+        // Based on the theme's name switch the CSS files accordingly.
+        var hostThemeEl = document.getElementById("hostTheme");
+        var hostEl = document.querySelector("body");
+        var curTheme = hostThemeEl.getAttribute("data-theme");
+        if (theme !== curTheme) {
+            hostThemeEl.setAttribute("data-theme", theme);
+            hostThemeEl.setAttribute("href", "css/spectrum/spectrum-" + theme + ".css");
+            hostEl.classList.remove("spectrum--" + curTheme);
+            hostEl.classList.add("spectrum--" + theme);
+        }
+    }
+
+
     // First things first: get some configuration information from the InDesign side.
     var config;
     var csInterface = new CSInterface();
 
-    // ThemeManager the InDesign color scheme
-    themeManager.init(csInterface);
+    // The ThemeManager handles the extension's color theme based on InDesign's scheme. So first
+    // get a latest HostEnvironment object from the application, and then install an event
+    // handler that's being called every time InDesign's color scheme changes.
+    updateThemeWithAppSkinInfo(csInterface.hostEnvironment.appSkinInfo);
+    csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, function (csEvent) {
+        var hostEnv = window.__adobe_cep__.getHostEnvironment();
+        var appSkinInfo = JSON.parse(hostEnv).appSkinInfo;
+        updateThemeWithAppSkinInfo(appSkinInfo);
+    });
 
     csInterface.evalScript("getConfiguration();", function (result) {
         config = JSON.parse(result);
