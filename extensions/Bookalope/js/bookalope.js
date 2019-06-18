@@ -781,6 +781,19 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                 uploadAndConvertDocument();
             });
 
+            // Register the callback for the File selection field that shows the selected
+            // file name or, if no file was selected, a default placeholder string.
+            document.getElementById("input-file").addEventListener("change", function (event) {
+                var label = this.parentNode.querySelector(".file__label");
+                if (this.files.length) {
+                    label.classList.remove("is-placeholder");
+                    label.textContent = event.target.value.split("\\").pop();
+                } else {
+                    label.classList.add("is-placeholder");
+                    label.textContent = this.getAttribute("placeholder");
+                }
+            });
+
             // And we're ready.
             showStatusOk();
 
@@ -795,7 +808,6 @@ function askSaveBookflowFile(bookflow, format, style, version) {
     // Once the DOM has been loaded, finish off a few elements.
     document.addEventListener("DOMContentLoaded", function () {
         selectCustomStyle.init(".spectrum-Dropdown-select", {viewport: ".panel__body"});
-        inputFileCustomStyle.init(".file__input");
     });
 
 }());
