@@ -1074,14 +1074,17 @@ Bookflow.prototype.getDocument = function() {
  * @async
  * @param {string} filename - The filename of the document.
  * @param {string} file - A byte array which will be Base64 encoded.
+ * @param {string} filetype - A supported file type: "doc", "epub", or "gutenberg".
+ * @param {boolean} skip_analysis - Whether Bookalope should skip structure analysis.
  * @returns {Promise}
  */
 
-Bookflow.prototype.setDocument = function(filename, file, filetype) {
+Bookflow.prototype.setDocument = function(filename, file, filetype, skip_analysis) {
   var bookflow = this;
   var bookalope = bookflow._bookalope;
 
   filetype = filetype || "doc";
+  skip_analysis = skip_analysis || false;
 
   return new Promise(function(resolve, reject) {
     if (bookflow.step !== "files") {
@@ -1091,7 +1094,8 @@ Bookflow.prototype.setDocument = function(filename, file, filetype) {
       var params = {
         filename: filename,
         filetype: filetype,
-        file: btoa(file)
+        file: btoa(file),
+        skip_analysis: skip_analysis
       };
       bookalope.httpPOST(url, params)
       .then(function(response) {

@@ -383,6 +383,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
     var bookVersion;
     var bookAutoClean;
     var bookHighlightIssues;
+    var bookSkipStructure;
 
 
     /**
@@ -529,7 +530,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             // Note that result.data is a base-64 encoded binary, so we have to decode it
             // before passing it to the Bookalope wrapper. The wrapper will then encode
             // it (again) before shipping it off to the server.
-            bookflow.setDocument(bookFile.name, atob(result.data))
+            bookflow.setDocument(bookFile.name, atob(result.data), "doc", bookSkipStructure)
             .then(function (bookflow) {
 
                 // Periodically poll the Bookalope server to update the Bookflow. Then check
@@ -619,6 +620,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         bookVersion = document.getElementById("input-book-version").checked;
         bookAutoClean = document.getElementById("input-book-autoclean").checked;
         bookHighlightIssues = document.getElementById("input-book-highlight-issues").checked;
+        bookSkipStructure = document.getElementById("input-book-skip-structure").checked;
 
         // Hide error messages and clear out highlighted fields, if there are any.
         clearErrors();
