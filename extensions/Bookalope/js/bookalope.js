@@ -794,6 +794,294 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                 }
             });
 
+            // Alright this is a funky Adobe Spectrum thing. Looking at the documentation for
+            // Dropdown elements: http://opensource.adobe.com/spectrum-css/2.13.0/docs/#dropdown
+            // then Spectrum switches a <select> element to `hidden` and instead uses its own
+            // implementation; however, it's required to keep the <select> element and to sync
+            // its <option> values with the Spectrum Dropdown to make sure that forms continue
+            // to work. A bit spunky, but that's how they do it, I guess 😳
+            // Note: we use the Javascript idiom here that declares an anonymous function and
+            // executes it, in order to use the function's closure.
+            (function () {
+
+                /**
+                 * Return true if the `element` itself or any of its ancestor elements match
+                 * the given `selector`; or false otherwise.
+                 */
+
+                function isAncestorOf(element, selector) {
+
+                    // If the element itself matches, then we're done already.
+                    if (element.matches(selector)) {
+                        return true;
+                    }
+
+                    // Ascend along the ancestor elements and check.
+                    // See https://developer.mozilla.org/en-US/docs/DOM/Node.nodeType
+                    var parent = element.parentNode;
+                    while (parent && parent.nodeType && parent.nodeType === 1) {
+                        if (parent.matches(selector)) {
+                            return true;
+                        }
+                        parent = parent.parentNode;
+                    }
+                    return false;
+                }
+
+                /**
+                 * Close the given Dropdown's popover element.
+                 */
+
+                function closeDropdown(dropdown) {
+                    dropdown.classList.remove("is-open");
+                    dropdown.classList.remove("is-dropup");
+                    var dropdownPopover = dropdown.querySelector(".spectrum-Dropdown-popover");
+                    if (dropdownPopover !== null) {
+                        // This should always exist, no?
+                        dropdownPopover.classList.remove("is-open");
+                    }
+                }
+
+                /**
+                 * Iterate over all Spectrum Dropdown elements and close their respective
+                 * popover elements. If an exception Dropdown is specified then do not close
+                 * its popover.
+                 */
+
+                function closeAllDropdowns(exception) {
+                    var dropdowns = document.querySelectorAll(".spectrum-Dropdown");
+                    for (var count = 0; count < dropdowns.length; count += 1) {
+                        dropdown = dropdowns[count];
+                        if (dropdown !== exception) {
+                            closeDropdown(dropdown);
+                        }
+                    }
+                }
+
+                // Here it goes. Iterate over all <select> elements in the documents (assuming
+                // that they have a class 'spectrum-Dropdown-select') and hide them; then
+                // create the Adobe Spectrum specific Dropdowns in their stead.
+                var dropdownSelects = document.querySelectorAll(".spectrum-Dropdown-select");
+                for (var count = 0; count < dropdownSelects.length; count += 1) {
+                    var select = dropdownSelects[count];
+
+                    /**
+                     * Change the current label of a Dropdown.
+                     */
+
+                    function changeDropdownLabel(newValue, newLabel, isPlaceholder) {
+                        dropdownLabel.textContent = newLabel;
+                        dropdownLabel.setAttribute("data-value", newValue);
+                        dropdownLabel.classList.toggle("is-placeholder", isPlaceholder === true);
+                    }
+
+                    /**
+                     * A new value was selected using the Dropdown, which now has to be propagated
+                     * to the original <select> element's option. This function takes care of that.
+                     */
+
+                    function changeSelectValue(newValue, newLabel) {
+
+                        // Close the Dropdown's popover.
+                        dropdown.classList.remove("is-open");
+                        dropdownPopover.classList.remove("is-open");
+
+                        // If the value hasn't changed, then do nothing and be done.
+                        if (select.value === newValue) {
+                            return;
+                        }
+
+                        // Find the Dropdown's data item which was selected and mark it; likewise
+                        // remove the selected mark from all other items in the Dropdown.
+                        var isPlaceholderValue = false;
+                        for (var count = 0; count < dropdownItems.length; count += 1) {
+                            var dropdownItem = dropdownItems[count];
+                            if (dropdownItem.getAttribute("data-value") === newValue) {
+                                dropdownItem.classList.add("is-selected");
+                                isPlaceholderValue = dropdownItem.classList.contains("is-placeholder");
+                            } else {
+                                dropdownItem.classList.remove("is-selected")
+                            }
+                        }
+
+                        // Show the selected value as the Dropdown's label.
+                        changeDropdownLabel(newValue, newLabel, isPlaceholderValue);
+
+                        // Update the original <select> element's value with the Dropdown's selected one.
+                        select.value = newValue;
+
+                        // Send a "change" event to the real <select> element to trigger any change
+                        // event listeners that might be attached.  TODO There aren't any currently.
+                        var changeEvent = new CustomEvent("change");
+                        select.dispatchEvent(changeEvent);
+                    }
+
+                    // Get the <select> element's options; its "placeholder" (which is the label shown
+                    // when no option is selected); and its id attribute.
+                    var selectOptions = select.children,
+                        selectPlaceholder = select.getAttribute("data-placeholder"),
+                        selectId = select.getAttribute("id");
+
+                    // Hide the original <select> element, but we need to keep it in the DOM to ensure
+                    // that its value is used by the outer form.
+                    select.classList.add("hidden");
+
+                    // Build the fancy-schmancy Spectrum Dropdown as an HTML string. For more details
+                    // on how this works, take a look at the docs:
+                    //   http://opensource.adobe.com/spectrum-css/2.13.0/docs/#dropdown
+                    // When done, add the HTML into the DOM right after the original <select> element.
+                    var dropdownHTML = "";
+                    dropdownHTML += "<div class='spectrum-Dropdown' data-id='" + selectId + "'>";
+                    dropdownHTML += "<button class='spectrum-FieldButton spectrum-Dropdown-trigger'>" +
+                                    "<span class='spectrum-Dropdown-label is-placeholder'>" + selectPlaceholder + "</span>" +
+                                    "<svg class='spectrum-Icon spectrum-Icon--sizeS spectrum-UIIcon-Alert' focusable='false'><use xlink:href='#icon-AlertMedium'></use></svg>" +
+                                    "<svg class='spectrum-Icon spectrum-UIIcon-ChevronDownMedium spectrum-Dropdown-icon' focusable='false'><use xlink:href='#icon-ChevronDownMedium'/></svg>" +
+                                    "</button>";
+                    dropdownHTML += "<div class='spectrum-Popover spectrum-Dropdown-popover'>" +
+                                    "<ul class='spectrum-Menu' role='listbox'>";
+                    for (var count = 0; count < selectOptions.length; count += 1) {
+                        var option = selectOptions[count];
+                        var isPlaceholder = option.getAttribute("data-placeholder") === "true",
+                            isDivider = option.getAttribute("data-divider") === "true";
+                        var cssItemClasses = "";
+                        cssItemClasses += isDivider ? "spectrum-Menu-divider" : "spectrum-Menu-item";
+                        if (isPlaceholder) {
+                            cssItemClasses += " is-placeholder";
+                        }
+                        if (option.selected === true) {
+                            cssItemClasses += " is-selected";
+                        }
+                        if (option.disabled === true) {
+                            cssItemClasses += " is-disabled";
+                        }
+                        var optionText = option.textContent,
+                            optionValue = option.getAttribute("value");
+                        dropdownHTML += "<li class='" + cssItemClasses + "' data-value='" + optionValue + "' " +
+                                        "role='" + (isDivider ? "separator" : "option") + "'>";
+                        if (!isDivider) {
+                            dropdownHTML += "<span class='spectrum-Menu-itemLabel'>" + optionText + "</span>";
+                        }
+                        dropdownHTML += "</li>";
+                    }
+                    dropdownHTML += "</ul></div></div>";
+                    select.insertAdjacentHTML("afterend", dropdownHTML);
+
+                    // Now that the Dropdown is inserted into the DOM, attach the required event handlers
+                    // so that it behaves like a proper replacement for the <select> element.
+                    var dropdown = document.querySelector(".spectrum-Dropdown[data-id='" + selectId + "']");
+                    var dropdownPopover = dropdown.querySelector(".spectrum-Dropdown-popover"),
+                        dropdownItems = dropdown.querySelectorAll(".spectrum-Menu-item"),
+                        dropdownLabel = dropdown.querySelector(".spectrum-Dropdown-label"),
+                        dropdownTrigger = dropdown.querySelector(".spectrum-Dropdown-trigger");
+
+                    // Iterate over the Dropdown's menu items, bind click handlers to each of them,
+                    // and set the Dropdown's label to the selected option.
+                    for (var count = 0; count < dropdownItems.length; count += 1) {
+                        var dropdownItem = dropdownItems[count];
+
+                        // If the menu item is disabled, skip on to the next.
+                        if (dropdownItem.classList.contains("is-disabled")) {
+                            continue;
+                        }
+
+                        // Bind click handler function to the menu item which, when the item is clicked,
+                        // updates the Dropdown's label and select's the correct option for the original
+                        // <select> element.
+                        dropdownItem.addEventListener("click", function (event) {
+                            var newValue = this.getAttribute("data-value"),
+                                newLabel = this.textContent;
+                            changeSelectValue(newValue, newLabel);
+                        });
+
+                        // If the menu item is the selected one, then update the Dropdown's label.
+                        var value = dropdownItem.getAttribute("data-value");
+                        if (value === select.value) {
+                            changeDropdownLabel(value, dropdownItem.textContent,
+                                                dropdownItem.classList.contains("is-placeholder"));
+                        }
+                    }
+
+                    // Notice that a Spectrum Dropdown also has a <button> that acts as the Dropdown's
+                    // "trigger" i.e. it opens the popover with the menu items. Here we bind a "click"
+                    // event handler that toggles that popover.
+                    dropdownTrigger.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (this.classList.contains("is-disabled") === false) {
+
+                            // If the popover is open, then close it.
+                            var dropdown = this.parentNode;
+                            if (dropdown.classList.contains("is-open")) {
+                                closeDropdown(dropdown);
+                            } else {
+
+                                /**
+                                 * Compute the effective height of the given DOM element.
+                                 */
+
+                                function getHeight(element) {
+
+                                    // If the element is displayed, then return its normal height.
+                                    var elementStyle = window.getComputedStyle(element);
+                                    if (elementStyle.display !== "none") {
+                                        var maxHeight = elementStyle.maxHeight.replace("px", "").replace("%", "");
+                                        if (maxHeight !== "0") {
+                                            return element.offsetHeight;
+                                        }
+                                    }
+
+                                    // The element is currently not displayed, so its height has not been
+                                    // computed. To fake that, hide the element but display it and grab
+                                    // its height. Then put it all back.
+                                    element.style.position = "absolute";
+                                    element.style.visibility = "hidden";
+                                    element.style.display = "block";
+
+                                    var height = element.offsetHeight;
+
+                                    // TODO Restore the original values, instead of overwriting them here.
+                                    element.style.position = "";
+                                    element.style.visibility = "";
+                                    element.style.display = "";
+
+                                    return height;
+                                }
+
+                                // This Dropdown is about to open its popover, so close the popovers of
+                                // of all other Dropdowns first. (This should only be one.)
+                                closeAllDropdowns(dropdown);
+
+                                // Make sure that the popover shows correctly in the ancestor's panel <div>.
+                                var panel = dropdown.closest(".panel__body");  // Or use <body>.
+                                var dropdownPopover = dropdown.querySelector(".spectrum-Dropdown-popover");
+
+                                // Check whether there is enough room below the Dropdown to open the
+                                // popover below; if there is not, then open the popover above the Dropdown.
+                                // TODO The popover is always not displayed yet, simplify getHeight() function!
+                                var popoverHeight = getHeight(dropdownPopover);
+                                if (dropdown.offsetTop > popoverHeight) {
+                                    var top = dropdown.offsetTop + dropdown.offsetHeight + popoverHeight;
+                                    if (top > panel.offsetHeight + panel.scrollTop) {
+                                        dropdown.classList.add("is-dropup");
+                                    }
+                                }
+
+                                // Open the Dropdown's popover.
+                                dropdown.classList.add("is-open");
+                                dropdownPopover.classList.add("is-open");
+                            }
+                        }
+                    });
+                }
+
+                // Clicking outside of the Dropdown or its popover closes any open popover.
+                document.addEventListener("click", function (event) {
+                    if (!isAncestorOf(event.target, ".spectrum-Dropdown")) {
+                        closeAllDropdowns();
+                    }
+                });
+            })();
+
             // And we're ready.
             showStatusOk();
 
@@ -804,10 +1092,4 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
     // Load all SVG icons used by the extension so that they become available to the <svg> elements.
     loadIcons("images/sprite-icons.svg");
-
-    // Once the DOM has been loaded, finish off a few elements.
-    document.addEventListener("DOMContentLoaded", function () {
-        selectCustomStyle.init(".spectrum-Dropdown-select", {viewport: ".panel__body"});
-    });
-
 }());
