@@ -165,15 +165,15 @@ function showMessage(message, msgClass) {
 
 function showElementError(element, text) {
     element.classList.add("is-invalid");
-    if (element.classList.contains('spectrum-Dropdown-input') === true || element.classList.contains('spectrum-Dropdown-select') === true) {
-        var controlDropdown = element.classList.contains('spectrum-Dropdown-input') === true ? element.closest('.spectrum-Dropdown') : element.nextSibling;
+    if (element.classList.contains("spectrum-Dropdown-input") === true || element.classList.contains("spectrum-Dropdown-select") === true) {
+        var controlDropdown = element.classList.contains("spectrum-Dropdown-input") === true ? element.closest(".spectrum-Dropdown") : element.nextSibling;
         if (controlDropdown !== null) {
             controlDropdown.classList.add("is-invalid");
-            controlDropdown.querySelector('.spectrum-Dropdown-trigger').classList.add("is-invalid");
+            controlDropdown.querySelector(".spectrum-Dropdown-trigger").classList.add("is-invalid");
         }
     }
-    else if (element.classList.contains('spectrum-Checkbox-input') === true) {
-        var controlCheckbox = element.closest('.spectrum-Checkbox');
+    else if (element.classList.contains("spectrum-Checkbox-input") === true) {
+        var controlCheckbox = element.closest(".spectrum-Checkbox");
         if (controlCheckbox !== null) {
             controlCheckbox.classList.add("is-invalid");
         }
