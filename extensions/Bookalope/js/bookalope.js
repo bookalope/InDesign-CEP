@@ -1,7 +1,7 @@
 /*jslint browser: true, devel: true */
-/*global window, atob, btoa */
+/*global window, document, navigator, atob */
 /*global Promise, Blob */
-/*global BookalopeClient, Book, Bookflow */
+/*global BookalopeClient, BookalopeError, Book, Bookflow */
 
 
 /**
