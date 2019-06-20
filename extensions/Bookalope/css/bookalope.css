@@ -1,3 +1,5 @@
+@charset "utf-8";
+
 @font-face {
 	font-family: 'Source Sans Pro';
 	font-weight: 200;
@@ -83,11 +85,16 @@
 	src: url("../fonts/SourceSansPro-BlackIt.otf.woff2") format("woff2");
 }
 
+
+/* Oddly enough this isn't actually defined in Spectrum. */
+
 .hidden {
 	display: none !important;
 }
 
-/*! Layout */
+
+/* Panel layout. TODO I think we can remove the -ms-bla and perhaps other specific properties. */
+
 html, body {
 	height: 100%;
 	position: relative;
@@ -152,7 +159,9 @@ html, body {
 	margin-left: 0;
 }
 
-/*! Customize Components of the Spectrum-CSS */
+
+/* Customize components of the Spectrum-CSS. */
+
 .spectrum-Form {
 	width: 100%;
 	table-layout: fixed;
@@ -179,11 +188,13 @@ html, body {
 	letter-spacing: 0.1px;
 }
 
-.spectrum-FieldLabel--right, .spectrum-FieldLabel--left {
+.spectrum-FieldLabel--right,
+.spectrum-FieldLabel--left {
 	width: 30%;
 }
 
-.spectrum-FieldLabel--right + .spectrum-Form-itemField, .spectrum-FieldLabel--left + .spectrum-Form-itemField {
+.spectrum-FieldLabel--right + .spectrum-Form-itemField,
+.spectrum-FieldLabel--left + .spectrum-Form-itemField {
 	width: 70%;
 }
 
@@ -209,7 +220,8 @@ html, body {
 	opacity: 1;
 }
 
-.spectrum-Datepicker .spectrum-Datefield.is-invalid, .spectrum-Datepicker .spectrum-Datefield:invalid {
+.spectrum-Datepicker .spectrum-Datefield.is-invalid,
+.spectrum-Datepicker .spectrum-Datefield:invalid {
 	background-position: calc(100% - 35px) 50%;
 	padding-right: 60px;
 }
@@ -312,7 +324,9 @@ html, body {
 	cursor: default;
 }
 
-/*! Components */
+
+/* Panel components. */
+
 .form__text,
 .form__nav {
 	padding: 10px 0;
@@ -382,9 +396,6 @@ html, body {
 
 .file__loader {
 	display: none;
-}
-
-.file__loader {
 	position: absolute;
 	right: 0;
 	top: 50%;
