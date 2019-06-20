@@ -584,7 +584,21 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         bookalope.createBook(bookName)
         .then(function (book) {
             var bookflow = book.bookflows[0];
-            uploadFile(bookflow);
+            bookflow.title = bookName;
+            bookflow.author = bookAuthor;
+            bookflow.copyright = bookCopyright;
+            bookflow.isbn = bookIsbn;
+            bookflow.language = bookLanguage;
+            bookflow.pubdate = bookPubDate;
+            bookflow.publisher = bookPublisher;
+            bookflow.save()
+            .then(function () {
+                uploadFile(bookflow);
+            })
+            .catch(function (error) {
+                showServerError(error.message);
+                hideSpinner();
+            });
         })
         .catch(function (error) {
             showServerError(error.message);
