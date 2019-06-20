@@ -13,7 +13,7 @@
  */
 
 function isToken(token) {
-  return new RegExp("^[0-9a-f]{32}$").test(token);
+  return new RegExp("^[0-9a-f]{32}$").test(token || "");
 }
 
 
@@ -68,21 +68,6 @@ var BookalopeClient = function(token, betaHost, version) {
     this._version = version;
   } else {
     this._version = "v1";
-  }
-};
-
-/**
- * Set or update the Bookalope client's host name depending on the beta flag.
- * Defaults to the production host.
- *
- * @param {boolean} betaHost - True if Bookalope's beta host should be used.
- */
-
-BookalopeClient.prototype.setHost = function (betaHost) {
-  if (betaHost) {
-    this._host = "https://beta.bookalope.net";
-  } else {
-    this._host = "https://bookflow.bookalope.net";
   }
 };
 
@@ -232,6 +217,22 @@ BookalopeClient.prototype.httpPOST = function(url, params) {
 
 BookalopeClient.prototype.httpDELETE = function(url) {
   return this._httpRequest(url, "DELETE", {}, {});
+};
+
+
+/**
+ * Set the host name of the Bookalope server that this client should use for all
+ * subsequent requests. Defaults to the production host.
+ *
+ * @param {boolean} betaHost - True if Bookalope's beta host should be used.
+ */
+
+BookalopeClient.prototype.setHost = function(betaHost) {
+  if (betaHost) {
+    this._host = "https://beta.bookalope.net";
+  } else {
+    this._host = "https://bookflow.bookalope.net";
+  }
 };
 
 
@@ -1083,9 +1084,6 @@ Bookflow.prototype.setDocument = function(filename, file, filetype, skip_analysi
   var bookflow = this;
   var bookalope = bookflow._bookalope;
 
-  filetype = filetype || "doc";
-  skip_analysis = skip_analysis || false;
-
   return new Promise(function(resolve, reject) {
     if (bookflow.step !== "files") {
       reject(new BookalopeError("Unable to set document because one is already set"));
@@ -1093,9 +1091,9 @@ Bookflow.prototype.setDocument = function(filename, file, filetype, skip_analysi
       var url = bookflow.url + "/files/document";
       var params = {
         filename: filename,
-        filetype: filetype,
+        filetype: filetype || "doc",
         file: btoa(file),
-        skip_analysis: skip_analysis
+        skip_analysis: skip_analysis || false
       };
       bookalope.httpPOST(url, params)
       .then(function(response) {
