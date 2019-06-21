@@ -240,9 +240,10 @@ function bookalopeGetDocumentDataFromActive() {
  *                                newly created InDesign document.
  * @param {string} bookId - A valid Bookalope Book id.
  * @param {string} bookflowId - A valid Bookalope Bookflow id.
+ * @param {boolean} betaHost - Booloan flag indicating whether the Book is on beta or production server.
  */
 
-function bookalopeCreateDocument(icmlFileName, bookId, bookflowId) {
+function bookalopeCreateDocument(icmlFileName, bookId, bookflowId, betaHost) {
 
     // Create and add a new document.
     var bookalopeDocument = app.documents.add();
@@ -271,4 +272,5 @@ function bookalopeCreateDocument(icmlFileName, bookId, bookflowId) {
     // Bookalope keeps some private data alongside the document.
     bookalopeAddDocumentData(bookalopeDocument, "book-id", bookId);
     bookalopeAddDocumentData(bookalopeDocument, "bookflow-id", bookflowId);
+    bookalopeAddDocumentData(bookalopeDocument, "beta", betaHost);
 }

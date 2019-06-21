@@ -58,35 +58,39 @@ function detectFeatures() {
 
 
 /**
- * Retrieve the user's Bookalope API token that's stored by Chromium, or return undefined
- * if the token wasn't found.
+ * Retrieve the user's Bookalope API token and beta host flag that's stored by Chromium,
+ * or return default values if they weren't found.
  *
  * See also: https://developer.mozilla.org/en/docs/Web/API/Window/localStorage
  *
- * @returns {string | undefined} The user's Bookalope API token.
+ * @returns {object} The user's Bookalope API token and whether to access Bookalope's beta host.
  */
 
 function getBookalopeAPIToken() {
-    var token = undefined;
+    var token = "";
+    var beta = false;
     if (typeof localStorage === "object") {
         token = localStorage.getItem("idsn_extension_bookalope_api_token");
+        beta = localStorage.getItem("idsn_extension_bookalope_beta_host") === "true";
     }
-    return token;
+    return {token: token, beta: beta};
 }
 
 
 /**
- * Store the given Bookalope API token for later use. Makes it easier for the user so she
- * doesn't have to keep entering the token between sessions.
+ * Store the given Bookalope API token and beta host flag for later use. Makes it easier
+ * for the user so she doesn't have to keep entering the token between sessions.
  *
  * See also: https://developer.mozilla.org/en/docs/Web/API/Window/localStorage
  *
  * @param {string} token - A valid Bookalope token.
+ * @param {boolean} beta - Flag indicating whether the token is valid for the beta host.
  */
 
-function setBookalopeAPIToken(token) {
+function setBookalopeAPIToken(token, beta) {
     if (typeof localStorage === "object") {
         localStorage.setItem("idsn_extension_bookalope_api_token", token);
+        localStorage.setItem("idsn_extension_bookalope_beta_host", beta);
     }
 }
 
@@ -104,7 +108,6 @@ function setBookalopeAPIToken(token) {
 function showUpload() {
 
     // Reset configuration fields.
-    document.getElementById("input-bookalope-beta").checked = false;
     document.getElementById("input-file").value = "";
     document.getElementById("input-book-name").value = "";
     document.getElementById("input-book-author").value = "";
@@ -495,7 +498,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             // Create the new document on the InDesign side, and pass the Book and Bookflow
             // IDs along to store them with the document. That way, we can update the panel
             // based on the currently active InDesign document.
-            var script = "bookalopeCreateDocument('" + filename + "', '" + bookflow.book.id + "', '" + bookflow.id + "');";
+            var script = "bookalopeCreateDocument('" + filename + "', '" + bookflow.book.id + "', '" + bookflow.id + "', " + bookalopeBetaHost + ");";
             csInterface.evalScript(script, function (result) {
                 // TODO handle result = 'EvalScript error'
 
@@ -632,9 +635,8 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         // Store the API authentication key to local storage for later.
         bookalopeToken = document.getElementById("input-bookalope-token").value.toLowerCase();
-        setBookalopeAPIToken(bookalopeToken);
-
         bookalopeBetaHost = document.getElementById("input-bookalope-beta").checked;
+        setBookalopeAPIToken(bookalopeToken, bookalopeBetaHost);
 
         // Get the values from the form fields.
         bookFile = document.getElementById("input-file").files[0];
@@ -696,10 +698,15 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             var bookalopeDocData = JSON.parse(result);
             if (bookalopeDocData) {
 
-                // Get Book and Bookflow IDs.
+                // Get Book and Bookflow IDs, as well as beta host information.
                 var bookId = bookalopeDocData["book-id"];
                 var bookflowId = bookalopeDocData["bookflow-id"];
                 // TODO Paranoid: (/^[0-9a-fA-F]{32}$/).test(bookId), (/^[0-9a-fA-F]{32}$/).test(bookflowId)
+
+                // Handle beta host information from the document.
+                if (bookalopeBetaHost !== bookalopeDocData["beta"]) {
+                    showClientError("Document " + (bookalopeDocData["beta"] ? "uses" : "doesn't use") + " beta server , please check token");
+                }
 
                 // Create a new Book and Bookflow object. Note that creating them does not
                 // talk with the Bookalope server, it merely instantiates the corresponding
@@ -794,12 +801,11 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         } else {
 
-            // Get the Bookalope API token if it's been stored before, and make it the value
-            // of the token input field.
-            bookalopeToken = getBookalopeAPIToken();
-            if (bookalopeToken !== undefined) {
-                document.getElementById("input-bookalope-token").value = bookalopeToken;
-            }
+            // Get the Bookalope API token and beta host flag if it's been stored before, and make
+            // them the value of their respective elements.
+            var bookalopeTokenInfo = getBookalopeAPIToken();
+            document.getElementById("input-bookalope-token").value = bookalopeTokenInfo.token;
+            document.getElementById("input-bookalope-beta").checked = bookalopeTokenInfo.beta;
 
             // Add a few relevant event handlers to catch changes.
             csInterface.addEventListener("documentAfterActivate", function (csEvent) {
