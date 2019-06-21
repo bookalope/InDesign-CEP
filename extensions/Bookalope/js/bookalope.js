@@ -36,6 +36,22 @@ function detectFeatures() {
     } else {
         missing.push("FileReader");
     }
+    // Check that we have the Array.from() method. Because the extension supports InDesign
+    // versions 11 (CEP6) and 12 (CEP7) it therefore must run on Chromium 41.0.2272.104 which
+    // does not have a native Array.from() method: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
+    if (typeof Array.from === "function" && Array.from.toString().indexOf("[native code]") !== -1) {
+        // We've got a native Array.from() method.
+    }
+    else {
+        // No support for a native Array.from() method, so we add a simple implementation shim.
+        Array.from = function (thing) {
+            var array = []
+            for (var count = 0; count < thing.length; count++) {
+                array.push(thing[count]);
+            }
+            return array;
+        };
+    }
 
     return missing;
 }
@@ -230,12 +246,9 @@ function showStatusOk() {
  */
 
 function clearErrors() {
-    // Grumble. No .forEach() for HTMLCollections, but instead we need to iterate the olden ways.
-    // https://stackoverflow.com/questions/22754315/for-loop-for-htmlcollection-elements#22754453
-    var elements = document.getElementsByClassName("is-invalid");
-    for (var count = 0; count < elements.length; count += 1) {
-        elements[count].classList.remove("is-invalid");
-    }
+    Array.from(document.getElementsByClassName("is-invalid")).forEach(function (element) {
+        element.classList.remove("is-invalid");
+    });
     showStatusOk();
 }
 
@@ -865,21 +878,17 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                  */
 
                 function closeAllDropdowns(exception) {
-                    var dropdowns = document.querySelectorAll(".spectrum-Dropdown");
-                    for (var count = 0; count < dropdowns.length; count += 1) {
-                        dropdown = dropdowns[count];
+                    Array.from(document.querySelectorAll(".spectrum-Dropdown")).forEach(function (dropdown) {
                         if (dropdown !== exception) {
                             closeDropdown(dropdown);
                         }
-                    }
+                    });
                 }
 
                 // Here it goes. Iterate over all <select> elements in the documents (assuming
                 // that they have a class 'spectrum-Dropdown-select') and hide them; then
                 // create the Adobe Spectrum specific Dropdowns in their stead.
-                var dropdownSelects = document.querySelectorAll(".spectrum-Dropdown-select");
-                for (var count = 0; count < dropdownSelects.length; count += 1) {
-                    var select = dropdownSelects[count];
+                Array.from(document.querySelectorAll(".spectrum-Dropdown-select")).forEach(function (select) {
 
                     /**
                      * Change the current label of a Dropdown.
@@ -910,15 +919,14 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                         // Find the Dropdown's data item which was selected and mark it; likewise
                         // remove the selected mark from all other items in the Dropdown.
                         var isPlaceholderValue = false;
-                        for (var count = 0; count < dropdownItems.length; count += 1) {
-                            var dropdownItem = dropdownItems[count];
+                        Array.from(dropdownItems).forEach(function (dropdownItem) {
                             if (dropdownItem.getAttribute("data-value") === newValue) {
                                 dropdownItem.classList.add("is-selected");
                                 isPlaceholderValue = dropdownItem.classList.contains("is-placeholder");
                             } else {
                                 dropdownItem.classList.remove("is-selected")
                             }
-                        }
+                        });
 
                         // Show the selected value as the Dropdown's label.
                         changeDropdownLabel(newValue, newLabel, isPlaceholderValue);
@@ -955,8 +963,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                                     "</button>";
                     dropdownHTML += "<div class='spectrum-Popover spectrum-Dropdown-popover'>" +
                                     "<ul class='spectrum-Menu' role='listbox'>";
-                    for (var count = 0; count < selectOptions.length; count += 1) {
-                        var option = selectOptions[count];
+                    Array.from(selectOptions).forEach(function (option) {
                         var isPlaceholder = option.getAttribute("data-placeholder") === "true",
                             isDivider = option.getAttribute("data-divider") === "true";
                         var cssItemClasses = "";
@@ -978,7 +985,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                             dropdownHTML += "<span class='spectrum-Menu-itemLabel'>" + optionText + "</span>";
                         }
                         dropdownHTML += "</li>";
-                    }
+                    });
                     dropdownHTML += "</ul></div></div>";
                     select.insertAdjacentHTML("afterend", dropdownHTML);
 
@@ -992,12 +999,11 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
                     // Iterate over the Dropdown's menu items, bind click handlers to each of them,
                     // and set the Dropdown's label to the selected option.
-                    for (var count = 0; count < dropdownItems.length; count += 1) {
-                        var dropdownItem = dropdownItems[count];
+                    Array.from(dropdownItems).forEach(function (dropdownItem) {
 
                         // If the menu item is disabled, skip on to the next.
                         if (dropdownItem.classList.contains("is-disabled")) {
-                            continue;
+                            return;  // continue;
                         }
 
                         // Bind click handler function to the menu item which, when the item is clicked,
@@ -1015,7 +1021,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                             changeDropdownLabel(value, dropdownItem.textContent,
                                                 dropdownItem.classList.contains("is-placeholder"));
                         }
-                    }
+                    });
 
                     // Notice that a Spectrum Dropdown also has a <button> that acts as the Dropdown's
                     // "trigger" i.e. it opens the popover with the menu items. Here we bind a "click"
@@ -1088,7 +1094,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                             }
                         }
                     });
-                }
+                });
 
                 // Clicking outside of the Dropdown or its popover closes any open popover.
                 document.addEventListener("click", function (event) {
