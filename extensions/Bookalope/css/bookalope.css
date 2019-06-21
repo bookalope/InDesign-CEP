@@ -148,7 +148,8 @@ html, body {
 .panel__footer-status {
     padding: 5px 10px;
     min-height: 0;
-    font-size: 13px;
+    font-size: 12px;
+    line-height: 12px;
 }
 
 .panel__footer-status:empty {
@@ -186,6 +187,7 @@ html, body {
 
 .spectrum-Form-itemLabel {
     letter-spacing: 0.1px;
+    font-size: 14px;
 }
 
 .spectrum-FieldLabel--right,
