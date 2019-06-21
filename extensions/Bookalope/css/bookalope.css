@@ -1,327 +1,327 @@
 @charset "utf-8";
 
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 200;
-	font-style: normal;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-ExtraLight.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 200;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-ExtraLight.otf.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 200;
-	font-style: italic;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-ExtraLightIt.oft.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 200;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-ExtraLightIt.oft.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 300;
-	font-style: normal;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-Light.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 300;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Light.otf.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 300;
-	font-style: italic;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-LightIt.oft.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 300;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-LightIt.oft.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 400;
-	font-style: normal;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-Regular.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 400;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Regular.otf.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 400;
-	font-style: italic;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-It.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 400;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-It.otf.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 600;
-	font-style: normal;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-Semibold.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Semibold.otf.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 600;
-	font-style: italic;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-SemiboldIt.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 600;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-SemiboldIt.otf.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 700;
-	font-style: normal;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-Bold.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 700;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Bold.otf.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 700;
-	font-style: italic;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-BoldIt.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 700;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-BoldIt.otf.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 900;
-	font-style: normal;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-Black.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 900;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Black.otf.woff2") format("woff2");
 }
 @font-face {
-	font-family: 'Source Sans Pro';
-	font-weight: 900;
-	font-style: italic;
-	font-stretch: normal;
-	src: url("../fonts/SourceSansPro-BlackIt.otf.woff2") format("woff2");
+    font-family: 'Source Sans Pro';
+    font-weight: 900;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-BlackIt.otf.woff2") format("woff2");
 }
 
 
 /* Oddly enough this isn't actually defined in Spectrum. */
 
 .hidden {
-	display: none !important;
+    display: none !important;
 }
 
 
 /* Panel layout. TODO I think we can remove the -ms-bla and perhaps other specific properties. */
 
 html, body {
-	height: 100%;
-	position: relative;
+    height: 100%;
+    position: relative;
 }
 
 .panel {
-	width: 100%;
-	height: 100%;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	position: relative;
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-orient: vertical;
-	-webkit-box-direction: normal;
-	-ms-flex-direction: column;
-	flex-direction: column;
+    width: 100%;
+    height: 100%;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
 }
 
 .panel__body {
-	-webkit-box-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
-	overflow: hidden;
-	overflow-y: auto;
-	padding: 10px;
-	padding-bottom: 20px;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 10px;
+    padding-bottom: 20px;
 }
 
 .panel__body::-webkit-scrollbar {
-	width: 10px;
+    width: 10px;
 }
 
 .panel__body::-webkit-scrollbar-track {
-	background: #f1f1f1;
+    background: #f1f1f1;
 }
 
 .panel__body::-webkit-scrollbar-thumb {
-	background: #888;
+    background: #888;
 }
 
 .panel__body::-webkit-scrollbar-thumb:hover {
-	background: #555;
+    background: #555;
 }
 
 .panel__footer-rule {
-	margin: 0;
+    margin: 0;
 }
 
 .panel__footer-status {
-	padding: 5px 10px;
-	min-height: 0;
-	font-size: 13px;
+    padding: 5px 10px;
+    min-height: 0;
+    font-size: 13px;
 }
 
 .panel__footer-status:empty {
-	display: none;
+    display: none;
 }
 
 .panel__footer-status:before {
-	margin-left: 0;
+    margin-left: 0;
 }
 
 
 /* Customize components of the Spectrum-CSS. */
 
 .spectrum-Form {
-	width: 100%;
-	table-layout: fixed;
-	border-spacing: 0 10px;
-	margin: -5px 0;
+    width: 100%;
+    table-layout: fixed;
+    border-spacing: 0 10px;
+    margin: -5px 0;
 }
 
 .spectrum-Form-itemField .spectrum-Dropdown-popover,
 .spectrum-Form-itemField .spectrum-Textfield,
 .spectrum-Form-itemField .spectrum-Dropdown {
-	width: 100%;
+    width: 100%;
 }
 
 .spectrum-Form-itemField .spectrum-Dropdown-popover {
-	max-width: 100%;
+    max-width: 100%;
 }
 
 .spectrum-Form--small {
-	border-spacing: 0 5px;
-	margin: 0px 0;
+    border-spacing: 0 5px;
+    margin: 0px 0;
 }
 
 .spectrum-Form-itemLabel {
-	letter-spacing: 0.1px;
+    letter-spacing: 0.1px;
 }
 
 .spectrum-FieldLabel--right,
 .spectrum-FieldLabel--left {
-	width: 30%;
+    width: 30%;
 }
 
 .spectrum-FieldLabel--right + .spectrum-Form-itemField,
 .spectrum-FieldLabel--left + .spectrum-Form-itemField {
-	width: 70%;
+    width: 70%;
 }
 
 .spectrum-Textfield {
-	font-family: inherit;
+    font-family: inherit;
 }
 
 .spectrum-Datepicker {
-	position: relative;
+    position: relative;
 }
 
 .spectrum-Datepicker-Icon {
-	position: absolute;
-	right: 12px;
-	top: 50%;
-	-webkit-transform: translateY(-50%);
-	-ms-transform: translateY(-50%);
-	transform: translateY(-50%);
-	opacity: .7;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    opacity: .7;
 }
 
 .spectrum-Datepicker:hover .spectrum-Datepicker-Icon {
-	opacity: 1;
+    opacity: 1;
 }
 
 .spectrum-Datepicker .spectrum-Datefield.is-invalid,
 .spectrum-Datepicker .spectrum-Datefield:invalid {
-	background-position: calc(100% - 35px) 50%;
-	padding-right: 60px;
+    background-position: calc(100% - 35px) 50%;
+    padding-right: 60px;
 }
 
 .spectrum-Datepicker .spectrum-Datefield::-webkit-calendar-picker-indicator {
-	background: rgba(0, 0, 0, 0);
-	opacity: 0;
-	cursor: pointer;
-	position: absolute;
-	right: 0;
-	top: 0;
-	height: 100%;
-	z-index: 8;
-	width: 40px;
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    z-index: 8;
+    width: 40px;
 }
 
 .spectrum-Datepicker .spectrum-Datefield::-webkit-clear-button {
-	position: relative;
-	right: 30px;
-	z-index: 9;
+    position: relative;
+    right: 30px;
+    z-index: 9;
 }
 
 .spectrum-Datepicker .spectrum-Datefield ::-webkit-inner-spin-button {
-	display: none;
+    display: none;
 }
 
 .spectrum-Button--small {
-	font-size: 14px;
+    font-size: 14px;
 }
 
 .spectrum-InputGroup {
-	min-width: 100%;
+    min-width: 100%;
 }
 
 .spectrum-InputGroup .spectrum-FieldButton {
-	min-width: 44px;
+    min-width: 44px;
 }
 
 .spectrum-FieldGroup-Button {
-	margin: 0 8px;
+    margin: 0 8px;
 }
 
 .spectrum-FieldGroup-Button:last-child {
-	margin-right: 0;
+    margin-right: 0;
 }
 
 .spectrum-FieldGroup--horizontal .spectrum-FieldGroup-Button {
-	-webkit-box-flex: 0;
-	-ms-flex: none;
-	flex: none;
+    -webkit-box-flex: 0;
+    -ms-flex: none;
+    flex: none;
 }
 
 .spectrum-Dropdown-label + .spectrum-Dropdown-label {
-	margin-left: 8px;
+    margin-left: 8px;
 }
 
 .spectrum-Dropdown-popover {
-	z-index: 9;
-	max-height: 200px;
-	overflow: hidden;
-	overflow-y: auto;
-	margin-bottom: 5px;
-	display: none;
+    z-index: 9;
+    max-height: 200px;
+    overflow: hidden;
+    overflow-y: auto;
+    margin-bottom: 5px;
+    display: none;
 }
 
 .spectrum-Dropdown-popover.is-open {
-	display: block;
+    display: block;
 }
 
 .spectrum-Dropdown-popover .spectrum-Menu {
-	display: block;
+    display: block;
 }
 
 .spectrum-Dropdown .spectrum-Dropdown-icon {
-	-webkit-transition: -webkit-transform 130ms ease-in-out;
-	transition: -webkit-transform 130ms ease-in-out;
-	-o-transition: transform 130ms ease-in-out;
-	transition: transform 130ms ease-in-out;
-	transition: transform 130ms ease-in-out, -webkit-transform 130ms ease-in-out;
+    -webkit-transition: -webkit-transform 130ms ease-in-out;
+    transition: -webkit-transform 130ms ease-in-out;
+    -o-transition: transform 130ms ease-in-out;
+    transition: transform 130ms ease-in-out;
+    transition: transform 130ms ease-in-out, -webkit-transform 130ms ease-in-out;
 }
 
 .spectrum-Dropdown.is-open .spectrum-Dropdown-icon {
-	-webkit-transform: rotate(-180deg);
-	-ms-transform: rotate(-180deg);
-	transform: rotate(-180deg);
+    -webkit-transform: rotate(-180deg);
+    -ms-transform: rotate(-180deg);
+    transform: rotate(-180deg);
 }
 
 .spectrum-Dropdown.is-dropup .spectrum-Dropdown-popover {
-	top: auto;
-	bottom: 100%;
-	margin-bottom: 0;
-	margin-top: 5px;
+    top: auto;
+    bottom: 100%;
+    margin-bottom: 0;
+    margin-top: 5px;
 }
 
 .spectrum-Dropdown:not(.is-invalid) .spectrum-UIIcon-Alert {
-	display: none;
+    display: none;
 }
 
 .spectrum-Menu-item.is-selected {
-	cursor: default;
+    cursor: default;
 }
 
 
@@ -329,77 +329,77 @@ html, body {
 
 .form__text,
 .form__nav {
-	padding: 10px 0;
+    padding: 10px 0;
 }
 
 .form__nav {
-	text-align: right;
+    text-align: right;
 }
 
 .spinner__wrapper {
-	z-index: 10;
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.6);
+    z-index: 10;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
 }
 
 .spinner__wrapper .spinner {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	-webkit-transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 .file__wrapper {
-	position: relative;
-	max-width: 100%;
+    position: relative;
+    max-width: 100%;
 }
 
 .file__wrapper .spectrum-Icon {
-	max-height: 100%;
-	-ms-flex-negative: 0;
-	flex-shrink: 0;
+    max-height: 100%;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
 }
 
 .file__wrapper .spectrum-Dropdown-icon {
-	margin-top: 0;
-	margin-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .file__btn {
-	width: 100%;
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-pack: justify;
-	-ms-flex-pack: justify;
-	justify-content: space-between;
-	-webkit-box-align: center;
-	-ms-flex-align: center;
-	align-items: center;
-	cursor: pointer;
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    cursor: pointer;
 }
 
 .file__input {
-	width: 0.1px;
-	height: 0.1px;
-	opacity: 0;
-	overflow: hidden;
-	position: absolute;
-	z-index: -1;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
 }
 
 .file__loader {
-	display: none;
-	position: absolute;
-	right: 0;
-	top: 50%;
-	-webkit-transform: translateY(-50%);
-	-ms-transform: translateY(-50%);
-	transform: translateY(-50%);
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
 }
