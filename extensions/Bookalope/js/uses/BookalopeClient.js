@@ -137,6 +137,9 @@ BookalopeClient.prototype._httpRequest = function(url, method, params, options) 
           catch (e) {
             // JSON parse failed, so Bookalope responded with HTML. This is a known issue
             // with failed authorization for a request, and needs to be fixed server-side.
+            if (this.status === 401) {
+              reject(new BookalopeError("Client error: Failed to authenticate, check token"));
+            }
           }
         }
         reject(new BookalopeError("Client error: " + this.statusText + " (" + this.status + ")"));
@@ -856,10 +859,10 @@ Bookflow.prototype.save = function() {
   return new Promise(function(resolve, reject) {
     var url = bookflow.url;
     var params = {
-      name: this.name
+      name: bookflow.name
     };
     // Copy only valid metadata to the parameter array to update on the server.
-    var metadata = this.getMetadata();
+    var metadata = bookflow.getMetadata();
     Object.keys(metadata).map(function(key) {
       var value = metadata[key];
       if (value) {
