@@ -323,7 +323,7 @@ function saveBookflowFile(bookflow, format, style, version, filename) {
                         });
                     } else if (status_ === "failed" || status_ === "na") {
                         clearInterval(intervalID);
-                        reject(new BookalopeError("Failed to convert document to " + format + "/" + style + "(" + version + ")"));
+                        reject(new BookalopeError("Failed to convert document to " + format + " ('" + style + "' style, " + version + " version)"));
                     } else {
                         // Do nothing and keep waiting.
                     }
@@ -456,7 +456,8 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         addClickListener(document.getElementById("button-download"), function () {
             var bookDownload = document.getElementById("input-book-download").value;
-            askSaveBookflowFile(bookflow, bookDownload, "default", "test");
+            var bookVersion = document.getElementById("input-book-download-version").checked ? "final" : "test";
+            askSaveBookflowFile(bookflow, bookDownload, "default", bookVersion);
             return false;
         });
 
@@ -487,7 +488,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         var fname = "idsn-" + time.toString(16).slice(-8) + "-" + rnd.toString(16).slice(-8);
 
         // Convert the given Bookflow's document to ICML, and save it as a temporary file.
-        saveBookflowFile(bookflow, "icml", "default", "test", config.tmp + "/" + fname + ".icml")
+        saveBookflowFile(bookflow, "icml", "default", bookVersion, config.tmp + "/" + fname + ".icml")
         .then(function (filename) {
             showStatus("Building InDesign document");
 
@@ -644,7 +645,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         bookPubDate = document.getElementById("input-book-pubdate").value;
         bookIsbn = document.getElementById("input-book-isbn").value;
         bookPublisher = document.getElementById("input-book-publisher").value;
-        bookVersion = document.getElementById("input-book-version").checked;
+        bookVersion = document.getElementById("input-book-version").checked ? "final" : "test";
         bookAutoClean = document.getElementById("input-book-autoclean").checked;
         bookHighlightIssues = document.getElementById("input-book-highlight-issues").checked;
         bookSkipStructure = document.getElementById("input-book-skip-structure").checked;
