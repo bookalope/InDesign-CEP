@@ -32,16 +32,16 @@
                     <Menu>Bookalope</Menu>
                     <Geometry>
                         <Size>
-                            <Width>400</Width>
-                            <Height>360</Height>
+                            <Width>450</Width>
+                            <Height>450</Height>
                         </Size>
                         <MinSize>
-                            <Width>400</Width>
-                            <Height>360</Height>
+                            <Width>450</Width>
+                            <Height>450</Height>
                         </MinSize>
                         <MaxSize>
-                            <Width>400</Width>
-                            <Height>360</Height>
+                            <Width>450</Width>
+                            <Height>800</Height>
                         </MaxSize>
                     </Geometry>
                     <Icons>
