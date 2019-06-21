@@ -1,6 +1,6 @@
 /*jslint browser: true, devel: true */
 /*global window, document, navigator, atob */
-/*global Promise, Blob */
+/*global Promise, Blob, FileReader, CustomEvent, localStorage, CSInterface */
 /*global BookalopeClient, BookalopeError, Book, Bookflow */
 
 
@@ -119,6 +119,7 @@ function showUpload() {
     document.getElementById("input-book-version").checked = false;
     document.getElementById("input-book-autoclean").checked = true;
     document.getElementById("input-book-highlight-issues").checked = false;
+    document.getElementById("input-book-skip-structure").checked = false;
 
     document.getElementById("bookalope-upload").classList.remove("hidden");
     document.getElementById("bookalope-update").classList.add("hidden");
@@ -279,13 +280,13 @@ function saveBookflowFile(bookflow, format, style, version, filename) {
 
             // Conversion is triggered on the server, now check periodically the status of the
             // conversion until it has succeeded or failed.
-            var intervalID = setInterval(function (bookflow) {
+            var intervalID = window.setInterval(function (bookflow) {
                 bookflow.convert_status(format, style, version)
                 .then(function (status_) {
 
                     // Conversion succeeded, now download and save the converted file.
                     if (status_ === "ok") {
-                        clearInterval(intervalID);
+                        window.clearInterval(intervalID);
                         bookflow.convert_download(format, style, version)
                         .then(function (blob) {
 
@@ -325,7 +326,7 @@ function saveBookflowFile(bookflow, format, style, version, filename) {
                             reject(error);
                         });
                     } else if (status_ === "failed" || status_ === "na") {
-                        clearInterval(intervalID);
+                        window.clearInterval(intervalID);
                         reject(new BookalopeError("Failed to convert document to " + format + " ('" + style + "' style, " + version + " version)"));
                     } else {
                         // Do nothing and keep waiting.
@@ -456,19 +457,17 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             }
             return false;
         });
-
         addClickListener(document.getElementById("button-download"), function () {
             var bookDownload = document.getElementById("input-book-download").value;
             var bookVersion = document.getElementById("input-book-download-version").checked ? "final" : "test";
             askSaveBookflowFile(bookflow, bookDownload, "default", bookVersion);
             return false;
         });
-
         addClickListener(document.getElementById("button-refresh"), function () {
+            showSpinner();
             convert(bookflow);
             return false;
         });
-
     }
 
 
@@ -503,7 +502,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                 // TODO handle result = 'EvalScript error'
 
                 // Delete the temporary ICML file.
-                var result = window.cep.fs.deleteFile(filename);
+                result = window.cep.fs.deleteFile(filename);
                 if (result.err) {
                     // TODO Handle error here: let the temporary ICML file leak quietly? Yup.
                 }
@@ -517,7 +516,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             });
         })
         .catch(function (error) {
-            showServerError(error);
+            showServerError(error.message);
             hideSpinner();
         });
     }
@@ -553,22 +552,22 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                 // Periodically poll the Bookalope server to update the Bookflow. Then check
                 // the step property for the current processing status of the Bookalope, and
                 // act accordingly.
-                var intervalID = setInterval(function (bookflow) {
+                var intervalID = window.setInterval(function (bookflow) {
                     bookflow.update()
                     .then(function (bookflow) {
                         if (bookflow.step === "processing") {
                             // Bookalope is still processing, keep waiting.
                         } else if (bookflow.step === "processing_failed") {
-                            clearInterval(intervalID);
+                            window.clearInterval(intervalID);
                             showServerError("Bookalope failed to process the document");
                             hideSpinner();
                         } else if (bookflow.step === "convert") {
-                            clearInterval(intervalID);
+                            window.clearInterval(intervalID);
                             convert(bookflow);
                         }
                     })
                     .catch(function (error) {
-                        clearInterval(intervalID);
+                        window.clearInterval(intervalID);
                         showServerError(error.message);
                         hideSpinner();
                     });
@@ -601,6 +600,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         bookalope.createBook(bookName)
         .then(function (book) {
             var bookflow = book.bookflows[0];
+            bookflow.name = bookName;
             bookflow.title = bookName;
             bookflow.author = bookAuthor;
             bookflow.copyright = bookCopyright;
@@ -654,6 +654,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         // Hide error messages and clear out highlighted fields, if there are any.
         clearErrors();
+
         // Check for errors of the input fields. If everything is good then
         // upload the document to Bookalope for conversion.
         if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {
@@ -788,7 +789,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         // Make sure all the necessary features are available. If not, then show a simple
         // error message and an otherwise empty panel. If all features are available, however,
-        // then show the appropriate panel.
+        // then show the appropriate panel. TODO This should never happen, we know the Chrome versions.
         var missingFeatures = detectFeatures();
         if (missingFeatures.length) {
 
