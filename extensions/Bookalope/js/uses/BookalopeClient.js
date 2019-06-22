@@ -13,7 +13,7 @@
  */
 
 function isToken(token) {
-  return new RegExp("^[0-9a-f]{32}$").test(token);
+  return new RegExp("^[0-9a-f]{32}$").test(token || "");
 }
 
 
@@ -54,7 +54,7 @@ BookalopeError.prototype = Object.create(Error.prototype);
  * services, and it wraps REST API calls into convenient functions.
  *
  * @param {string} token - The Bookalope API token used to authenticate calls.
- * @param {string} betaHost - True if Bookalope's beta host should be used.
+ * @param {boolean} betaHost - True if Bookalope's beta host should be used.
  * @param {string} version - Version of the API to use.
  * @constructor
  */
@@ -63,11 +63,7 @@ var BookalopeClient = function(token, betaHost, version) {
   if (token) {
     this._token = token;
   }
-  if (betaHost) {
-    this._host = "https://beta.bookalope.net";
-  } else {
-    this._host = "https://bookflow.bookalope.net";
-  }
+  this.setHost(betaHost);
   if (version) {
     this._version = version;
   } else {
@@ -141,6 +137,9 @@ BookalopeClient.prototype._httpRequest = function(url, method, params, options) 
           catch (e) {
             // JSON parse failed, so Bookalope responded with HTML. This is a known issue
             // with failed authorization for a request, and needs to be fixed server-side.
+            if (this.status === 401) {
+              reject(new BookalopeError("Client error: Failed to authenticate, check token"));
+            }
           }
         }
         reject(new BookalopeError("Client error: " + this.statusText + " (" + this.status + ")"));
@@ -221,6 +220,22 @@ BookalopeClient.prototype.httpPOST = function(url, params) {
 
 BookalopeClient.prototype.httpDELETE = function(url) {
   return this._httpRequest(url, "DELETE", {}, {});
+};
+
+
+/**
+ * Set the host name of the Bookalope server that this client should use for all
+ * subsequent requests. Defaults to the production host.
+ *
+ * @param {boolean} betaHost - True if Bookalope's beta host should be used.
+ */
+
+BookalopeClient.prototype.setHost = function(betaHost) {
+  if (betaHost) {
+    this._host = "https://beta.bookalope.net";
+  } else {
+    this._host = "https://bookflow.bookalope.net";
+  }
 };
 
 
@@ -844,10 +859,10 @@ Bookflow.prototype.save = function() {
   return new Promise(function(resolve, reject) {
     var url = bookflow.url;
     var params = {
-      name: this.name
+      name: bookflow.name
     };
     // Copy only valid metadata to the parameter array to update on the server.
-    var metadata = this.getMetadata();
+    var metadata = bookflow.getMetadata();
     Object.keys(metadata).map(function(key) {
       var value = metadata[key];
       if (value) {
@@ -1063,10 +1078,12 @@ Bookflow.prototype.getDocument = function() {
  * @async
  * @param {string} filename - The filename of the document.
  * @param {string} file - A byte array which will be Base64 encoded.
+ * @param {string} filetype - A supported file type: "doc", "epub", or "gutenberg".
+ * @param {boolean} skip_analysis - Whether Bookalope should skip structure analysis.
  * @returns {Promise}
  */
 
-Bookflow.prototype.setDocument = function(filename, file, filetype="doc") {
+Bookflow.prototype.setDocument = function(filename, file, filetype, skip_analysis) {
   var bookflow = this;
   var bookalope = bookflow._bookalope;
 
@@ -1077,8 +1094,9 @@ Bookflow.prototype.setDocument = function(filename, file, filetype="doc") {
       var url = bookflow.url + "/files/document";
       var params = {
         filename: filename,
-        filetype: filetype,
-        file: btoa(file)
+        filetype: filetype || "doc",
+        file: btoa(file),
+        skip_analysis: skip_analysis || false
       };
       bookalope.httpPOST(url, params)
       .then(function(response) {

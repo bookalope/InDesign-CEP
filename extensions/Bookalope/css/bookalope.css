@@ -1,185 +1,407 @@
-
-/* Those classes will be edited at runtime with values specified by the settings of the CC application */
-
-.hostFontColor {
-}
-
-.hostFontFamily {
-}
-
-.hostFontSize {
-}
-
-.hostFont {
-}
-
-.hostBgd {
-}
-
-.hostBgdLight {
-}
-
-.hostBgdDark {
-}
-
-.hostElt {
-}
-
-/* Panel styling */
+@charset "utf-8";
 
 @font-face {
-  font-family: "Noto Sans";
-  src: url("../font/NotoSans-Regular.ttf");
+    font-family: 'Source Sans Pro';
+    font-weight: 200;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-ExtraLight.otf.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Noto Serif";
-  src: url("../font/NotoSerif-Regular.ttf");
+    font-family: 'Source Sans Pro';
+    font-weight: 200;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-ExtraLightIt.oft.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 300;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Light.otf.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 300;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-LightIt.oft.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 400;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Regular.otf.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 400;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-It.otf.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Semibold.otf.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 600;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-SemiboldIt.otf.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 700;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Bold.otf.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 700;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-BoldIt.otf.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 900;
+    font-style: normal;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-Black.otf.woff2") format("woff2");
+}
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-weight: 900;
+    font-style: italic;
+    font-stretch: normal;
+    src: url("../fonts/SourceSansPro-BlackIt.otf.woff2") format("woff2");
 }
 
-body {
-  color: #d6d6d6;
-  background-color: #494949;
-  font: normal 12px "Noto Sans", Helvetica, Arial, sans-serif;
-  padding: 10px;
- /* Enable for browser testing.
-  width: 400px;
-  height: 290px;
- */
+
+/* Oddly enough this isn't actually defined in Spectrum. */
+
+.hidden {
+    display: none !important;
 }
 
-:focus {
-  outline: none;
+
+/* Panel layout. TODO I think we can remove the -ms-bla and perhaps other specific properties. */
+
+html, body {
+    height: 100%;
+    position: relative;
 }
 
-#content {
-  width: 100%;
-  height: 100%;
-}
-#content,
-#content * {
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-}
-
-#bookalope-upload {
-  display: none;
-}
-
-#bookalope-update {
-  display: none;
+.panel {
+    width: 100%;
+    height: 100%;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
 }
 
-div.form-row:nth-child(n+0):nth-child(-n+3) {
-  padding-bottom: 5px;
+.panel__body {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    overflow: hidden;
+    overflow-y: auto;
+    padding: 10px;
+    padding-bottom: 20px;
 }
 
-.form-row {
-  overflow: auto;
+.panel__body::-webkit-scrollbar {
+    width: 10px;
 }
 
-.buttons-row {
-  margin-top: 10px;
-  padding-left: 25%;
+.panel__body::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
 
-label {
-  float: left;
-  width: 25%;
-  padding-right: 10px;
-  text-align: right;
+.panel__body::-webkit-scrollbar-thumb {
+    background: #888;
 }
 
-.input-wrapper {
-  width: 75%;
-  float: left;
+.panel__body::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
-.file-wrapper {
+.panel__footer-rule {
+    margin: 0;
 }
 
-.p-wrapper{
+.panel__footer-status {
+    padding: 5px 10px;
+    min-height: 0;
+    font-size: 12px;
+    line-height: 12px;
 }
 
-.checkbox-radiobutton-wrapper {
-  margin-left: 25%;
-}
-.checkbox-radiobutton-wrapper label {
-  float: none;
+.panel__footer-status:empty {
+    display: none;
 }
 
-.status-message-box {
-  position: absolute;
-  bottom: 0;
-  padding-bottom: 5px;
-}
-.status-type-info {
-  color: #d6d6d6;
-}
-.status-type-error {
-  color: #ec514e;
-}
-.error-row {
-  border: solid 1px red;
+.panel__footer-status:before {
+    margin-left: 0;
 }
 
-input[type="text"] {
-  width: 100%;
-  padding: 2px;
-  border: 1px solid #272727;
-  background-color: #a2a2a2;
-  font: normal 12px "Noto Sans", Helvetica, Arial, sans-serif;
+
+/* Customize components of the Spectrum-CSS. */
+
+.spectrum-Form {
+    width: 100%;
+    table-layout: fixed;
+    border-spacing: 0 10px;
+    margin: -5px 0;
 }
 
-input[type="file"] {
-  font: normal 12px "Noto Sans", Helvetica, Arial, sans-serif;
+.spectrum-Form-itemField .spectrum-Dropdown-popover,
+.spectrum-Form-itemField .spectrum-Textfield,
+.spectrum-Form-itemField .spectrum-Dropdown {
+    width: 100%;
 }
 
-input[type="checkbox"] {
+.spectrum-Form-itemField .spectrum-Dropdown-popover {
+    max-width: 100%;
 }
 
-input[type="radio"] {
+.spectrum-Form--small {
+    border-spacing: 0 5px;
+    margin: 0px 0;
 }
 
-button {
-  border: 1px solid #272727;
-  background-color: #a2a2a2;
-  font: normal 12px "Noto Sans", Helvetica, Arial, sans-serif;
-}
-button:hover {
-  background-color: #737373;
-  cursor: pointer;
+.spectrum-Form-itemLabel {
+    letter-spacing: 0.1px;
+    font-size: 14px;
 }
 
-hr {
-  border-top-color: #343434;
-  border-left-color: #737373;
-  border-bottom-color: #737373;
-  border-right-color: #343434;
+.spectrum-FieldLabel--right,
+.spectrum-FieldLabel--left {
+    width: 30%;
 }
 
-a {
-  color: #737373;
-  text-decoration: none;
-}
-a:hover {
-  color: #d6d6d6;
-  text-decoration: underline;
+.spectrum-FieldLabel--right + .spectrum-Form-itemField,
+.spectrum-FieldLabel--left + .spectrum-Form-itemField {
+    width: 70%;
 }
 
-#spinner {
-  display: none;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+.spectrum-Textfield {
+    font-family: inherit;
 }
-#spinner > img {
-  position: absolute;
-  left: 180px;
-  top: 110px;
-  width: 40px;
-  height: 40px;
+
+.spectrum-Datepicker {
+    position: relative;
+}
+
+.spectrum-Datepicker-Icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    opacity: .7;
+}
+
+.spectrum-Datepicker:hover .spectrum-Datepicker-Icon {
+    opacity: 1;
+}
+
+.spectrum-Datepicker .spectrum-Datefield.is-invalid,
+.spectrum-Datepicker .spectrum-Datefield:invalid {
+    background-position: calc(100% - 35px) 50%;
+    padding-right: 60px;
+}
+
+.spectrum-Datepicker .spectrum-Datefield::-webkit-calendar-picker-indicator {
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    z-index: 8;
+    width: 40px;
+}
+
+.spectrum-Datepicker .spectrum-Datefield::-webkit-clear-button {
+    position: relative;
+    right: 30px;
+    z-index: 9;
+}
+
+.spectrum-Datepicker .spectrum-Datefield ::-webkit-inner-spin-button {
+    display: none;
+}
+
+.spectrum-Button--small {
+    font-size: 14px;
+}
+
+.spectrum-InputGroup {
+    min-width: 100%;
+}
+
+.spectrum-InputGroup .spectrum-FieldButton {
+    min-width: 44px;
+}
+
+.spectrum-FieldGroup-Button {
+    margin: 0 8px;
+}
+
+.spectrum-FieldGroup-Button:last-child {
+    margin-right: 0;
+}
+
+.spectrum-FieldGroup--horizontal .spectrum-FieldGroup-Button {
+    -webkit-box-flex: 0;
+    -ms-flex: none;
+    flex: none;
+}
+
+.spectrum-Dropdown-label + .spectrum-Dropdown-label {
+    margin-left: 8px;
+}
+
+.spectrum-Dropdown-popover {
+    z-index: 9;
+    max-height: 200px;
+    overflow: hidden;
+    overflow-y: auto;
+    margin-bottom: 5px;
+    display: none;
+}
+
+.spectrum-Dropdown-popover.is-open {
+    display: block;
+}
+
+.spectrum-Dropdown-popover .spectrum-Menu {
+    display: block;
+}
+
+.spectrum-Dropdown .spectrum-Dropdown-icon {
+    -webkit-transition: -webkit-transform 130ms ease-in-out;
+    transition: -webkit-transform 130ms ease-in-out;
+    -o-transition: transform 130ms ease-in-out;
+    transition: transform 130ms ease-in-out;
+    transition: transform 130ms ease-in-out, -webkit-transform 130ms ease-in-out;
+}
+
+.spectrum-Dropdown.is-open .spectrum-Dropdown-icon {
+    -webkit-transform: rotate(-180deg);
+    -ms-transform: rotate(-180deg);
+    transform: rotate(-180deg);
+}
+
+.spectrum-Dropdown.is-dropup .spectrum-Dropdown-popover {
+    top: auto;
+    bottom: 100%;
+    margin-bottom: 0;
+    margin-top: 5px;
+}
+
+.spectrum-Dropdown:not(.is-invalid) .spectrum-UIIcon-Alert {
+    display: none;
+}
+
+.spectrum-Menu-item.is-selected {
+    cursor: default;
+}
+
+
+/* Panel components. */
+
+.form__text,
+.form__nav {
+    padding: 10px 0;
+}
+
+.form__nav {
+    text-align: right;
+}
+
+.spinner__wrapper {
+    z-index: 10;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.spinner__wrapper .spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.file__wrapper {
+    position: relative;
+    max-width: 100%;
+}
+
+.file__wrapper .spectrum-Icon {
+    max-height: 100%;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+}
+
+.file__wrapper .spectrum-Dropdown-icon {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.file__btn {
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.file__input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.file__loader {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
 }

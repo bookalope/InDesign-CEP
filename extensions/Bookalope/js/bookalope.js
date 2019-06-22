@@ -1,7 +1,7 @@
 /*jslint browser: true, devel: true */
-/*global window, atob, btoa */
-/*global Promise, Blob */
-/*global BookalopeClient, Book, Bookflow */
+/*global window, document, navigator, atob */
+/*global Promise, Blob, FileReader, CustomEvent, localStorage, CSInterface */
+/*global BookalopeClient, BookalopeError, Book, Bookflow */
 
 
 /**
@@ -36,41 +36,61 @@ function detectFeatures() {
     } else {
         missing.push("FileReader");
     }
+    // Check that we have the Array.from() method. Because the extension supports InDesign
+    // versions 11 (CEP6) and 12 (CEP7) it therefore must run on Chromium 41.0.2272.104 which
+    // does not have a native Array.from() method: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
+    if (typeof Array.from === "function" && Array.from.toString().indexOf("[native code]") !== -1) {
+        // We've got a native Array.from() method.
+    }
+    else {
+        // No support for a native Array.from() method, so we add a simple implementation shim.
+        Array.from = function (thing) {
+            var array = []
+            for (var count = 0; count < thing.length; count++) {
+                array.push(thing[count]);
+            }
+            return array;
+        };
+    }
 
     return missing;
 }
 
 
 /**
- * Retrieve the user's Bookalope API token that's stored by Chromium, or return undefined
- * if the token wasn't found.
+ * Retrieve the user's Bookalope API token and beta host flag that's stored by Chromium,
+ * or return default values if they weren't found.
  *
  * See also: https://developer.mozilla.org/en/docs/Web/API/Window/localStorage
  *
- * @returns {string | undefined} The user's Bookalope API token.
+ * @returns {object} The user's Bookalope API token and whether to access Bookalope's beta host.
  */
 
 function getBookalopeAPIToken() {
-    var token = undefined;
+    var token = "";
+    var beta = false;
     if (typeof localStorage === "object") {
         token = localStorage.getItem("idsn_extension_bookalope_api_token");
+        beta = localStorage.getItem("idsn_extension_bookalope_beta_host") === "true";
     }
-    return token;
+    return {token: token, beta: beta};
 }
 
 
 /**
- * Store the given Bookalope API token for later use. Makes it easier for the user so she
- * doesn't have to keep entering the token between sessions.
+ * Store the given Bookalope API token and beta host flag for later use. Makes it easier
+ * for the user so she doesn't have to keep entering the token between sessions.
  *
  * See also: https://developer.mozilla.org/en/docs/Web/API/Window/localStorage
  *
  * @param {string} token - A valid Bookalope token.
+ * @param {boolean} beta - Flag indicating whether the token is valid for the beta host.
  */
 
-function setBookalopeAPIToken(token) {
+function setBookalopeAPIToken(token, beta) {
     if (typeof localStorage === "object") {
         localStorage.setItem("idsn_extension_bookalope_api_token", token);
+        localStorage.setItem("idsn_extension_bookalope_beta_host", beta);
     }
 }
 
@@ -91,12 +111,18 @@ function showUpload() {
     document.getElementById("input-file").value = "";
     document.getElementById("input-book-name").value = "";
     document.getElementById("input-book-author").value = "";
+    document.getElementById("input-book-language").value = "";
+    document.getElementById("input-book-copyright").value = "";
+    document.getElementById("input-book-pubdate").valueAsDate = new Date();
+    document.getElementById("input-book-isbn").value = "";
+    document.getElementById("input-book-publisher").value = "";
     document.getElementById("input-book-version").checked = false;
     document.getElementById("input-book-autoclean").checked = true;
     document.getElementById("input-book-highlight-issues").checked = false;
+    document.getElementById("input-book-skip-structure").checked = false;
 
-    document.getElementById("bookalope-upload").style.display = "block";
-    document.getElementById("bookalope-update").style.display = "none";
+    document.getElementById("bookalope-upload").classList.remove("hidden");
+    document.getElementById("bookalope-update").classList.add("hidden");
 }
 
 
@@ -110,8 +136,8 @@ function showUpload() {
  */
 
 function showUpdate() {
-    document.getElementById("bookalope-upload").style.display = "none";
-    document.getElementById("bookalope-update").style.display = "block";
+    document.getElementById("bookalope-upload").classList.add("hidden");
+    document.getElementById("bookalope-update").classList.remove("hidden");
 }
 
 
@@ -120,7 +146,7 @@ function showUpdate() {
  */
 
 function showSpinner() {
-    document.getElementById("spinner").style.display = "block";
+    document.getElementById("spinner").classList.remove("hidden");
 }
 
 
@@ -129,7 +155,7 @@ function showSpinner() {
  */
 
 function hideSpinner() {
-    document.getElementById("spinner").style.display = "none";
+    document.getElementById("spinner").classList.add("hidden");
 }
 
 
@@ -138,14 +164,14 @@ function hideSpinner() {
  * a given message of the given class into that message box.
  *
  * @param {string} message - The message to be displayed.
- * @param {string} msgClass - One of two CSS class names, "status-type-info" or "status-type-error".
+ * @param {string} msgClass - One of two CSS class names, "spectrum-StatusLight--celery" or "spectrum-StatusLight--negative".
  */
 
 function showMessage(message, msgClass) {
     var messageBox = document.getElementById("status-message-box");
-    messageBox.classList.remove("status-type-info", "status-type-error");
+    messageBox.classList.remove("spectrum-StatusLight--celery", "spectrum-StatusLight--negative");
     messageBox.classList.add(msgClass);
-    messageBox.children[0].innerHTML = message;
+    messageBox.innerHTML = message;
 }
 
 
@@ -158,8 +184,21 @@ function showMessage(message, msgClass) {
  */
 
 function showElementError(element, text) {
-    element.closest(".form-row").classList.add("error-row");
-    showMessage("Error: " + text, "status-type-error");
+    element.classList.add("is-invalid");
+    if (element.classList.contains("spectrum-Dropdown-input") === true || element.classList.contains("spectrum-Dropdown-select") === true) {
+        var controlDropdown = element.classList.contains("spectrum-Dropdown-input") === true ? element.closest(".spectrum-Dropdown") : element.nextSibling;
+        if (controlDropdown !== null) {
+            controlDropdown.classList.add("is-invalid");
+            controlDropdown.querySelector(".spectrum-Dropdown-trigger").classList.add("is-invalid");
+        }
+    }
+    else if (element.classList.contains("spectrum-Checkbox-input") === true) {
+        var controlCheckbox = element.closest(".spectrum-Checkbox");
+        if (controlCheckbox !== null) {
+            controlCheckbox.classList.add("is-invalid");
+        }
+    }
+    showMessage("Error: " + text, "spectrum-StatusLight--negative");
 }
 
 
@@ -170,7 +209,7 @@ function showElementError(element, text) {
  */
 
 function showClientError(text) {
-    showMessage("InDesign client error: " + text, "status-type-error");
+    showMessage("InDesign client error: " + text, "spectrum-StatusLight--negative");
 }
 
 
@@ -181,7 +220,7 @@ function showClientError(text) {
  */
 
 function showServerError(text) {
-    showMessage("Bookalope server error: " + text, "status-type-error");
+    showMessage("Bookalope server error: " + text, "spectrum-StatusLight--negative");
 }
 
 
@@ -192,7 +231,7 @@ function showServerError(text) {
  */
 
 function showStatus(text) {
-    showMessage("Status: " + text, "status-type-info");
+    showMessage("Status: " + text, "spectrum-StatusLight--celery");
 }
 
 
@@ -201,7 +240,7 @@ function showStatus(text) {
  */
 
 function showStatusOk() {
-    showStatus("Ok (β 0.9.5)");
+    showStatus("Ok (v0.9.6)");
 }
 
 
@@ -211,12 +250,9 @@ function showStatusOk() {
  */
 
 function clearErrors() {
-    // Grumble. No .forEach() for HTMLCollections, but instead we need to iterate the olden ways.
-    // https://stackoverflow.com/questions/22754315/for-loop-for-htmlcollection-elements#22754453
-    var elements = document.getElementsByClassName("form-row");
-    for (var count = 0; count < elements.length; count += 1) {
-        elements[count].classList.remove("error-row");
-    }
+    Array.from(document.getElementsByClassName("is-invalid")).forEach(function (element) {
+        element.classList.remove("is-invalid");
+    });
     showStatusOk();
 }
 
@@ -244,13 +280,13 @@ function saveBookflowFile(bookflow, format, style, version, filename) {
 
             // Conversion is triggered on the server, now check periodically the status of the
             // conversion until it has succeeded or failed.
-            var intervalID = setInterval(function (bookflow) {
+            var intervalID = window.setInterval(function (bookflow) {
                 bookflow.convert_status(format, style, version)
                 .then(function (status_) {
 
                     // Conversion succeeded, now download and save the converted file.
                     if (status_ === "ok") {
-                        clearInterval(intervalID);
+                        window.clearInterval(intervalID);
                         bookflow.convert_download(format, style, version)
                         .then(function (blob) {
 
@@ -290,14 +326,14 @@ function saveBookflowFile(bookflow, format, style, version, filename) {
                             reject(error);
                         });
                     } else if (status_ === "failed" || status_ === "na") {
-                        clearInterval(intervalID);
-                        reject(new BookalopeError("Failed to convert document to " + format + "/" + style + "(" + version + ")"));
+                        window.clearInterval(intervalID);
+                        reject(new BookalopeError("Failed to convert document to " + format + " ('" + style + "' style, " + version + " version)"));
                     } else {
                         // Do nothing and keep waiting.
                     }
                 })
                 .catch(function (error) {
-                  reject(error);
+                    reject(error);
                 });
             }, 5000, bookflow);
         })
@@ -350,14 +386,21 @@ function askSaveBookflowFile(bookflow, format, style, version) {
     // The BookalopeClient object that helps us talk to the server, and the Bookalope API token.
     var bookalope;
     var bookalopeToken;
+    var bookalopeBetaHost;
 
     // Tis where we keep the current inputs from the panel.
     var bookFile;
     var bookName;
     var bookAuthor;
+    var bookLanguage;
+    var bookCopyright;
+    var bookPubDate;
+    var bookIsbn;
+    var bookPublisher;
     var bookVersion;
     var bookAutoClean;
     var bookHighlightIssues;
+    var bookSkipStructure;
 
 
     /**
@@ -371,6 +414,8 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         if (bookalope === undefined) {
             bookalope = new BookalopeClient(bookalopeToken);
         }
+        bookalope.setToken(bookalopeToken);
+        bookalope.setHost(bookalopeBetaHost);
         return bookalope;
         // bookalope || bookalope = new BookalopeClient(bookalopeToken)
     }
@@ -412,16 +457,15 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             }
             return false;
         });
-        addClickListener(document.getElementById("a-bookalope-epub"), function () {
-            askSaveBookflowFile(bookflow, "epub", "default", "test");
+        addClickListener(document.getElementById("button-download"), function () {
+            var bookDownload = document.getElementById("input-book-download").value;
+            var bookVersion = document.getElementById("input-book-download-version").checked ? "final" : "test";
+            askSaveBookflowFile(bookflow, bookDownload, "default", bookVersion);
             return false;
         });
-        addClickListener(document.getElementById("a-bookalope-mobi"), function () {
-            askSaveBookflowFile(bookflow, "mobi", "default", "test");
-            return false;
-        });
-        addClickListener(document.getElementById("a-bookalope-pdf"), function () {
-            askSaveBookflowFile(bookflow, "pdf", "default", "test");
+        addClickListener(document.getElementById("button-refresh"), function () {
+            showSpinner();
+            convert(bookflow);
             return false;
         });
     }
@@ -446,19 +490,19 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         var fname = "idsn-" + time.toString(16).slice(-8) + "-" + rnd.toString(16).slice(-8);
 
         // Convert the given Bookflow's document to ICML, and save it as a temporary file.
-        saveBookflowFile(bookflow, "icml", "default", "test", config.tmp + "/" + fname + ".icml")
+        saveBookflowFile(bookflow, "icml", "default", bookVersion, config.tmp + "/" + fname + ".icml")
         .then(function (filename) {
             showStatus("Building InDesign document");
 
             // Create the new document on the InDesign side, and pass the Book and Bookflow
             // IDs along to store them with the document. That way, we can update the panel
             // based on the currently active InDesign document.
-            var script = "bookalopeCreateDocument('" + filename + "', '" + bookflow.book.id + "', '" + bookflow.id + "');";
+            var script = "bookalopeCreateDocument('" + filename + "', '" + bookflow.book.id + "', '" + bookflow.id + "', " + bookalopeBetaHost + ");";
             csInterface.evalScript(script, function (result) {
                 // TODO handle result = 'EvalScript error'
 
                 // Delete the temporary ICML file.
-                var result = window.cep.fs.deleteFile(filename);
+                result = window.cep.fs.deleteFile(filename);
                 if (result.err) {
                     // TODO Handle error here: let the temporary ICML file leak quietly? Yup.
                 }
@@ -472,7 +516,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             });
         })
         .catch(function (error) {
-            showServerError(error);
+            showServerError(error.message);
             hideSpinner();
         });
     }
@@ -502,28 +546,28 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             // Note that result.data is a base-64 encoded binary, so we have to decode it
             // before passing it to the Bookalope wrapper. The wrapper will then encode
             // it (again) before shipping it off to the server.
-            bookflow.setDocument(bookFile.name, atob(result.data))
+            bookflow.setDocument(bookFile.name, atob(result.data), "doc", bookSkipStructure)
             .then(function (bookflow) {
 
                 // Periodically poll the Bookalope server to update the Bookflow. Then check
                 // the step property for the current processing status of the Bookalope, and
                 // act accordingly.
-                var intervalID = setInterval(function (bookflow) {
+                var intervalID = window.setInterval(function (bookflow) {
                     bookflow.update()
                     .then(function (bookflow) {
                         if (bookflow.step === "processing") {
                             // Bookalope is still processing, keep waiting.
                         } else if (bookflow.step === "processing_failed") {
-                            clearInterval(intervalID);
+                            window.clearInterval(intervalID);
                             showServerError("Bookalope failed to process the document");
                             hideSpinner();
                         } else if (bookflow.step === "convert") {
-                            clearInterval(intervalID);
+                            window.clearInterval(intervalID);
                             convert(bookflow);
                         }
                     })
                     .catch(function (error) {
-                        clearInterval(intervalID);
+                        window.clearInterval(intervalID);
                         showServerError(error.message);
                         hideSpinner();
                     });
@@ -549,13 +593,29 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         // Get the BookalopeClient object.
         var bookalope = getBookalope();
 
+
         // Create a new Book, which then contains an empty Bookflow. That is the
         // Bookfow we'll work with. Note that the user will see both Book and Bookflow
         // when she logs into the website.
         bookalope.createBook(bookName)
         .then(function (book) {
             var bookflow = book.bookflows[0];
-            uploadFile(bookflow);
+            bookflow.name = bookName;
+            bookflow.title = bookName;
+            bookflow.author = bookAuthor;
+            bookflow.copyright = bookCopyright;
+            bookflow.isbn = bookIsbn;
+            bookflow.language = bookLanguage;
+            bookflow.pubdate = bookPubDate;
+            bookflow.publisher = bookPublisher;
+            bookflow.save()
+            .then(function () {
+                uploadFile(bookflow);
+            })
+            .catch(function (error) {
+                showServerError(error.message);
+                hideSpinner();
+            });
         })
         .catch(function (error) {
             showServerError(error.message);
@@ -575,36 +635,48 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         // Store the API authentication key to local storage for later.
         bookalopeToken = document.getElementById("input-bookalope-token").value.toLowerCase();
-        setBookalopeAPIToken(bookalopeToken);
+        bookalopeBetaHost = document.getElementById("input-bookalope-beta").checked;
+        setBookalopeAPIToken(bookalopeToken, bookalopeBetaHost);
 
         // Get the values from the form fields.
         bookFile = document.getElementById("input-file").files[0];
         bookName = document.getElementById("input-book-name").value;
         bookAuthor = document.getElementById("input-book-author").value;
-        bookVersion = document.getElementById("input-book-version").checked;
+        bookCopyright = document.getElementById("input-book-copyright").value;
+        bookLanguage = document.getElementById("input-book-language").value;
+        bookPubDate = document.getElementById("input-book-pubdate").value;
+        bookIsbn = document.getElementById("input-book-isbn").value;
+        bookPublisher = document.getElementById("input-book-publisher").value;
+        bookVersion = document.getElementById("input-book-version").checked ? "final" : "test";
         bookAutoClean = document.getElementById("input-book-autoclean").checked;
         bookHighlightIssues = document.getElementById("input-book-highlight-issues").checked;
+        bookSkipStructure = document.getElementById("input-book-skip-structure").checked;
 
         // Hide error messages and clear out highlighted fields, if there are any.
         clearErrors();
 
         // Check for errors of the input fields. If everything is good then
         // upload the document to Bookalope for conversion.
-        if (bookFile === undefined) {
+        if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {
+            showElementError(document.getElementById("input-bookalope-token"), "Field is required");
+            document.getElementById("input-bookalope-token").scrollIntoView(false);
+        }
+        else if (bookFile === undefined) {
             showElementError(document.getElementById("input-file"), "Field is required");
+            document.getElementById("input-book-name").scrollIntoView(false);
         }
         else if (bookFile.size > 268435456) { // 256MiB
             showElementError(document.getElementById("input-file"), "File size exceeded 12Mb");
-        }
-        else if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {
-            showElementError(document.getElementById("input-bookalope-token"), "Field is required");
+            document.getElementById("input-book-name").scrollIntoView(false);
         }
         else if (bookName.length === 0) {
             showElementError(document.getElementById("input-book-name"), "Field is required");
+            document.getElementById("input-book-name").scrollIntoView(false);
         }
-
-        // No errors, proceed.
-        createBook();
+        else {
+            // No errors, proceed.
+            createBook();
+        }
     }
 
 
@@ -627,10 +699,15 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             var bookalopeDocData = JSON.parse(result);
             if (bookalopeDocData) {
 
-                // Get Book and Bookflow IDs.
+                // Get Book and Bookflow IDs, as well as beta host information.
                 var bookId = bookalopeDocData["book-id"];
                 var bookflowId = bookalopeDocData["bookflow-id"];
                 // TODO Paranoid: (/^[0-9a-fA-F]{32}$/).test(bookId), (/^[0-9a-fA-F]{32}$/).test(bookflowId)
+
+                // Handle beta host information from the document.
+                if (bookalopeBetaHost !== bookalopeDocData["beta"]) {
+                    showClientError("Document " + (bookalopeDocData["beta"] ? "uses" : "doesn't use") + " beta server , please check token");
+                }
 
                 // Create a new Book and Bookflow object. Note that creating them does not
                 // talk with the Bookalope server, it merely instantiates the corresponding
@@ -661,27 +738,58 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
 
     /**
-     * Stub handler that is called when the user switches the InDesign color scheme.
-     *
-     * @param {Event} csEvent
+     * Given a skin info compute the matching color scheme and, if it has changed compared
+     * to the application's current scheme change to the new scheme.
      */
 
-    function themeColorChangedEventHandler(csEvent) {
-        var hostEnv = window.__adobe_cep__.getHostEnvironment();
-        var skinInfo = JSON.parse(hostEnv).appSkinInfo;
-        // TODO Handle the theme manager event.
+    function updateThemeWithAppSkinInfo(appSkinInfo) {
+
+        // Update the theme of the extension panel.
+        var theme = undefined;
+        var sentinelColor = appSkinInfo.panelBackgroundColor.color.red;
+        if (sentinelColor > 200) {
+            theme = "lightest";
+        } else if (sentinelColor > 180) {
+            theme = "light";
+        } else if (sentinelColor > 67) {
+            theme = "dark";
+        } else {
+            theme = "darkest";
+        }
+
+        // Based on the theme's name switch the CSS files accordingly.
+        var hostThemeEl = document.getElementById("hostTheme");
+        var hostEl = document.querySelector("body");
+        var curTheme = hostThemeEl.getAttribute("data-theme");
+        if (theme !== curTheme) {
+            hostThemeEl.setAttribute("data-theme", theme);
+            hostThemeEl.setAttribute("href", "css/spectrum/spectrum-" + theme + ".css");
+            hostEl.classList.remove("spectrum--" + curTheme);
+            hostEl.classList.add("spectrum--" + theme);
+        }
     }
 
 
     // First things first: get some configuration information from the InDesign side.
     var config;
     var csInterface = new CSInterface();
+
+    // The ThemeManager handles the extension's color theme based on InDesign's scheme. So first
+    // get a latest HostEnvironment object from the application, and then install an event
+    // handler that's being called every time InDesign's color scheme changes.
+    updateThemeWithAppSkinInfo(csInterface.hostEnvironment.appSkinInfo);
+    csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, function (csEvent) {
+        var hostEnv = window.__adobe_cep__.getHostEnvironment();
+        var appSkinInfo = JSON.parse(hostEnv).appSkinInfo;
+        updateThemeWithAppSkinInfo(appSkinInfo);
+    });
+
     csInterface.evalScript("getConfiguration();", function (result) {
         config = JSON.parse(result);
 
         // Make sure all the necessary features are available. If not, then show a simple
         // error message and an otherwise empty panel. If all features are available, however,
-        // then show the appropriate panel.
+        // then show the appropriate panel. TODO This should never happen, we know the Chrome versions.
         var missingFeatures = detectFeatures();
         if (missingFeatures.length) {
 
@@ -694,23 +802,317 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         } else {
 
-            // Get the Bookalope API token if it's been stored before, and make it the value
-            // of the token input field.
-            bookalopeToken = getBookalopeAPIToken();
-            if (bookalopeToken !== undefined) {
-                document.getElementById("input-bookalope-token").value = bookalopeToken;
-            }
+            // Get the Bookalope API token and beta host flag if it's been stored before, and make
+            // them the value of their respective elements.
+            var bookalopeTokenInfo = getBookalopeAPIToken();
+            bookalopeToken = bookalopeTokenInfo.token;
+            bookalopeBetaHost = bookalopeTokenInfo.beta;
+            document.getElementById("input-bookalope-token").value = bookalopeToken;
+            document.getElementById("input-bookalope-beta").checked = bookalopeBetaHost;
 
             // Add a few relevant event handlers to catch changes.
             csInterface.addEventListener("documentAfterActivate", function (csEvent) {
                 switchPanel();
             });
-            csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, themeColorChangedEventHandler);
 
             // Register the callback for the Convert button.
             document.getElementById("button-send").addEventListener("click", function () {
                 uploadAndConvertDocument();
             });
+
+            // Register the callback for the File selection field that shows the selected
+            // file name or, if no file was selected, a default placeholder string.
+            document.getElementById("input-file").addEventListener("change", function (event) {
+                var label = this.parentNode.querySelector(".file__label");
+                if (this.files.length) {
+                    label.classList.remove("is-placeholder");
+                    label.textContent = event.target.value.split("\\").pop();
+                } else {
+                    label.classList.add("is-placeholder");
+                    label.textContent = this.getAttribute("placeholder");
+                }
+            });
+
+            // Alright this is a funky Adobe Spectrum thing. Looking at the documentation for
+            // Dropdown elements: http://opensource.adobe.com/spectrum-css/2.13.0/docs/#dropdown
+            // then Spectrum switches a <select> element to `hidden` and instead uses its own
+            // implementation; however, it's required to keep the <select> element and to sync
+            // its <option> values with the Spectrum Dropdown to make sure that forms continue
+            // to work. A bit spunky, but that's how they do it, I guess 😳
+            // Note: we use the Javascript idiom here that declares an anonymous function and
+            // executes it, in order to use the function's closure.
+            (function () {
+
+                /**
+                 * Return true if the `element` itself or any of its ancestor elements match
+                 * the given `selector`; or false otherwise.
+                 */
+
+                function isAncestorOf(element, selector) {
+
+                    // If the element itself matches, then we're done already.
+                    if (element.matches(selector)) {
+                        return true;
+                    }
+
+                    // Ascend along the ancestor elements and check.
+                    // See https://developer.mozilla.org/en-US/docs/DOM/Node.nodeType
+                    var parent = element.parentNode;
+                    while (parent && parent.nodeType && parent.nodeType === 1) {
+                        if (parent.matches(selector)) {
+                            return true;
+                        }
+                        parent = parent.parentNode;
+                    }
+                    return false;
+                }
+
+                /**
+                 * Close the given Dropdown's popover element.
+                 */
+
+                function closeDropdown(dropdown) {
+                    dropdown.classList.remove("is-open");
+                    dropdown.classList.remove("is-dropup");
+                    var dropdownPopover = dropdown.querySelector(".spectrum-Dropdown-popover");
+                    if (dropdownPopover !== null) {
+                        // This should always exist, no?
+                        dropdownPopover.classList.remove("is-open");
+                    }
+                }
+
+                /**
+                 * Iterate over all Spectrum Dropdown elements and close their respective
+                 * popover elements. If an exception Dropdown is specified then do not close
+                 * its popover.
+                 */
+
+                function closeAllDropdowns(exception) {
+                    Array.from(document.querySelectorAll(".spectrum-Dropdown")).forEach(function (dropdown) {
+                        if (dropdown !== exception) {
+                            closeDropdown(dropdown);
+                        }
+                    });
+                }
+
+                // Here it goes. Iterate over all <select> elements in the documents (assuming
+                // that they have a class 'spectrum-Dropdown-select') and hide them; then
+                // create the Adobe Spectrum specific Dropdowns in their stead.
+                Array.from(document.querySelectorAll(".spectrum-Dropdown-select")).forEach(function (select) {
+
+                    /**
+                     * Change the current label of a Dropdown.
+                     */
+
+                    function changeDropdownLabel(newValue, newLabel, isPlaceholder) {
+                        dropdownLabel.textContent = newLabel;
+                        dropdownLabel.setAttribute("data-value", newValue);
+                        dropdownLabel.classList.toggle("is-placeholder", isPlaceholder === true);
+                    }
+
+                    /**
+                     * A new value was selected using the Dropdown, which now has to be propagated
+                     * to the original <select> element's option. This function takes care of that.
+                     */
+
+                    function changeSelectValue(newValue, newLabel) {
+
+                        // Close the Dropdown's popover.
+                        dropdown.classList.remove("is-open");
+                        dropdownPopover.classList.remove("is-open");
+
+                        // If the value hasn't changed, then do nothing and be done.
+                        if (select.value === newValue) {
+                            return;
+                        }
+
+                        // Find the Dropdown's data item which was selected and mark it; likewise
+                        // remove the selected mark from all other items in the Dropdown.
+                        var isPlaceholderValue = false;
+                        Array.from(dropdownItems).forEach(function (dropdownItem) {
+                            if (dropdownItem.getAttribute("data-value") === newValue) {
+                                dropdownItem.classList.add("is-selected");
+                                isPlaceholderValue = dropdownItem.classList.contains("is-placeholder");
+                            } else {
+                                dropdownItem.classList.remove("is-selected")
+                            }
+                        });
+
+                        // Show the selected value as the Dropdown's label.
+                        changeDropdownLabel(newValue, newLabel, isPlaceholderValue);
+
+                        // Update the original <select> element's value with the Dropdown's selected one.
+                        select.value = newValue;
+
+                        // Send a "change" event to the real <select> element to trigger any change
+                        // event listeners that might be attached.  TODO There aren't any currently.
+                        var changeEvent = new CustomEvent("change");
+                        select.dispatchEvent(changeEvent);
+                    }
+
+                    // Get the <select> element's options; its "placeholder" (which is the label shown
+                    // when no option is selected); and its id attribute.
+                    var selectOptions = select.children,
+                        selectPlaceholder = select.getAttribute("data-placeholder"),
+                        selectId = select.getAttribute("id");
+
+                    // Hide the original <select> element, but we need to keep it in the DOM to ensure
+                    // that its value is used by the outer form.
+                    select.classList.add("hidden");
+
+                    // Build the fancy-schmancy Spectrum Dropdown as an HTML string. For more details
+                    // on how this works, take a look at the docs:
+                    //   http://opensource.adobe.com/spectrum-css/2.13.0/docs/#dropdown
+                    // When done, add the HTML into the DOM right after the original <select> element.
+                    var dropdownHTML = "";
+                    dropdownHTML += "<div class='spectrum-Dropdown' data-id='" + selectId + "'>";
+                    dropdownHTML += "<button class='spectrum-FieldButton spectrum-Dropdown-trigger'>" +
+                                    "<span class='spectrum-Dropdown-label is-placeholder'>" + selectPlaceholder + "</span>" +
+                                    "<svg class='spectrum-Icon spectrum-Icon--sizeS spectrum-UIIcon-Alert' focusable='false'><use xlink:href='#icon-AlertMedium'></use></svg>" +
+                                    "<svg class='spectrum-Icon spectrum-UIIcon-ChevronDownMedium spectrum-Dropdown-icon' focusable='false'><use xlink:href='#icon-ChevronDownMedium'/></svg>" +
+                                    "</button>";
+                    dropdownHTML += "<div class='spectrum-Popover spectrum-Dropdown-popover'>" +
+                                    "<ul class='spectrum-Menu' role='listbox'>";
+                    Array.from(selectOptions).forEach(function (option) {
+                        var isPlaceholder = option.getAttribute("data-placeholder") === "true",
+                            isDivider = option.getAttribute("data-divider") === "true";
+                        var cssItemClasses = "";
+                        cssItemClasses += isDivider ? "spectrum-Menu-divider" : "spectrum-Menu-item";
+                        if (isPlaceholder) {
+                            cssItemClasses += " is-placeholder";
+                        }
+                        if (option.selected === true) {
+                            cssItemClasses += " is-selected";
+                        }
+                        if (option.disabled === true) {
+                            cssItemClasses += " is-disabled";
+                        }
+                        var optionText = option.textContent,
+                            optionValue = option.getAttribute("value");
+                        dropdownHTML += "<li class='" + cssItemClasses + "' data-value='" + optionValue + "' " +
+                                        "role='" + (isDivider ? "separator" : "option") + "'>";
+                        if (!isDivider) {
+                            dropdownHTML += "<span class='spectrum-Menu-itemLabel'>" + optionText + "</span>";
+                        }
+                        dropdownHTML += "</li>";
+                    });
+                    dropdownHTML += "</ul></div></div>";
+                    select.insertAdjacentHTML("afterend", dropdownHTML);
+
+                    // Now that the Dropdown is inserted into the DOM, attach the required event handlers
+                    // so that it behaves like a proper replacement for the <select> element.
+                    var dropdown = document.querySelector(".spectrum-Dropdown[data-id='" + selectId + "']");
+                    var dropdownPopover = dropdown.querySelector(".spectrum-Dropdown-popover"),
+                        dropdownItems = dropdown.querySelectorAll(".spectrum-Menu-item"),
+                        dropdownLabel = dropdown.querySelector(".spectrum-Dropdown-label"),
+                        dropdownTrigger = dropdown.querySelector(".spectrum-Dropdown-trigger");
+
+                    // Iterate over the Dropdown's menu items, bind click handlers to each of them,
+                    // and set the Dropdown's label to the selected option.
+                    Array.from(dropdownItems).forEach(function (dropdownItem) {
+
+                        // If the menu item is disabled, skip on to the next.
+                        if (dropdownItem.classList.contains("is-disabled")) {
+                            return;  // continue;
+                        }
+
+                        // Bind click handler function to the menu item which, when the item is clicked,
+                        // updates the Dropdown's label and select's the correct option for the original
+                        // <select> element.
+                        dropdownItem.addEventListener("click", function (event) {
+                            var newValue = this.getAttribute("data-value"),
+                                newLabel = this.textContent;
+                            changeSelectValue(newValue, newLabel);
+                        });
+
+                        // If the menu item is the selected one, then update the Dropdown's label.
+                        var value = dropdownItem.getAttribute("data-value");
+                        if (value === select.value) {
+                            changeDropdownLabel(value, dropdownItem.textContent,
+                                                dropdownItem.classList.contains("is-placeholder"));
+                        }
+                    });
+
+                    // Notice that a Spectrum Dropdown also has a <button> that acts as the Dropdown's
+                    // "trigger" i.e. it opens the popover with the menu items. Here we bind a "click"
+                    // event handler that toggles that popover.
+                    dropdownTrigger.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (this.classList.contains("is-disabled") === false) {
+
+                            // If the popover is open, then close it.
+                            var dropdown = this.parentNode;
+                            if (dropdown.classList.contains("is-open")) {
+                                closeDropdown(dropdown);
+                            } else {
+
+                                /**
+                                 * Compute the effective height of the given DOM element.
+                                 */
+
+                                function getHeight(element) {
+
+                                    // If the element is displayed, then return its normal height.
+                                    var elementStyle = window.getComputedStyle(element);
+                                    if (elementStyle.display !== "none") {
+                                        var maxHeight = elementStyle.maxHeight.replace("px", "").replace("%", "");
+                                        if (maxHeight !== "0") {
+                                            return element.offsetHeight;
+                                        }
+                                    }
+
+                                    // The element is currently not displayed, so its height has not been
+                                    // computed. To fake that, hide the element but display it and grab
+                                    // its height. Then put it all back.
+                                    element.style.position = "absolute";
+                                    element.style.visibility = "hidden";
+                                    element.style.display = "block";
+
+                                    var height = element.offsetHeight;
+
+                                    // TODO Restore the original values, instead of overwriting them here.
+                                    element.style.position = "";
+                                    element.style.visibility = "";
+                                    element.style.display = "";
+
+                                    return height;
+                                }
+
+                                // This Dropdown is about to open its popover, so close the popovers of
+                                // of all other Dropdowns first. (This should only be one.)
+                                closeAllDropdowns(dropdown);
+
+                                // Make sure that the popover shows correctly in the ancestor's panel <div>.
+                                var panel = dropdown.closest(".panel__body");  // Or use <body>.
+                                var dropdownPopover = dropdown.querySelector(".spectrum-Dropdown-popover");
+
+                                // Check whether there is enough room below the Dropdown to open the
+                                // popover below; if there is not, then open the popover above the Dropdown.
+                                // TODO The popover is always not displayed yet, simplify getHeight() function!
+                                var popoverHeight = getHeight(dropdownPopover);
+                                if (dropdown.offsetTop > popoverHeight) {
+                                    var top = dropdown.offsetTop + dropdown.offsetHeight + popoverHeight;
+                                    if (top > panel.offsetHeight + panel.scrollTop) {
+                                        dropdown.classList.add("is-dropup");
+                                    }
+                                }
+
+                                // Open the Dropdown's popover.
+                                dropdown.classList.add("is-open");
+                                dropdownPopover.classList.add("is-open");
+                            }
+                        }
+                    });
+                });
+
+                // Clicking outside of the Dropdown or its popover closes any open popover.
+                document.addEventListener("click", function (event) {
+                    if (!isAncestorOf(event.target, ".spectrum-Dropdown")) {
+                        closeAllDropdowns();
+                    }
+                });
+            })();
 
             // And we're ready.
             showStatusOk();
@@ -720,4 +1122,6 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         }
     });
 
+    // Load all SVG icons used by the extension so that they become available to the <svg> elements.
+    loadIcons("images/sprite-icons.svg");
 }());

@@ -8,16 +8,16 @@ This repository contains the complete source code for [Bookalope](https://bookal
 
 ## Requirements
 
-The extension requires and supports Adobe InDesign versions 11–13. However, the extension may run on older versions that provide CEP support, but that hasn’t been tested.
+The extension requires and supports Adobe InDesign versions 11–14. However, while the extension may run on older versions that hasn’t been tested in depth.
 
 ## Coding
 
-Read a general introduction to writing an Adobe CEP extension [here](http://www.adobe.com/devnet/creativesuite/articles/a-short-guide-to-HTML5-extensions.html). For more information on the Bookalope API please refer to its [documentation on Github](https://github.com/jenstroeger/Bookalope).
+Read a general introduction to writing an Adobe CEP extension [here](http://www.adobe.com/devnet/creativesuite/articles/a-short-guide-to-HTML5-extensions.html), and a more in-depth documentation provides the [CEP Extension Cookbook](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_9.x/Documentation/CEP%209.0%20HTML%20Extension%20Cookbook.md). For more information on the Bookalope API please refer to its [documentation on Github](https://github.com/jenstroeger/Bookalope).
 
 InDesign does not load an extension unless the extension has been cryptographically signed. Therefore, in order to run the Bookalope extension from source, you need to switch InDesign to _PlayerDebugMode_:
 
- - On Mac, open the file `~/Library/Preferences/com.adobe.CSXS.8.plist` and add a row with key `PlayerDebugMode` of type String and value `1`. You can edit `.plist` files using [Xcode](https://developer.apple.com/xcode/), [PList Edit](https://www.fatcatsoftware.com/plisteditpro/) or other applications suited to edit [Property Lists](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/PropertyLists/Introduction/Introduction.html).
- - On Windows, using its [registry editor](https://support.microsoft.com/en-au/help/4027573/windows-open-registry-editor-in-windows-10) open the registry key `HKEY_CURRENT_USER/Software/Adobe/CSXS.8` and add a key named `PlayerDebugMode` of type String and value `1`.
+ - On Mac, open the file `~/Library/Preferences/com.adobe.CSXS.9.plist` and add a row with key `PlayerDebugMode` of type String and value `1`. You can edit `.plist` files using [Xcode](https://developer.apple.com/xcode/), [PList Edit](https://www.fatcatsoftware.com/plisteditpro/) or other applications suited to edit [Property Lists](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/PropertyLists/Introduction/Introduction.html).
+ - On Windows, using its [registry editor](https://support.microsoft.com/en-au/help/4027573/windows-open-registry-editor-in-windows-10) open the registry key `HKEY_CURRENT_USER/Software/Adobe/CSXS.9` and add a key named `PlayerDebugMode` of type String and value `1`.
 
 If you have multiple CSXS versions installed, add the `PlayerDebugMode` to all of them.
 
@@ -61,13 +61,13 @@ Then start InDesign, and the extension should be available from the _Window → 
 
 Once installed, open the extension panel:
 
-<img src="https://bookalope.net/img/idsn-bookalope-upload.png" width="50%" alt="Bookalope InDesign: Upload panel">
+<img src="https://bookalope.net/img/idsn-bookalope-0.9.6-upload.jpg" width="50%" alt="Bookalope InDesign: Upload panel">
 
 To use the Bookalope web services, you need a Bookalope API key: you can find the key in the [user profile](https://bookflow.bookalope.net/profile) of your Bookalope account. Then select a book manuscript in Word format (or any other of the [supported document formats](https://github.com/jenstroeger/Bookalope/blob/master/API.md#get-formats)), fill in `Name` and `Author` of the book, and then click the `Upload and convert` button.
 
 The extension uploads the document to the Bookalope server for analysis and conversion. This can take a little while. Once finished, the extension downloads the converted file, creates a new InDesign document, and places the downloaded content into the new InDesign document. The extension’s panel changes now to this:
 
-<img src="https://bookalope.net/img/idsn-bookalope-update.png" width="50%" alt="Bookalope InDesign: Update panel">
+<img src="https://bookalope.net/img/idsn-bookalope-0.9.6-update.jpg" width="50%" alt="Bookalope InDesign: Update panel">
 
 From here, you can open the document on the Bookalope website to revisit and adjust the entire analysis and conversion flow (watch the video tutorials on [Youtube](https://www.youtube.com/channel/UCCxR_k6G06qEAj3IjZ9AcoQ)). You can also download the converted document in EPUB, MOBI, or print-ready PDF formats.
 
