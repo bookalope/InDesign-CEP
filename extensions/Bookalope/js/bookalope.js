@@ -805,8 +805,10 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             // Get the Bookalope API token and beta host flag if it's been stored before, and make
             // them the value of their respective elements.
             var bookalopeTokenInfo = getBookalopeAPIToken();
-            document.getElementById("input-bookalope-token").value = bookalopeTokenInfo.token;
-            document.getElementById("input-bookalope-beta").checked = bookalopeTokenInfo.beta;
+            bookalopeToken = bookalopeTokenInfo.token;
+            bookalopeBetaHost = bookalopeTokenInfo.beta;
+            document.getElementById("input-bookalope-token").value = bookalopeToken;
+            document.getElementById("input-bookalope-beta").checked = bookalopeBetaHost;
 
             // Add a few relevant event handlers to catch changes.
             csInterface.addEventListener("documentAfterActivate", function (csEvent) {
