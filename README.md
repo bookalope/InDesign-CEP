@@ -55,7 +55,7 @@ The easy way to install the packaged and signed extension is by using [Anastasiy
     > ExManCmd --list all  # List all installed extensions
     > ExManCmd --install ./com.bookalope.zxp  # Install the Bookalope extension
 
-Then start InDesign, and the extension should be available from the _Window → Extensions_ menu.
+Then start InDesign, and the extension should be available from the panel list under the _Window_ menu.
 
 ## Running
 

@@ -29,7 +29,7 @@
                 </Lifecycle>
                 <UI>
                     <Type>Panel</Type>
-                    <Menu>Bookalope</Menu>
+                    <Menu Placement="'Main:&amp;Window',600.0,'KBSCE Window menu'">Bookalope</Menu>
                     <Geometry>
                         <Size>
                             <Width>450</Width>
