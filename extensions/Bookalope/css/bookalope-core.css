@@ -129,18 +129,6 @@ html, body {
     width: 10px;
 }
 
-.panel__body::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.panel__body::-webkit-scrollbar-thumb {
-    background: #888;
-}
-
-.panel__body::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
 .panel__footer-rule {
     margin: 0;
 }

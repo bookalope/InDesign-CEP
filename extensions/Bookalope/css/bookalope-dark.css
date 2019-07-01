@@ -1,0 +1,13 @@
+@charset "utf-8";
+
+.panel__body::-webkit-scrollbar-track {
+    background: rgb(62, 62, 62);  /* --spectrum-scrollbar-track-color */
+}
+
+.panel__body::-webkit-scrollbar-thumb {
+    background: rgb(90, 90, 90);  /* --spectrum-scrollbar-bar-color */
+}
+
+.panel__body::-webkit-scrollbar-thumb:hover {
+    background: rgb(144, 144, 144);  /* --spectrum-scrollbar-bar-color-hover */
+}

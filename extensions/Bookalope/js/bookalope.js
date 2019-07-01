@@ -759,11 +759,13 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
         // Based on the theme's name switch the CSS files accordingly.
         var hostThemeEl = document.getElementById("hostTheme");
-        var hostEl = document.querySelector("body");
         var curTheme = hostThemeEl.getAttribute("data-theme");
         if (theme !== curTheme) {
             hostThemeEl.setAttribute("data-theme", theme);
             hostThemeEl.setAttribute("href", "css/spectrum/spectrum-" + theme + ".css");
+            hostThemeEl.nextElementSibling.nextElementSibling.setAttribute("href", "css/bookalope-" + theme + ".css");
+
+            var hostEl = document.querySelector("body");
             hostEl.classList.remove("spectrum--" + curTheme);
             hostEl.classList.add("spectrum--" + theme);
         }
