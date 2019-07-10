@@ -2,7 +2,7 @@
 
 ## Introduction
 
-[Adobe CEP](https://github.com/Adobe-CEP), or Common Extensibility Platform, provides a framework to extend Adobe applications like [InDesign](http://www.adobe.com/products/indesign.html) with custom user interfaces and functionality. There is a wealth of useful extensions available on [Adobe’s Add-On Marketplace](https://creative.adobe.com/addons).
+[Adobe CEP](https://github.com/Adobe-CEP), or Common Extensibility Platform, provides a framework to extend Adobe applications like [InDesign](http://www.adobe.com/products/indesign.html) with custom user interfaces and functionality. There is a wealth of useful extensions available on [Adobe’s Extension Marketplace](https://www.adobeexchange.com/creativecloud.html).
 
 This repository contains the complete source code for [Bookalope](https://bookalope.net/)’s InDesign extension. The extension uses the [Bookalope REST API](https://github.com/jenstroeger/Bookalope/blob/master/API.md) and its [Javascript wrapper](https://github.com/jenstroeger/Bookalope/blob/master/clients/javascript/bookalope.js) to integrate the Bookalope toolset into InDesign. For more information on Bookalope and its services, please refer to the [Bookalope](https://bookalope.net) website.
 
@@ -76,8 +76,8 @@ From here, you can open the document on the Bookalope website to revisit and adj
 Writing an Adobe CEP extension requires documentation which is not always readily available. However, some useful resources are:
 
  - The Adobe CEP resources on Github is [here](https://github.com/Adobe-CEP/CEP-Resources);
+ - The Adobe CEP extensions’s UI is styled using [Adobe’s Spectrum CSS](https://github.com/adobe/spectrum-css).
  - The ExtendScript documentation is [here](http://www.indesignjs.de/extendscriptAPI/indesign-latest/);
  - Davide Barranca’s [blog](https://www.davidebarranca.com/category/code/) contains useful tips;
- - Adobe CEP extensions’s UI should be styled using [CEP Spectrum Boilerplate](https://github.com/Hennamann/CEP-Spectrum-Boilerplate) or [Topcoat](https://github.com/topcoat/topcoat).
 
 In addition to the above, the [InDesign Scripting Forum](https://forums.adobe.com/community/indesign/indesign_scripting) might be useful, or the [#cep channel on Slack](https://adobedevs.slack.com/messages/C1FKLQ63F) is a playground to many experienced developers.

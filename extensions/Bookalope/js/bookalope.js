@@ -412,12 +412,11 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
     function getBookalope() {
         if (bookalope === undefined) {
-            bookalope = new BookalopeClient(bookalopeToken);
+            bookalope = new BookalopeClient();
         }
         bookalope.setToken(bookalopeToken);
         bookalope.setHost(bookalopeBetaHost);
         return bookalope;
-        // bookalope || bookalope = new BookalopeClient(bookalopeToken)
     }
 
 
@@ -772,9 +771,11 @@ function askSaveBookflowFile(bookflow, format, style, version) {
     }
 
 
-    // First things first: get some configuration information from the InDesign side.
+    // First things first: get and initialize the Creative Suite Interface. There is much
+    // speculation as to what CS stands for: https://adobedevs.slack.com/archives/C1F8U99S7/p1561952315033200
     var config;
     var csInterface = new CSInterface();
+    var resourceBundle = csInterface.initResourceBundle();
 
     // The ThemeManager handles the extension's color theme based on InDesign's scheme. So first
     // get a latest HostEnvironment object from the application, and then install an event
@@ -812,7 +813,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             document.getElementById("input-bookalope-token").value = bookalopeToken;
             document.getElementById("input-bookalope-beta").checked = bookalopeBetaHost;
 
-            // Add a few relevant event handlers to catch changes.
+            // Add a few relevant event handlers to catch changes from the other side.
             csInterface.addEventListener("documentAfterActivate", function (csEvent) {
                 switchPanel();
             });
