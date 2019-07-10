@@ -24,11 +24,11 @@
               </svg>
             </label>
             <div class="spectrum-Form-itemField">
-              <input type="text" name="input-bookalope-token" id="input-bookalope-token" class="spectrum-Textfield">
+              <input type="text" name="input-bookalope-token" id="input-bookalope-token" placeholder="Token" class="spectrum-Textfield">
             </div>
           </div>
           <div class="spectrum-Form-item">
-            <label for="input-bookalope-beta" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Use Beta version</label>
+            <label for="input-bookalope-beta" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Use Beta server</label>
             <div class="spectrum-Form-itemField">
               <label class="spectrum-Checkbox" for="input-bookalope-beta">
                 <input type="checkbox" name="input-bookalope-beta" id="input-bookalope-beta" class="spectrum-Checkbox-input">
@@ -195,14 +195,6 @@
 
         <!-- Update or Download panel: download converted files, or update/refresh the local document from the Bookalope server. -->
         <div id="bookalope-update" class="hidden">
-          <div class="form__nav">
-            <button class="spectrum-Button spectrum-Button--cta" id="button-refresh">
-              <span class="spectrum-Button-label">Refresh from server</span>
-            </button>
-          </div>
-
-          <hr class="spectrum-Rule spectrum-Rule--small"/>
-
           <div class="form__text">
             <p class="spectrum-Body4">Edit this document in&#8194;
               <a href="#" id="a-bookalope" class="spectrum-Link">
@@ -211,8 +203,17 @@
                 </svg>
                 Bookalope
               </a>
+              , and then refresh the changes in a new local document.
             </p>
           </div>
+          <div class="form__nav">
+            <button class="spectrum-Button spectrum-Button--cta" id="button-refresh">
+              <span class="spectrum-Button-label">Refresh from server</span>
+            </button>
+          </div>
+
+          <hr class="spectrum-Rule spectrum-Rule--small"/>
+
           <div class="spectrum-Form spectrum-Form--small">
             <div class="spectrum-Form-item">
               <label for="input-book-download" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">Download as</label>
