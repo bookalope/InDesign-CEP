@@ -818,6 +818,12 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             csInterface.addEventListener("documentAfterActivate", function (csEvent) {
                 switchPanel();
             });
+            csInterface.addEventListener("documentBeforeClose", function (csEvent) {
+                if (csEvent.data === 1) {
+                    showUpload();
+                    showStatusOk();
+                }
+            });
 
             // Register the callback for the Convert button.
             document.getElementById("button-send").addEventListener("click", function () {
