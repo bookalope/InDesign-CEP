@@ -109,6 +109,7 @@ function showUpload() {
 
     // Reset configuration fields.
     document.getElementById("input-file").value = "";
+    document.getElementById("input-file").dispatchEvent(new Event("change"));
     document.getElementById("input-book-name").value = "";
     document.getElementById("input-book-author").value = "";
     document.getElementById("input-book-language").value = "";
