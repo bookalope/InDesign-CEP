@@ -757,17 +757,18 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             theme = "darkest";
         }
 
-        // Based on the theme's name switch the CSS files accordingly.
-        var hostThemeEl = document.getElementById("hostTheme");
-        var curTheme = hostThemeEl.getAttribute("data-theme");
-        if (theme !== curTheme) {
-            hostThemeEl.setAttribute("data-theme", theme);
-            hostThemeEl.setAttribute("href", "css/spectrum/spectrum-" + theme + ".css");
-            hostThemeEl.nextElementSibling.nextElementSibling.setAttribute("href", "css/bookalope-" + theme + ".css");
+        // Based on the theme's name switch classes and CSS files accordingly.
+        var body = document.querySelector("body");
+        var currentTheme = body.getAttribute("data-theme");
+        if (theme !== currentTheme) {
+            body.setAttribute("data-theme", theme);
+            body.classList.remove("spectrum--" + currentTheme);
+            body.classList.add("spectrum--" + theme);
 
-            var hostEl = document.querySelector("body");
-            hostEl.classList.remove("spectrum--" + curTheme);
-            hostEl.classList.add("spectrum--" + theme);
+            // Switch the CSS files.
+            document.querySelectorAll("link[data-theme-css]").forEach(function (link) {
+                link.setAttribute("href", link.getAttribute("data-theme-css") + theme + ".css");
+            });
         }
     }
 
