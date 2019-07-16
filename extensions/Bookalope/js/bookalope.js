@@ -899,7 +899,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                  */
 
                 function closeAllDropdowns(exception) {
-                    Array.from(document.querySelectorAll(".spectrum-Dropdown")).forEach(function (dropdown) {
+                    document.querySelectorAll(".spectrum-Dropdown").forEach(function (dropdown) {
                         if (dropdown !== exception) {
                             closeDropdown(dropdown);
                         }
@@ -909,7 +909,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                 // Here it goes. Iterate over all <select> elements in the documents (assuming
                 // that they have a class 'spectrum-Dropdown-select') and hide them; then
                 // create the Adobe Spectrum specific Dropdowns in their stead.
-                Array.from(document.querySelectorAll(".spectrum-Dropdown-select")).forEach(function (select) {
+                document.querySelectorAll(".spectrum-Dropdown-select").forEach(function (select) {
 
                     /**
                      * Change the current label of a Dropdown.
@@ -940,7 +940,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
                         // Find the Dropdown's data item which was selected and mark it; likewise
                         // remove the selected mark from all other items in the Dropdown.
                         var isPlaceholderValue = false;
-                        Array.from(dropdownItems).forEach(function (dropdownItem) {
+                        dropdownItems.forEach(function (dropdownItem) {
                             if (dropdownItem.getAttribute("data-value") === newValue) {
                                 dropdownItem.classList.add("is-selected");
                                 isPlaceholderValue = dropdownItem.classList.contains("is-placeholder");
@@ -1020,7 +1020,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
 
                     // Iterate over the Dropdown's menu items, bind click handlers to each of them,
                     // and set the Dropdown's label to the selected option.
-                    Array.from(dropdownItems).forEach(function (dropdownItem) {
+                    dropdownItems.forEach(function (dropdownItem) {
 
                         // If the menu item is disabled, skip on to the next.
                         if (dropdownItem.classList.contains("is-disabled")) {
