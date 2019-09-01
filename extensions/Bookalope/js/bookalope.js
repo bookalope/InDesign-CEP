@@ -241,7 +241,7 @@ function showStatus(text) {
  */
 
 function showStatusOk() {
-    showStatus("Ok (v1.0.0)");
+    showStatus("Ok (v1.0.1)");
 }
 
 
@@ -543,10 +543,12 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             hideSpinner();
         } else {
 
-            // Note that result.data is a base-64 encoded binary, so we have to decode it
-            // before passing it to the Bookalope wrapper. The wrapper will then encode
-            // it (again) before shipping it off to the server.
-            bookflow.setDocument(bookFile.name, atob(result.data), "doc", bookSkipStructure)
+            // Passing `undefined` as document type to setDocument() causes the server to
+            // determine the type of the uploaded file. Also note that result.data is a
+            // base-64 encoded binary, so we have to decode it before passing it to the
+            // Bookalope wrapper. The wrapper will then encode it (again) before shipping
+            // it off to the server.
+            bookflow.setDocument(bookFile.name, atob(result.data), undefined, bookSkipStructure)
             .then(function (bookflow) {
 
                 // Periodically poll the Bookalope server to update the Bookflow. Then check
