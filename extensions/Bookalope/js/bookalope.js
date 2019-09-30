@@ -595,7 +595,6 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         // Get the BookalopeClient object.
         var bookalope = getBookalope();
 
-
         // Create a new Book, which then contains an empty Bookflow. That is the
         // Bookfow we'll work with. Note that the user will see both Book and Bookflow
         // when she logs into the website.
