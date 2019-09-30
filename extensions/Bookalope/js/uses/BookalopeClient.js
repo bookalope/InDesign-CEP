@@ -389,6 +389,37 @@ BookalopeClient.prototype.getImportFormats = function() {
 
 
 /**
+ * Get a list Bookshelves. Returns a promise that is fulfilled with a list of
+ * Bookshelf instances or rejected with a BookalopeError.
+ *
+ * @async
+ * @returns {Promise}
+ */
+
+BookalopeClient.prototype.getBookshelves = function() {
+  var bookalope = this;
+
+  return new Promise(function(resolve, reject) {
+    var url = "/api/bookshelves";
+    bookalope.httpGET(url)
+    .then(function(response) {
+
+      // Create and populate a list of Bookshelf instances from the response data.
+      var bookshelfList = [];
+      response.bookshelves.forEach(function(bookshelf) {
+        bookshelfList.push(new Bookshelf(bookalope, bookshelf));
+      });
+
+      resolve(bookshelfList);
+    })
+    .catch(function(error) {
+      reject(error);
+    });
+  });
+};
+
+
+/**
  * Get a list of Books. Returns a promise that is fulfilled with a list of Book
  * instances or rejected with a BookalopeError.
  *
@@ -425,10 +456,11 @@ BookalopeClient.prototype.getBooks = function() {
  *
  * @async
  * @param {string} name - The name for the new book.
+ * @param {Bookshelf} bookshelf - A Bookshelf instance to which the new Book belongs.
  * @returns {Promise}
  */
 
-BookalopeClient.prototype.createBook = function(name) {
+BookalopeClient.prototype.createBook = function(name, bookshelf) {
   var bookalope = this;
 
   return new Promise(function(resolve, reject) {
@@ -436,6 +468,9 @@ BookalopeClient.prototype.createBook = function(name) {
     var params = {
       "name": name || "<none>"
     };
+    if (bookshelf) {
+      params["bookshelf_id"] = bookshelf.id;
+    }
     bookalope.httpPOST(url, params)
     .then(function(response) {
 
@@ -562,6 +597,163 @@ var Style = function(format, packed) {
 
 
 /**
+ * The Bookshelf class describes a single bookshelf as used by Bookalope. A
+ * Bookshelf may be associated with zero or more Books, and it has a name.
+ *
+ * @param {BookalopeClient} bookalope - An instance of the BookalopeClient.
+ * @param {string | object} idOrJson - The Book instance is initialized using the
+ *        valid ID or the data from a JSON object describing the Book.
+ * @throws {BookalopeError} if the idOrJson parameter contained invalid data.
+ * @constructor
+ */
+
+var Bookshelf = function(bookalope, idOrJson) {
+  assert(bookalope instanceof BookalopeClient, "Expected BookalopeClient instance");
+  this._bookalope = bookalope;
+  if (typeof idOrJson === "object") {
+    var bookshelf = idOrJson;
+    this.id = book.id;
+    this.url = "/api/bookshelves/" + this.id;
+    this.name = bookshelf.name;
+    this.description = bookshelf.description;
+    this.created = new Date(bookshelf.created);
+    this.books = [];
+    if (bookshelf.books) {
+      bookshelf.books.forEach(function(book) {
+        this.books.push(new Book(this._bookalope, book));
+      }, this);
+    }
+  } else if (typeof idOrJson === "string") {
+    assert(isToken(idOrJson), "Malformed Bookalope token: " + idOrJson);
+    this.id = idOrJson;
+    this.url = "/api/bookhelves/" + this.id;
+  } else {
+    throw new BookalopeError("Unable to initialize Bookshelf, incorrect parameter");
+  }
+};
+
+
+/**
+ * Refresh the Bookshelf instance data from the Bookalope server. Returns a promise
+ * that is fulfilled with the Bookshelf or rejected with a BookalopeError.
+ *
+ * @async
+ * @returns {Promise}
+ */
+
+Bookshelf.prototype.update = function() {
+  var bookshelf = this;
+  var bookalope = bookshelf._bookalope;
+
+  return new Promise(function(resolve, reject) {
+    var url = bookshelf.url;
+    bookalope.httpGET(url)
+    .then(function(response) {
+
+      // Update this Bookshelf's properties from the response data. This also
+      // re-populates the list of Books.
+      bookshelf.name = response.bookshelf.name;
+      bookshelf.description = response.bookshelf.description;
+      bookshelf.books.length = 0;
+      response.bookshelf.books.forEach(function(book) {
+        bookshelf.books.push(new Book(bookalope, book));
+      });
+
+      resolve(bookshelf);
+    })
+    .catch(function(error) {
+      reject(error);
+    });
+  });
+};
+
+
+/**
+ * Post this Bookshelf's instance data to the Bookalope server. Returns a promise
+ * that is fulfilled with the Bookshelf or rejected with a BookalopeError.
+ *
+ * @async
+ * @returns {Promise}
+ */
+
+Bookshelf.prototype.save = function() {
+  var bookshelf = this;
+  var bookalope = bookshelf._bookalope;
+
+  return new Promise(function(resolve, reject) {
+    var url = bookshelf.url;
+    var params = {
+      "description": this.description,
+      "name": this.name
+    };
+    bookalope.httpPOST(url, params)
+    .then(function(response) {
+      resolve(bookshelf);
+    })
+    .catch(function(error, message) {
+      reject(error);
+    });
+  });
+};
+
+
+/**
+ * Delete this Bookshelf (and all of its Books and their Bookflows) from the Bookalope
+ * server. Returns a promise that is fulfilled with the Bookshelf or rejected with a
+ * BookalopeError. Note that this Bookshelf instance becomes useless as its ID is invalid.
+ *
+ * @async
+ * @returns {Promise}
+ */
+
+Bookshelf.prototype.delete = function() {
+  var bookshelf = this;
+  var bookalope = bookshelf._bookalope;
+
+  return new Promise(function(resolve, reject) {
+    var url = bookshelf.url;
+    bookalope.httpDELETE(url)
+    .then(function(response) {
+      resolve(bookshelf);
+    })
+    .catch(function(error) {
+      reject(error);
+    });
+  });
+};
+
+
+/**
+ * Add the given Book instance to this Bookshelf. Returns a promise that is fulfilled
+ * with the Bookshelf or rejected with a BookalopeError.
+ *
+ * @async
+ * @param {Book} book - A book instance that's added to this Bookshelf.
+ * @returns {Promise}
+ */
+
+Bookshelf.prototype.addBook = function(book) {
+  var bookshelf = this;
+  return book.addToBookshelf(bookshelf);
+};
+
+
+/**
+ * Remove the given Book instance from this Bookshelf. Returns a promise that is
+ * fulfilled with the Bookshelf or rejected with a BookalopeError.
+ *
+ * @async
+ * @param {Book} book - A book instance that's removed from this Bookshelf.
+ * @returns {Promise}
+ */
+
+Bookshelf.prototype.removeBook = function(book) {
+  var bookshelf = this;
+  return book.removeFromBookshelf();
+};
+
+
+/**
  * The Book class describes a single book as used by Bookalope. A book has only
  * one name, and a list of conversions: the Bookflows. Note that the Book instance
  * is not necessarily valid with respect to the server data; call .update() to
@@ -583,6 +775,10 @@ var Book = function(bookalope, idOrJson) {
     this.url = "/api/books/" + this.id;
     this.name = book.name;
     this.created = new Date(book.created);
+    this.bookshelf = undefined;
+    if (book.bookshelf) {
+      this.bookshelf = new Bookshelf(this._bookalope, book.bookshelf.id);
+    }
     this.bookflows = [];
     if (book.bookflows) {
       book.bookflows.forEach(function(bookflow) {
@@ -688,29 +884,57 @@ Book.prototype.delete = function() {
 
 
 /**
- * Get the list of Bookflows for this Book instance. Returns a promise that is fulfilled
- * with a list of Bookflow instances or rejected with a BookalopeError.
+ * Move this Book onto the specified Bookshelf. If the Book is already associated
+ * with a Bookshelf then it moves to the new one. Returns a promise that is
+ * fulfilled with the newly created Bookflow or rejected with a BookalopeError.
+ *
+ * @async
+ * @param {Bookshelf} bookshelf - A Bookshelf instance onto which to move this Book.
+ * @returns {Promise}
+ */
+
+Book.prototype.moveToBookshelf = function(bookshelf) {
+  var book = this;
+  var bookalope = book._bookalope;
+
+  return new Promise(function(resolve, reject) {
+    var url = book.url;
+    var params = {
+      "bookshelf_id": bookshelf.id
+    };
+    bookalope.httpPOST(url, params)
+    .then(function(response) {
+      book.bookshelf = bookshelf;
+      resolve(book);
+    })
+    .catch(function(error) {
+      reject(error);
+    });
+  });
+};
+
+
+/**
+ * Remove this Book from its Bookshelf. Returns a promise that is fulfilled
+ * with the newly created Bookflow or rejected with a BookalopeError.
  *
  * @async
  * @returns {Promise}
  */
 
-Book.prototype.getBookflows = function() {
+Book.prototype.removeFromBookshelf = function() {
   var book = this;
   var bookalope = book._bookalope;
 
   return new Promise(function(resolve, reject) {
-    var url = book.url + "/bookflows";
-    bookalope.httpGET(url)
+    var url = book.url;
+    var params = {
+      "bookshelf_id": null
+    };
+    bookalope.httpPOST(url, params)
     .then(function(response) {
-
-      // Create and populate a list of Bookflow from the response data.
-      var bookflowList = [];
-      response.bookflows.forEach(function(bookflow) {
-        bookflowList.push(new Bookflow(bookalope, book, bookflow));
-      });
-
-      resolve(bookflowList);
+      book.bookshelf = undefined;
+      resolve(book);
     })
     .catch(function(error) {
       reject(error);
