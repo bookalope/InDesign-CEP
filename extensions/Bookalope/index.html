@@ -134,10 +134,10 @@
 
           <div class="spectrum-Form spectrum-Form--small">
             <div class="spectrum-Form-item">
-              <label for="input-book-version" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Full version (paid)</label>
+              <label for="input-book-credit" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Apply paid plan</label>
               <div class="spectrum-Form-itemField">
-                <label class="spectrum-Checkbox" for="input-book-version">
-                  <input type="checkbox" name="input-book-version" id="input-book-version" class="spectrum-Checkbox-input" title="If a suitable plan was purchased then apply it to this conversion. Otherwise, continue with a test document.">
+                <label class="spectrum-Checkbox" for="input-book-credit">
+                  <input type="checkbox" name="input-book-credit" id="input-book-credit" class="spectrum-Checkbox-input" title="If a suitable plan was purchased then apply it to this conversion. Otherwise, continue with a test document.">
                   <span class="spectrum-Checkbox-box">
                     <svg class="spectrum-Icon spectrum-UIIcon-CheckmarkSmall spectrum-Checkbox-checkmark" focusable="false">
                       <use xlink:href="#icon-CheckmarkSmall"/>
@@ -195,15 +195,27 @@
 
         <!-- Update or Download panel: download converted files, or update/refresh the local document from the Bookalope server. -->
         <div id="bookalope-update" class="hidden">
+          <div class="form__text hidden" id="div-bookflow-type-none">
+            <p class="spectrum-Body4">This is a <strong>test version</strong> of the document. Please&nbsp;
+              <a href="#" id="a-purchase" class="spectrum-Link">
+                <svg class="spectrum-Icon spectrum-Icon--sizeXS" focusable="false">
+                  <use xlink:href="#icon-LinkOut"/>
+                </svg>
+                purchase a plan
+              </a> to upgrade to the full versions!
+            </p>
+          </div>
+          <div class="form__text hidden" id="div-bookflow-type-basic">
+            <p class="spectrum-Body4">This is a <strong>test version</strong> of the document; a full version is not covered by the Basic plan.</p>
+          </div>
           <div class="form__text">
-            <p class="spectrum-Body4">Edit this document in&#8194;
+            <p class="spectrum-Body4">Edit this document in&nbsp;
               <a href="#" id="a-bookalope" class="spectrum-Link">
                 <svg class="spectrum-Icon spectrum-Icon--sizeXS" focusable="false">
                   <use xlink:href="#icon-LinkOut"/>
                 </svg>
                 Bookalope
-              </a>
-              , and then refresh the changes in a new local document.
+              </a>, and then refresh the changes in a new local document.
             </p>
           </div>
           <div class="form__nav">
@@ -231,19 +243,6 @@
                     Download
                   </button>
                 </div>
-              </div>
-            </div>
-            <div class="spectrum-Form-item">
-              <label for="input-book-download-version" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Full version (paid)</label>
-              <div class="spectrum-Form-itemField">
-                <label class="spectrum-Checkbox" for="input-book-download-version">
-                  <input type="checkbox" name="input-book-download-version" id="input-book-download-version" class="spectrum-Checkbox-input" title="If a suitable plan was purchased then apply it to this conversion. Otherwise, continue with a test document.">
-                  <span class="spectrum-Checkbox-box">
-                    <svg class="spectrum-Icon spectrum-UIIcon-CheckmarkSmall spectrum-Checkbox-checkmark" focusable="false">
-                      <use xlink:href="#icon-CheckmarkSmall"/>
-                    </svg>
-                  </span>
-                </label>
               </div>
             </div>
           </div>

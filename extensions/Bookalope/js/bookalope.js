@@ -117,7 +117,7 @@ function showUpload() {
     document.getElementById("input-book-pubdate").valueAsDate = new Date();
     document.getElementById("input-book-isbn").value = "";
     document.getElementById("input-book-publisher").value = "";
-    document.getElementById("input-book-version").checked = false;
+    document.getElementById("input-book-credit").checked = false;
     document.getElementById("input-book-autoclean").checked = true;
     document.getElementById("input-book-highlight-issues").checked = false;
     document.getElementById("input-book-skip-structure").checked = false;
@@ -265,30 +265,31 @@ function clearErrors() {
  *
  * @param {Bookflow} bookflow - A valid Bookflow object referencing a server-side document conversion.
  * @param {string} format - Convert the given document to this format.
+ * @param {string} style - The styling for the converted InDesign story.
  * @param {string} filename - The file name to save the converted file.
  * @returns {Promise}
  */
 
-function saveBookflowFile(bookflow, format, style, version, filename) {
+function saveBookflowFile(bookflow, format, style, filename) {
 
     // Create and return a new Promise.
     return new Promise(function (resolve, reject) {
 
         // Call the Bookflow's convert function, which itself returns a Promise. The returned
         // Promise is fulfilled with the Booklow ready for waiting, or rejected with a BookalopeError.
-        bookflow.convert(format, style, version)
+        bookflow.convert(format, style)
         .then(function (bookflow) {
 
             // Conversion is triggered on the server, now check periodically the status of the
             // conversion until it has succeeded or failed.
             var intervalID = window.setInterval(function (bookflow) {
-                bookflow.convert_status(format, style, version)
+                bookflow.convert_status(format)
                 .then(function (status_) {
 
                     // Conversion succeeded, now download and save the converted file.
-                    if (status_ === "ok") {
+                    if (status_ === "available") {
                         window.clearInterval(intervalID);
-                        bookflow.convert_download(format, style, version)
+                        bookflow.convert_download(format)
                         .then(function (blob) {
 
                             // Read the Blob's data as a data URL: a MIME header with Base64 encoded content.
@@ -326,11 +327,11 @@ function saveBookflowFile(bookflow, format, style, version, filename) {
                         .catch(function (error) {
                             reject(error);
                         });
-                    } else if (status_ === "failed" || status_ === "na") {
+                    } else if (status_ === "failed" || status_ === "none") {
                         window.clearInterval(intervalID);
-                        reject(new BookalopeError("Failed to convert document to " + format + " ('" + style + "' style, " + version + " version)"));
+                        reject(new BookalopeError("Failed to convert document to " + format + " ('" + style + "' style)"));
                     } else {
-                        // Do nothing and keep waiting.
+                        // Status is "processing", so do nothing and keep waiting.
                     }
                 })
                 .catch(function (error) {
@@ -352,9 +353,10 @@ function saveBookflowFile(bookflow, format, style, version, filename) {
  *
  * @param {Bookflow} bookflow - A valid Bookflow object referencing a server-side document conversion.
  * @param {string} format - Convert the given document to this format.
+ * @param {string} style - The styling for the converted InDesign story.
  */
 
-function askSaveBookflowFile(bookflow, format, style, version) {
+function askSaveBookflowFile(bookflow, format, style) {
     showStatus("Converting and downloading Bookalope file");
     showSpinner();
 
@@ -368,7 +370,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
     } else {
 
         // Save the downloaded file to the local host filesystem.
-        saveBookflowFile(bookflow, format, style, version, result.data)
+        saveBookflowFile(bookflow, format, style, result.data)
         .then(function (filename) {
             showStatusOk();
             hideSpinner();
@@ -445,22 +447,37 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             el.parentNode.replaceChild(clone, el);
         }
 
+        /**
+         * Helper function that takes a URL and opens that URL in a browser.
+         *
+         * @param {string} url - The URL for the browser.
+         */
+
+        function openURL(url) {
+            var result = window.cep.util.openURLInDefaultBrowser(url);
+            if (result.err) {
+                showClientError("Failed to open web browser (" + result.err + ")");
+            }
+        }
+
 
         // Bind click handler functions to the links. Because we're using anonymous
         // handler functions here, we can't remove them easily and have to jump through
         // odd hoops (see helper function).
         addClickListener(document.getElementById("a-bookalope"), function () {
             var url = bookflow.getWebURL();
-            var result = window.cep.util.openURLInDefaultBrowser(url);
-            if (result.err) {
-                showClientError("Failed to open web browser (" + result.err + ")");
-            }
+            openURL(url);
+            return false;
+        });
+        addClickListener(document.getElementById("a-purchase"), function () {
+            var bookalope = getBookalope();
+            var url = bookalope.getHost() + "/billing";
+            openURL(url);
             return false;
         });
         addClickListener(document.getElementById("button-download"), function () {
             var bookDownload = document.getElementById("input-book-download").value;
-            var bookVersion = document.getElementById("input-book-download-version").checked ? "final" : "test";
-            askSaveBookflowFile(bookflow, bookDownload, "default", bookVersion);
+            askSaveBookflowFile(bookflow, bookDownload, "default");
             return false;
         });
         addClickListener(document.getElementById("button-refresh"), function () {
@@ -468,6 +485,18 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             convert(bookflow);
             return false;
         });
+
+        // Depending on the Bookflow's current credit type, show/hide notes for the user.
+        if (bookflow.credit === "pro") {
+            document.getElementById("div-bookflow-type-none").classList.add("hidden");
+            document.getElementById("div-bookflow-type-basic").classList.add("hidden");
+        } else if (bookflow.credit === "basic") {
+            document.getElementById("div-bookflow-type-none").classList.add("hidden");
+            document.getElementById("div-bookflow-type-basic").classList.remove("hidden");
+        } else {
+            document.getElementById("div-bookflow-type-none").classList.remove("hidden");
+            document.getElementById("div-bookflow-type-basic").classList.add("hidden");
+        }
     }
 
 
@@ -490,7 +519,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         var fname = "idsn-" + time.toString(16).slice(-8) + "-" + rnd.toString(16).slice(-8);
 
         // Convert the given Bookflow's document to ICML, and save it as a temporary file.
-        saveBookflowFile(bookflow, "icml", "default", bookVersion, config.tmp + "/" + fname + ".icml")
+        saveBookflowFile(bookflow, "icml", "default", config.tmp + "/" + fname + ".icml")
         .then(function (filename) {
             showStatus("Building InDesign document");
 
@@ -611,7 +640,21 @@ function askSaveBookflowFile(bookflow, format, style, version) {
             bookflow.publisher = bookPublisher;
             bookflow.save()
             .then(function () {
-                uploadFile(bookflow);
+
+                // If the user wants to apply a plan credit to this Bookflow, then do
+                // so now before we upload the file to the server. If that fails, just
+                // continue and let the user sort it out through the website later.
+                if (bookCredit) {
+                    bookflow.setCredit("pro")
+                    .then(function () {
+                        uploadFile(bookflow);
+                    })
+                    .catch(function (error) {
+                        uploadFile(bookflow);
+                    });
+                } else {
+                    uploadFile(bookflow);
+                }
             })
             .catch(function (error) {
                 showServerError(error.message);
@@ -648,7 +691,7 @@ function askSaveBookflowFile(bookflow, format, style, version) {
         bookPubDate = document.getElementById("input-book-pubdate").value;
         bookIsbn = document.getElementById("input-book-isbn").value;
         bookPublisher = document.getElementById("input-book-publisher").value;
-        bookVersion = document.getElementById("input-book-version").checked ? "final" : "test";
+        bookCredit = document.getElementById("input-book-credit").checked;
         bookAutoClean = document.getElementById("input-book-autoclean").checked;
         bookHighlightIssues = document.getElementById("input-book-highlight-issues").checked;
         bookSkipStructure = document.getElementById("input-book-skip-structure").checked;
