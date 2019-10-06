@@ -61,13 +61,13 @@ Then start InDesign, and the extension should be available from the panel list u
 
 Once installed, open the extension panel:
 
-<img src="https://bookalope.net/img/idsn-bookalope-1.0.0-upload.jpg" width="50%" alt="Bookalope InDesign: Upload panel">
+<img src="https://bookalope.net/img/idsn-bookalope-1.1.0-upload.jpg" width="50%" alt="Bookalope InDesign: Upload panel">
 
 To use the Bookalope web services, you need a Bookalope API key: you can find the key in the [user profile](https://bookflow.bookalope.net/profile) of your Bookalope account. Then select a book manuscript in Word format (or any other of the [supported document formats](https://github.com/jenstroeger/Bookalope/blob/master/API.md#get-formats)), fill in `Name` and `Author` of the book, and then click the `Upload and convert` button.
 
 The extension uploads the document to the Bookalope server for analysis and conversion. This can take a little while. Once finished, the extension downloads the converted file, creates a new InDesign document, and places the downloaded content into the new InDesign document. The extension’s panel changes now to this:
 
-<img src="https://bookalope.net/img/idsn-bookalope-1.0.0-update.jpg" width="50%" alt="Bookalope InDesign: Update panel">
+<img src="https://bookalope.net/img/idsn-bookalope-1.1.0-update.jpg" width="50%" alt="Bookalope InDesign: Update panel">
 
 From here, you can open the document on the Bookalope website to revisit and adjust the entire analysis and conversion flow (watch the video tutorials on [Youtube](https://www.youtube.com/channel/UCCxR_k6G06qEAj3IjZ9AcoQ)). You can also download the converted document in EPUB, MOBI, or print-ready PDF formats.
 
