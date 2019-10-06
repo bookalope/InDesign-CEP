@@ -3,7 +3,7 @@
     <Author>Jens Troeger, Bookalope</Author>
     <Abstract>Adobe CEP extension for InDesign to use the Bookalope cloud services.</Abstract>
     <ExtensionList>
-        <Extension Id="Bookalope Panel" Version="1.0.1" />
+        <Extension Id="Bookalope" Version="1.0.1" />
     </ExtensionList>
     <ExecutionEnvironment>
         <HostList>
@@ -17,7 +17,7 @@
         </RequiredRuntimeList>
     </ExecutionEnvironment>
     <DispatchInfoList>
-        <Extension Id="Bookalope Panel">
+        <Extension Id="Bookalope">
             <DispatchInfo>
                 <Resources>
                     <MainPath>./index.html</MainPath>

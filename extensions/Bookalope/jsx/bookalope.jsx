@@ -46,8 +46,12 @@ function getConfiguration() {
         app: {
             version: app.version,
             user: app.userName,
+            win: Folder.fs == "Windows",
         },
-        tmp: Folder.temp.toString(),
+        fs: {
+            tmp: Folder.temp.fsName,
+            separator: Folder.fs == "Windows" ? "\\" : "/",
+        },
     };
     return JSON.stringify(config);
 }

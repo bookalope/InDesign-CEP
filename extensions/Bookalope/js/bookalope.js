@@ -516,32 +516,43 @@ function askSaveBookflowFile(bookflow, format, style) {
         // TODO Consider using SHA(apiKey + time + rnd) for a unique identifier.
         var time = Date.now();
         var rnd = Math.random();
-        var fname = "idsn-" + time.toString(16).slice(-8) + "-" + rnd.toString(16).slice(-8);
+        var fname = "idsn-" + time.toString(16).slice(-8) + "-" + rnd.toString(16).slice(-8) + ".icml";
+        var fpath = config.fs.tmp + config.fs.separator + fname;
 
         // Convert the given Bookflow's document to ICML, and save it as a temporary file.
-        saveBookflowFile(bookflow, "icml", "default", config.tmp + "/" + fname + ".icml")
+        saveBookflowFile(bookflow, "icml", "default", fpath)
         .then(function (filename) {
             showStatus("Building InDesign document");
 
             // Create the new document on the InDesign side, and pass the Book and Bookflow
             // IDs along to store them with the document. That way, we can update the panel
-            // based on the currently active InDesign document.
-            var script = "bookalopeCreateDocument('" + filename + "', '" + bookflow.book.id + "', '" + bookflow.id + "', " + bookalopeBetaHost + ");";
+            // based on the currently active InDesign document. Note that we need to escape
+            // backslash characters in the path string to make sure they arrive safely on the
+            // other side in application/JSX land!
+            var script = "bookalopeCreateDocument('" + filename.replace(/\\/g, "\\\\") + "', '" + bookflow.book.id + "', '" + bookflow.id + "', " + bookalopeBetaHost + ");";
             csInterface.evalScript(script, function (result) {
-                // TODO handle result = 'EvalScript error'
 
-                // Delete the temporary ICML file.
-                result = window.cep.fs.deleteFile(filename);
-                if (result.err) {
-                    // TODO Handle error here: let the temporary ICML file leak quietly? Yup.
+                // Check for errors during evalScript. Note that the EvalScript_ErrMessage
+                // string is defined in CSInterface.js and thus available; would be nice
+                // if that was scoped though.
+                if (result === EvalScript_ErrMessage) {
+                    showServerError(result);
+                    hideSpinner();
+                } else {
+
+                    // Delete the temporary ICML file.
+                    result = window.cep.fs.deleteFile(filename);
+                    if (result.err) {
+                        // TODO Handle error here: let the temporary ICML file leak quietly? Yup.
+                    }
+
+                    // Update links to Bookalope and then switch from the Upload panel to
+                    // to the Update panel view.
+                    setBookalopeLinks(bookflow);
+                    showUpdate();
+                    showStatusOk();
+                    hideSpinner();
                 }
-
-                // Update links to Bookalope and then switch from the Upload panel to
-                // to the Update panel view.
-                setBookalopeLinks(bookflow);
-                showUpdate();
-                showStatusOk();
-                hideSpinner();
             });
         })
         .catch(function (error) {

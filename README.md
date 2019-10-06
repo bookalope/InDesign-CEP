@@ -17,7 +17,7 @@ Read a general introduction to writing an Adobe CEP extension [here](http://www.
 InDesign does not load an extension unless the extension has been cryptographically signed. Therefore, in order to run the Bookalope extension from source, you need to switch InDesign to _PlayerDebugMode_:
 
  - On Mac, open the file `~/Library/Preferences/com.adobe.CSXS.9.plist` and add a row with key `PlayerDebugMode` of type String and value `1`. You can edit `.plist` files using [Xcode](https://developer.apple.com/xcode/), [PList Edit](https://www.fatcatsoftware.com/plisteditpro/) or other applications suited to edit [Property Lists](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/PropertyLists/Introduction/Introduction.html).
- - On Windows, using its [registry editor](https://support.microsoft.com/en-au/help/4027573/windows-open-registry-editor-in-windows-10) open the registry key `HKEY_CURRENT_USER/Software/Adobe/CSXS.9` and add a key named `PlayerDebugMode` of type String and value `1`.
+ - On Windows, using its [registry editor](https://support.microsoft.com/en-au/help/4027573/windows-open-registry-editor-in-windows-10) open the registry key `HKEY_CURRENT_USER/Software/Adobe/CSXS.9` and add a key named `PlayerDebugMode` of type String and value `1`. Alternatively, `reg add HKEY_CURRENT_USER\SOFTWARE\Adobe\CSXS.9 /t REG_SZ /v PlayerDebugMode /d 1 /f` should work from the command line prompt.
 
 If you have multiple CSXS versions installed, add the `PlayerDebugMode` to all of them.
 
