@@ -26,7 +26,7 @@ For InDesign to find and load the Bookalope extension, copy the entire `extensio
  - On Mac: `~/Library/Application Support/Adobe/CEP/extensions`
  - On Windows: `%APPDATA%\Adobe\CEP\extensions`
 
-Then start InDesign, and the extension should be available from the _Window → Extensions_ menu.
+Then start InDesign, and the extension should be available from the _Window_ menu.
 
 ### Debugging
 
