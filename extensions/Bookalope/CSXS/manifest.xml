@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="5.0" ExtensionBundleId="Bookalope" ExtensionBundleName="Bookalope" ExtensionBundleVersion="1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ExtensionManifest Version="7.0" ExtensionBundleId="Bookalope" ExtensionBundleName="Bookalope" ExtensionBundleVersion="1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Author>Jens Troeger, Bookalope</Author>
     <Abstract>Adobe CEP extension for InDesign to use the Bookalope cloud services.</Abstract>
     <ExtensionList>
@@ -13,7 +13,7 @@
             <Locale Code="All" />
         </LocaleList>
         <RequiredRuntimeList>
-            <RequiredRuntime Name="CSXS" Version="5.0" />
+            <RequiredRuntime Name="CSXS" Version="9.0" />
         </RequiredRuntimeList>
     </ExecutionEnvironment>
     <DispatchInfoList>
@@ -32,17 +32,17 @@
                     <Menu Placement="'Main:&amp;Window',600.0,'KBSCE Window menu'">Bookalope</Menu>
                     <Geometry>
                         <Size>
-                            <Width>450</Width>
                             <Height>450</Height>
+                            <Width>450</Width>
                         </Size>
-                        <MinSize>
-                            <Width>450</Width>
-                            <Height>450</Height>
-                        </MinSize>
                         <MaxSize>
-                            <Width>450</Width>
                             <Height>800</Height>
+                            <Width>450</Width>
                         </MaxSize>
+                        <MinSize>
+                            <Height>450</Height>
+                            <Width>450</Width>
+                        </MinSize>
                     </Geometry>
                     <Icons>
                         <Icon Type="Normal">./icons/iconNormal.png</Icon>

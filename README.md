@@ -30,6 +30,8 @@ Then start InDesign, and the extension should be available from the _Window_ men
 
 ### Debugging
 
+First of all, make sure that the extension’s `CSXS/manifest.xml` contains valid XML; follow the instructions [here](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_9.x/Documentation/CEP%209.0%20HTML%20Extension%20Cookbook.md#extension-manifest-xsd). Note that the _order_ of elements in `<Geometry>` actually seems to matter!
+
 Debugging the ExtendScript side of the extension doesn’t really work. However, I found it helpful to use the [ExtendScript Toolkit](http://www.adobe.com/au/products/extendscript-toolkit.html), connect it to a running InDesign instance, and prototype the code there before using it for the Bookalope extension.
 
 Debugging the Javascript side is easier. The file `extensions/Bookalope/.debug` configures a remote debugger which can connect to a running InDesign instance. Once the extension panel is open, navigate the [Chrome web browser](https://www.google.com/chrome/) (or alternatively, the [Adobe cef-client](https://github.com/Adobe-CEP/CEP-Resources)) to `localhost:8001` and enjoy…
