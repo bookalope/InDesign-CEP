@@ -536,7 +536,7 @@ function askSaveBookflowFile(bookflow, format, style) {
                 // string is defined in CSInterface.js and thus available; would be nice
                 // if that was scoped though.
                 if (result === EvalScript_ErrMessage) {
-                    showServerError(result);
+                    showClientError("Failed to build document: " + result);
                     hideSpinner();
                 } else {
 
@@ -761,7 +761,7 @@ function askSaveBookflowFile(bookflow, format, style) {
 
                 // Handle beta host information from the document.
                 if (bookalopeBetaHost !== bookalopeDocData["beta"]) {
-                    showClientError("Document " + (bookalopeDocData["beta"] ? "uses" : "doesn't use") + " beta server , please check token");
+                    showClientError("Document " + (bookalopeDocData["beta"] ? "uses" : "doesn't use") + " beta server, please check token");
                 }
 
                 // Create a new Book and Bookflow object. Note that creating them does not
