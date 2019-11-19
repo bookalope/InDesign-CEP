@@ -7,7 +7,7 @@
     </ExtensionList>
     <ExecutionEnvironment>
         <HostList>
-             <Host Name="IDSN" Version="[13.0,14.9]" />
+            <Host Name="IDSN" Version="13.0" />
         </HostList>
         <LocaleList>
             <Locale Code="All" />
