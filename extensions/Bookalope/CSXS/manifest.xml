@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="7.0" ExtensionBundleId="Bookalope" ExtensionBundleName="Bookalope" ExtensionBundleVersion="1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ExtensionManifest Version="7.0" ExtensionBundleId="Bookalope" ExtensionBundleName="Bookalope" ExtensionBundleVersion="1.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Author>Jens Troeger, Bookalope</Author>
     <Abstract>Adobe CEP extension for InDesign to use the Bookalope cloud services.</Abstract>
     <ExtensionList>
-        <Extension Id="Bookalope" Version="1.1.0" />
+        <Extension Id="Bookalope" Version="1.1.1" />
     </ExtensionList>
     <ExecutionEnvironment>
         <HostList>
