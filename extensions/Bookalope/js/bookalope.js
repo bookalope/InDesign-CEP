@@ -577,18 +577,18 @@ function askSaveBookflowFile(bookflow, format, style) {
         showStatus("Uploading and analyzing document");
 
         // Read the user selected file.
-        var result = window.cep.fs.readFile(bookFile.path, window.cep.encoding.Base64);
-        if (result.err) {
-            showElementError(document.getElementById("input-file"), "Unable to load file (" + result.err + ")");
+        var reader = new FileReader();
+        reader.onerror = function() {
+            showElementError(document.getElementById("input-file"), "Unable to load file (" + reader.error + ")");
             hideSpinner();
-        } else {
-
+        };
+        reader.onload = function() {
             // Passing `undefined` as document type to setDocument() causes the server to
             // determine the type of the uploaded file. Also note that result.data is a
             // base-64 encoded binary, so we have to decode it before passing it to the
             // Bookalope wrapper. The wrapper will then encode it (again) before shipping
             // it off to the server.
-            bookflow.setDocument(bookFile.name, atob(result.data), undefined, bookSkipStructure)
+            bookflow.setDocument(bookFile.name, reader.result, undefined, bookSkipStructure)
             .then(function (bookflow) {
 
                 // Periodically poll the Bookalope server to update the Bookflow. Then check
@@ -619,7 +619,8 @@ function askSaveBookflowFile(bookflow, format, style) {
                 showServerError(error.message);
                 hideSpinner();
             });
-        }
+        };
+        reader.readAsBinaryString(bookFile);
     }
 
 
