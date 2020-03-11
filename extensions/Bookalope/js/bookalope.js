@@ -241,7 +241,7 @@ function showStatus(text) {
  */
 
 function showStatusOk() {
-    showStatus("Ok (v1.1.1)");
+    showStatus("Ok (v1.2.0)");
 }
 
 
@@ -501,10 +501,9 @@ function askSaveBookflowFile(bookflow, format, style) {
 
 
     /**
-     * Given the Bookflow, convert and download an ICML file and write that file to the
-     * local file system as a temporary file. Then invoke the InDesign side to create and
-     * layout a new document and place the ICML file into that document. When that returns,
-     * delete the ICML file.
+     * Given the Bookflow, convert and download an IDML file and write that file to the
+     * local file system as a temporary file. Then invoke the InDesign side and open that
+     * IDML file as a new document there. When that returns, delete the IDML file.
      *
      * @param {Bookflow} bookflow - The Bookflow.
      */
@@ -512,15 +511,15 @@ function askSaveBookflowFile(bookflow, format, style) {
     function convert(bookflow) {
         showStatus("Converting and downloading file");
 
-        // Produce a random file name to unique the ICML file.
+        // Produce a random file name to unique the IDML file.
         // TODO Consider using SHA(apiKey + time + rnd) for a unique identifier.
         var time = Date.now();
         var rnd = Math.random();
-        var fname = "idsn-" + time.toString(16).slice(-8) + "-" + rnd.toString(16).slice(-8) + ".icml";
+        var fname = "idsn-" + time.toString(16).slice(-8) + "-" + rnd.toString(16).slice(-8) + ".idml";
         var fpath = config.fs.tmp + config.fs.separator + fname;
 
-        // Convert the given Bookflow's document to ICML, and save it as a temporary file.
-        saveBookflowFile(bookflow, "icml", "default", fpath)
+        // Convert the given Bookflow's document to IDML, and save it as a temporary file.
+        saveBookflowFile(bookflow, "idml", "default", fpath)
         .then(function (filename) {
             showStatus("Building InDesign document");
 
@@ -540,10 +539,10 @@ function askSaveBookflowFile(bookflow, format, style) {
                     hideSpinner();
                 } else {
 
-                    // Delete the temporary ICML file.
+                    // Delete the temporary IDML file.
                     result = window.cep.fs.deleteFile(filename);
                     if (result.err) {
-                        // TODO Handle error here: let the temporary ICML file leak quietly? Yup.
+                        // TODO Handle error here: let the temporary IDML file leak quietly? Yup.
                     }
 
                     // Update links to Bookalope and then switch from the Upload panel to
@@ -567,7 +566,7 @@ function askSaveBookflowFile(bookflow, format, style) {
      * information to Bookalope. Uploading will trigger the analysis and content extraction.
      * Then wait until the Bookflow step changes from 'processing' to 'convert' which indicates
      * successful analysis; 'processing-failed' would indicate that the analysis failed. Once
-     * the analysis succeeded, continue to convert and download the ICML for this document.
+     * the analysis succeeded, continue to convert and download the IDML for this document.
      *
      * @param {Bookflow} bookflow - The Bookflow.
      *
@@ -681,8 +680,8 @@ function askSaveBookflowFile(bookflow, format, style) {
 
     /**
      * When the user clicks the "Upload and Convert", then we create a new Book and Bookflow
-     * for the given document, upload the given file, and when converted, download the ICML
-     * and place it into a new InDesign document. All that is being kicked off by this handler
+     * for the given document, upload the given file, and when converted, download the IDML
+     * and open it in a new InDesign document. All that is being kicked off by this handler
      * function.
      */
 

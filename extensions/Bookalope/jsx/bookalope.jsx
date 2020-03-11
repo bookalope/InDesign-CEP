@@ -60,126 +60,6 @@ function getConfiguration() {
 
 
 /**
- * When we open a new InDesign document, apply theses styles to the document. Currently
- * this is all hardwired in for a single and overly simplistic design.
- *
- * See also: http://www.indesignjs.de/extendscriptAPI/indesign-latest/#Document.html
- *
- * @param {Document} doc - The InDesign document that needs styling.
- */
-
-function setDefaultStyle(doc) {
-
-    // Set the measurement units and ruler origin for the document to points.
-    doc.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.points;
-    doc.viewPreferences.verticalMeasurementUnits = MeasurementUnits.points;
-    doc.viewPreferences.rulerOrigin = RulerOrigin.pageOrigin;
-
-    /**
-     * Helper function: get (if exists) or create (if doesn't exist) a named paragraph
-     * style for this document. This function is currently unused.
-     *
-     * See also: http://www.indesignjs.de/extendscriptAPI/indesign-latest/#ParagraphStyle.html
-     *
-     * @param {string} name - The name of the paragraph style we're looking for.
-     * @returns {ParagraphStyle}
-     */
-
-    function getParagraphStyle(name) {
-        var paragraphStyle = doc.paragraphStyles.item(name);
-        if (!paragraphStyle.isValid) {
-            paragraphStyle = doc.paragraphStyles.add({name: name});
-        }
-        return paragraphStyle;
-    }
-
-
-    // Get a reference to the master spread.
-    var masterSpread = doc.masterSpreads.item(0);
-
-    // Get the left (verso) page of the document and set it up...
-    var masterLeftPage = masterSpread.pages.item(0);
-
-    // ...page margins, ...
-    masterLeftPage.marginPreferences.properties = {
-        left: 84,
-        top: 70,
-        right: 70,
-        bottom: 78,
-    };
-
-    // ...footer with an automatically incrementing page number, ...
-    var footer = masterLeftPage.textFrames.add();
-    footer.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
-    footer.properties = {
-        // label: "",
-        geometricBounds: [728, 70, 742, 528],
-        contents: SpecialCharacters.autoPageNumber,
-    };
-    footer.parentStory.characters.item(0).properties = {
-        pointSize: 11,
-        leading: 14,
-        justification: Justification.leftAlign,
-    };
-
-    // ...main text frame to flow the page content.
-    var textFrame = masterLeftPage.textFrames.add();
-    textFrame.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
-    //textFrame.textFramePreferences.textColumnCount =
-    //textFrame.textFramePreferences.textColumnGutter =
-    textFrame.properties = {
-        label: "BodyTextFrame",
-        geometricBounds: [70, 70, 714, 528],
-    };
-
-    // Get the right (recto) page of the document and set it up...
-    var masterRightPage = masterSpread.pages.item(1);
-
-    // ...page margins, ...
-    masterRightPage.marginPreferences.properties = {
-        left: 84,
-        top: 70,
-        right: 70,
-        bottom: 78,
-    };
-
-    // ...footer with an automatically incrementing page number, ...
-    footer = masterRightPage.textFrames.add();
-    footer.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
-    footer.properties = {
-        // label: "",
-        geometricBounds: [728, 84, 742, 542],
-        contents: SpecialCharacters.autoPageNumber,
-    };
-    footer.parentStory.characters.item(0).properties = {
-        pointSize: 11,
-        leading: 14,
-        justification: Justification.rightAlign,
-    };
-
-    // ...main text frame to flow the page content.
-    textFrame = masterRightPage.textFrames.add();
-    textFrame.textFramePreferences.firstBaselineOffset = FirstBaseline.leadingOffset;
-    //textFrame.textFramePreferences.textColumnCount =
-    //textFrame.textFramePreferences.textColumnGutter =
-    textFrame.properties = {
-        label: "BodyTextFrame",
-        geometricBounds: [70, 84, 714, 542],
-    };
-
-    // Link the main text frames on both pages together.
-    masterLeftPage.textFrames.item(0).nextTextFrame = masterRightPage.textFrames.item(0);
-
-    // Set a baseline grid for the document.
-    doc.gridPreferences.properties = {
-        baselineDivision: 14,
-        baselineStart: 70,
-        baselineGridShown: true,
-    };
-}
-
-
-/**
  * Add the given key:value pair to the given document's Bookalope data store.
  *
  * @param {Document} doc - The InDesign document whose data store we want to use.
@@ -266,38 +146,17 @@ function bookalopeGetDocumentDataFromActive() {
  *  - https://www.adobe.com/content/dam/Adobe/en/devnet/indesign/cs55-docs/IDML/idml-specification.pdf
  *  - https://www.adobe.com/content/dam/Adobe/en/devnet/indesign/cs5_docs/idml/idml-cookbook.pdf
  *
- * @param {string} icmlFileName - The path of an ICML file which is to be placed in the
- *                                newly created InDesign document.
+ * @param {string} idmlFileName - The path of an IDML file which is to be loaded into InDesign.
  * @param {string} bookId - A valid Bookalope Book id.
  * @param {string} bookflowId - A valid Bookalope Bookflow id.
  * @param {boolean} betaHost - Booloan flag indicating whether the Book is on beta or production server.
  */
 
-function bookalopeCreateDocument(icmlFileName, bookId, bookflowId, betaHost) {
+function bookalopeCreateDocument(idmlFileName, bookId, bookflowId, betaHost) {
 
-    // Create and add a new document.
-    var bookalopeDocument = app.documents.add();
-
-    // Save the current view preferences of the document. (Does this create a deep copy
-    // of the preferences or just keep a reference, in which case the next lines might
-    // still trash the properties!)
-    var currentViewPrefs = bookalopeDocument.viewPreferences.properties;
-
-    // Set the styling of the master spread of this document.
-    setDefaultStyle(bookalopeDocument);
-
-    // Restore the saved view preferences.
-    bookalopeDocument.viewPreferences.properties = currentViewPrefs;
-
-    // New page and text frame in the document based on the master spread.
-    var masterSpread = bookalopeDocument.masterSpreads.item(0);
-    var textFrame = masterSpread.pages.item(1).textFrames.item(0).override(bookalopeDocument.pages.item(0));
-
-    // The ICML file contains only structure, the structural elements have been styled
-    // above. Now place the entire structured document onto the pages.
-    var icmlFile = new File(icmlFileName);
-    textFrame.place(icmlFile);
-    bookalopeDocument.links.itemByName(icmlFile.name).unlink();
+    // Open the document in default mode, and display it.
+    var idmlFile = new File(idmlFileName)
+    var bookalopeDocument = app.open(idmlFile);
 
     // Bookalope keeps some private data alongside the document.
     bookalopeAddDocumentData(bookalopeDocument, "book-id", bookId);
