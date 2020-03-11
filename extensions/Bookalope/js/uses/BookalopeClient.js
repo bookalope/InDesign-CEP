@@ -55,7 +55,7 @@ BookalopeError.prototype = Object.create(Error.prototype);
  *
  * @param {string} token - The Bookalope API token used to authenticate calls.
  * @param {boolean} betaHost - True if Bookalope's beta host should be used.
- * @param {string} version - Version of the API to use.
+ * @param {string} version - Version of the server API to use.
  * @constructor
  */
 
@@ -67,7 +67,7 @@ var BookalopeClient = function(token, betaHost, version) {
   if (version) {
     this._version = version;
   } else {
-    this._version = "v1";
+    this._version = "1.1.0";
   }
 };
 
@@ -97,7 +97,7 @@ BookalopeClient.prototype._httpRequest = function(url, method, params, options) 
     xhr.onload = function () {
 
       // Make sure that this client and the server's API version match; if not, then throw an error.
-      if (this.getResponseHeader("X-Bookalope-Api-Version") !== "1.1.0") {
+      if (this.getResponseHeader("X-Bookalope-Api-Version") !== bookalope._version) {
         reject(new BookalopeError("Invalid API server version, please update this client"));
       }
 
