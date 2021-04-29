@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" class="spectrum--medium">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="css/normalize.css"/>
-  <link rel="stylesheet" href="css/spectrum/spectrum-core.css"/>
+  <link rel="stylesheet" href="css/spectrum/spectrum-globals.css"/>
+  <link rel="stylesheet" href="css/spectrum/spectrum-medium.css"/>
   <link rel="stylesheet" href="css/spectrum/spectrum-dark.css" data-theme-css="css/spectrum/spectrum-"/>
-  <link rel="stylesheet" href="css/bookalope-core.css"/>
+  <link rel="stylesheet" href="css/spectrum/spectrum-components.css"/>
+  <link rel="stylesheet" href="css/bookalope.css"/>
   <link rel="stylesheet" href="css/bookalope-dark.css" data-theme-css="css/bookalope-"/>
   <style id="hostStyle"></style>
 </head>
-<body class="spectrum spectrum--dark" data-theme="dark" ondragover="return false;" ondrop="return false;">
+<body class="spectrum spectrum--dark spectrum--medium" data-theme="dark" ondragover="return false;" ondrop="return false;">
   <div class="panel">
     <div class="panel__body">
       <div class="panel__body-inner">
@@ -17,177 +19,269 @@
         <!-- Both, Upload panel and Update panel require the Bookalope token field. -->
         <div class="spectrum-Form">
           <div class="spectrum-Form-item">
-            <label for="input-bookalope-token" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">
+            <label for="input-bookalope-token"
+                   class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left spectrum-FieldLabel--sizeM">
               API Token
-              <svg class="spectrum-Icon spectrum-UIIcon-Asterisk spectrum-FieldLabel-requiredIcon" focusable="false">
-                <use xlink:href="#icon-Asterisk"></use>
+              <svg class="spectrum-Icon spectrum-UIIcon-Asterisk100 spectrum-FieldLabel-requiredIcon" focusable="false"
+                   aria-hidden="true">
+                <use xlink:href="#spectrum-css-icon-Asterisk100"/>
               </svg>
             </label>
             <div class="spectrum-Form-itemField">
-              <input type="text" name="input-bookalope-token" id="input-bookalope-token" placeholder="Token" class="spectrum-Textfield">
+              <div class="spectrum-Textfield">
+                <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
+                  <use xlink:href="#spectrum-icon-18-Alert" />
+                </svg>
+                <input type="text" name="input-bookalope-token" id="input-bookalope-token"
+                       placeholder="Token" class="spectrum-Textfield-input">
+              </div>
             </div>
           </div>
           <div class="spectrum-Form-item">
-            <label for="input-bookalope-beta" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Use Beta server</label>
+            <label for="input-bookalope-beta"
+                   class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">
+              Use Beta server</label>
             <div class="spectrum-Form-itemField">
-              <label class="spectrum-Checkbox" for="input-bookalope-beta">
-                <input type="checkbox" name="input-bookalope-beta" id="input-bookalope-beta" class="spectrum-Checkbox-input" title="Use Bookalope’s beta server which contains more recent and experimental features.">
+              <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized"
+                     for="input-bookalope-beta">
+                <input type="checkbox" name="input-bookalope-beta" id="input-bookalope-beta"
+                       class="spectrum-Checkbox-input"
+                       title="Use Bookalope’s beta server which contains more recent and experimental features.">
                 <span class="spectrum-Checkbox-box">
-                  <svg class="spectrum-Icon spectrum-UIIcon-CheckmarkSmall spectrum-Checkbox-checkmark" focusable="false">
-                    <use xlink:href="#icon-CheckmarkSmall"/>
-                  </svg>
-                </span>
+                      <svg class="spectrum-Icon spectrum-UIIcon-Checkmark100 spectrum-Checkbox-checkmark"
+                           focusable="false"
+                           aria-hidden="true">
+                        <use xlink:href="#spectrum-css-icon-Checkmark100"/>
+                      </svg>
+                    </span>
               </label>
             </div>
           </div>
         </div>
 
-        <hr class="spectrum-Rule spectrum-Rule--small">
+        <hr class="spectrum-Divider spectrum-Divider--sizeS">
 
         <!-- Upload panel: select a file and upload it to the Bookalope server. -->
         <div id="bookalope-upload" class="hidden">
           <div class="spectrum-Form">
             <div class="spectrum-Form-item">
-              <label for="input-file" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">
+              <label for="input-file" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">
                 Document
-                <svg class="spectrum-Icon spectrum-UIIcon-Asterisk spectrum-FieldLabel-requiredIcon" focusable="false">
-                  <use xlink:href="#icon-Asterisk"></use>
+                <svg class="spectrum-Icon spectrum-UIIcon-Asterisk100 spectrum-FieldLabel-requiredIcon" focusable="false"
+                     aria-hidden="true">
+                  <use xlink:href="#spectrum-css-icon-Asterisk100"/>
                 </svg>
               </label>
               <div class="spectrum-Form-itemField">
-                <div class="file__wrapper spectrum-Dropdown">
-                  <label class="file__btn spectrum-Dropdown-trigger" for="input-file">
-                    <input type="file" name="input-book-file" id="input-file" class="file__input spectrum-Dropdown-input" placeholder="Choose File">
-                    <svg class="spectrum-Icon spectrum-Icon--sizeS spectrum-Dropdown-icon" focusable="false">
-                      <use xlink:href="#icon-Attach"/>
-                    </svg>
-                    <span class="file__label spectrum-Dropdown-label is-placeholder">Choose File</span>
-                    <svg class="spectrum-Icon spectrum-Icon--sizeS spectrum-UIIcon-Alert" focusable="false">
-                      <use xlink:href="#icon-AlertMedium"></use>
-                    </svg>
-                  </label>
-                </div>
+                  <button type="button" class="file__wrapper spectrum-Picker spectrum-Picker--sizeM">
+                    <label class="file__btn" for="input-file">
+                      <input type="file" name="input-book-file" id="input-file"
+                             class="file__input spectrum-Textfield-input spectrum-Picker-input"
+                             placeholder="Choose File">
+                      <svg class="spectrum-Icon spectrum-Icon--sizeS" focusable="false">
+                        <use xlink:href="#spectrum-icon-18-Attach"/>
+                      </svg>
+                      <span class="file__label spectrum-Picker-label is-placeholder">Choose File</span>
+                      <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Picker-validationIcon" focusable="false">
+                        <use xlink:href="#spectrum-icon-18-Alert"></use>
+                      </svg>
+                    </label>
+                  </button>
               </div>
             </div>
           </div>
 
-          <hr class="spectrum-Rule spectrum-Rule--small"/>
+          <hr class="spectrum-Divider spectrum-Divider--sizeS">
 
           <div class="spectrum-Form">
             <div class="spectrum-Form-item">
-              <label for="input-book-name" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">
+              <label for="input-book-name" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">
                 Book title
-                <svg class="spectrum-Icon spectrum-UIIcon-Asterisk spectrum-FieldLabel-requiredIcon" focusable="false">
-                  <use xlink:href="#icon-Asterisk"></use>
+                <svg class="spectrum-Icon spectrum-UIIcon-Asterisk100 spectrum-FieldLabel-requiredIcon" focusable="false"
+                     aria-hidden="true">
+                  <use xlink:href="#spectrum-css-icon-Asterisk100"/>
                 </svg>
               </label>
               <div class="spectrum-Form-itemField">
-                <input type="text" name="input-book-name" id="input-book-name" placeholder="E.g. Cloud Atlas" class="spectrum-Textfield">
-              </div>
-            </div>
-            <div class="spectrum-Form-item">
-              <label for="input-book-author" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">Author</label>
-              <div class="spectrum-Form-itemField">
-                <input type="text" name="input-book-author" id="input-book-author" placeholder="E.g. David Mitchell" class="spectrum-Textfield">
-              </div>
-            </div>
-            <div class="spectrum-Form-item">
-              <label for="input-book-language" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">Language</label>
-              <div class="spectrum-Form-itemField">
-                <select id="input-book-language" name="input-book-language" data-placeholder="Choose Language" class="spectrum-Textfield spectrum-Dropdown-select">
-                  <option value="en-US" selected>English (United States)</option>
-                </select>
-              </div>
-            </div>
-            <div class="spectrum-Form-item">
-              <label for="input-book-copyright" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">Copyright</label>
-              <div class="spectrum-Form-itemField">
-                <input type="text" name="input-book-copyright" id="input-book-copyright" placeholder="E.g. Copyright 2004 by Sceptre" class="spectrum-Textfield">
-              </div>
-            </div>
-            <div class="spectrum-Form-item">
-              <label for="input-book-pubdate" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">Publishing date</label>
-              <div class="spectrum-Form-itemField">
-                <div class="spectrum-Datepicker">
-                  <input type="date" name="input-book-pubdate" id="input-book-pubdate" class="spectrum-Textfield spectrum-Datefield" placeholder="E.g. 16/01/2020">
-                  <svg class="spectrum-Icon spectrum-Icon--sizeS spectrum-Datepicker-Icon" focusable="false">
-                    <use xlink:href="#icon-Datepicker"/>
+                <div class="spectrum-Textfield">
+                  <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
+                    <use xlink:href="#spectrum-icon-18-Alert" />
                   </svg>
+                  <input type="text" name="input-book-name" id="input-book-name"
+                         placeholder="E.g. Cloud Atlas"
+                         class="spectrum-Textfield-input">
                 </div>
               </div>
             </div>
             <div class="spectrum-Form-item">
-              <label for="input-book-isbn" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">ISBN</label>
+              <label for="input-book-author"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">Author</label>
               <div class="spectrum-Form-itemField">
-                <input type="text" name="input-book-isbn" id="input-book-isbn" class="spectrum-Textfield" placeholder="0-340-82277-5">
+                <div class="spectrum-Textfield">
+                  <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
+                    <use xlink:href="#spectrum-icon-18-Alert" />
+                  </svg>
+                  <input type="text" name="input-book-author" id="input-book-author"
+                         placeholder="E.g. David Mitchell" class="spectrum-Textfield-input">
+                </div>
               </div>
             </div>
             <div class="spectrum-Form-item">
-              <label for="input-book-publisher" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">Publisher</label>
+              <label for="input-book-language"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">Language</label>
               <div class="spectrum-Form-itemField">
-                <input type="text" name="input-book-publisher" id="input-book-publisher" placeholder="E.g. Sceptre, Hachette UK" class="spectrum-Textfield">
+                <div class="spectrum-Textfield">
+                  <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
+                    <use xlink:href="#spectrum-icon-18-Alert" />
+                  </svg>
+                  <select id="input-book-language" name="input-book-language" data-placeholder="Choose Language"
+                          class="spectrum-Textfield-input spectrum-Picker-select">
+                    <option value="en-US" selected>English (United States)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="spectrum-Form-item">
+              <label for="input-book-copyright"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">Copyright</label>
+              <div class="spectrum-Form-itemField">
+                <div class="spectrum-Textfield">
+                  <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
+                    <use xlink:href="#spectrum-icon-18-Alert" />
+                  </svg>
+                  <input type="text" name="input-book-copyright" id="input-book-copyright"
+                                                       placeholder="E.g. Copyright 2004 by Sceptre"
+                                                       class="spectrum-Textfield-input">
+                </div>
+              </div>
+            </div>
+            <div class="spectrum-Form-item">
+              <label for="input-book-pubdate"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">Publishing date</label>
+              <div class="spectrum-Form-itemField">
+                <div class="spectrum-Datepicker">
+                  <div class="spectrum-Textfield">
+                    <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
+                      <use xlink:href="#spectrum-icon-18-Alert" />
+                    </svg>
+                    <input type="date" name="input-book-pubdate" id="input-book-pubdate"
+                                                         class="spectrum-Textfield-input spectrum-Datefield"
+                                                         placeholder="E.g. 16/01/2020">
+                    <svg class="spectrum-Icon spectrum-Icon--sizeS spectrum-Datepicker-Icon" focusable="false">
+                      <use xlink:href="#spectrum-icon-18-Calendar"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="spectrum-Form-item">
+              <label for="input-book-isbn" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">ISBN</label>
+              <div class="spectrum-Form-itemField">
+                <div class="spectrum-Textfield">
+                  <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
+                    <use xlink:href="#spectrum-icon-18-Alert" />
+                  </svg>
+                  <input type="text" name="input-book-isbn" id="input-book-isbn"
+                                                       class="spectrum-Textfield-input" placeholder="0-340-82277-5">
+                </div>
+              </div>
+            </div>
+            <div class="spectrum-Form-item">
+              <label for="input-book-publisher"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">Publisher</label>
+              <div class="spectrum-Form-itemField">
+                <div class="spectrum-Textfield">
+                  <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
+                    <use xlink:href="#spectrum-icon-18-Alert" />
+                  </svg>
+                  <input type="text" name="input-book-publisher" id="input-book-publisher"
+                                                       placeholder="E.g. Sceptre, Hachette UK" class="spectrum-Textfield-input">
+                </div>
               </div>
             </div>
           </div>
 
-          <hr class="spectrum-Rule spectrum-Rule--small"/>
+          <hr class="spectrum-Divider spectrum-Divider--sizeS">
 
           <div class="spectrum-Form spectrum-Form--small">
             <div class="spectrum-Form-item">
-              <label for="input-book-credit" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Apply paid plan</label>
+              <label for="input-book-credit"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Apply paid
+                plan</label>
               <div class="spectrum-Form-itemField">
-                <label class="spectrum-Checkbox" for="input-book-credit">
-                  <input type="checkbox" name="input-book-credit" id="input-book-credit" class="spectrum-Checkbox-input" title="If a suitable plan was purchased then apply it to this conversion. Otherwise, continue with a test document.">
+                <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized"
+                       for="input-book-credit">
+                  <input type="checkbox" name="input-book-credit" id="input-book-credit" class="spectrum-Checkbox-input"
+                         title="If a suitable plan was purchased then apply it to this conversion. Otherwise, continue with a test document.">
                   <span class="spectrum-Checkbox-box">
-                    <svg class="spectrum-Icon spectrum-UIIcon-CheckmarkSmall spectrum-Checkbox-checkmark" focusable="false">
-                      <use xlink:href="#icon-CheckmarkSmall"/>
-                    </svg>
-                  </span>
+                        <svg class="spectrum-Icon spectrum-UIIcon-Checkmark100 spectrum-Checkbox-checkmark"
+                             focusable="false" aria-hidden="true">
+                          <use xlink:href="#spectrum-css-icon-Checkmark100"/>
+                        </svg>
+                      </span>
                 </label>
               </div>
             </div>
             <div class="spectrum-Form-item">
-              <label for="input-book-autoclean" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Automatic cleanup</label>
+              <label for="input-book-autoclean"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Automatic
+                cleanup</label>
               <div class="spectrum-Form-itemField">
-                <label class="spectrum-Checkbox" for="input-book-autoclean">
-                  <input type="checkbox" name="input-book-autoclean" id="input-book-autoclean" checked="true" class="spectrum-Checkbox-input" disabled title="Automatically clean up the content of the document during ingestion.">
+                <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized"
+                       for="input-book-autoclean">
+                  <input type="checkbox" name="input-book-autoclean" id="input-book-autoclean" checked="true"
+                         class="spectrum-Checkbox-input" disabled
+                         title="Automatically clean up the content of the document during ingestion.">
                   <span class="spectrum-Checkbox-box">
-                    <svg class="spectrum-Icon spectrum-UIIcon-CheckmarkSmall spectrum-Checkbox-checkmark" focusable="false">
-                      <use xlink:href="#icon-CheckmarkSmall"/>
-                    </svg>
-                  </span>
+                        <svg class="spectrum-Icon spectrum-UIIcon-Checkmark100 spectrum-Checkbox-checkmark spectrum-Icon--sizeS"
+                             focusable="false" aria-hidden="true">
+                          <use xlink:href="#spectrum-css-icon-Checkmark100"/>
+                        </svg>
+                      </span>
                 </label>
               </div>
             </div>
             <div class="spectrum-Form-item">
-              <label for="input-book-highlight-issues" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Highlight issues</label>
+              <label for="input-book-highlight-issues"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Highlight
+                issues</label>
               <div class="spectrum-Form-itemField">
-                <label class="spectrum-Checkbox" for="input-book-highlight-issues">
-                  <input type="checkbox" name="input-book-highlight-issues" id="input-book-highlight-issues" class="spectrum-Checkbox-input" disabled title="Highlight spelling, punctuation, and other issues in the converted document.">
+                <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized"
+                       for="input-book-highlight-issues">
+                  <input type="checkbox" name="input-book-highlight-issues" id="input-book-highlight-issues"
+                         class="spectrum-Checkbox-input" disabled
+                         title="Highlight spelling, punctuation, and other issues in the converted document.">
                   <span class="spectrum-Checkbox-box">
-                    <svg class="spectrum-Icon spectrum-UIIcon-CheckmarkSmall spectrum-Checkbox-checkmark" focusable="false">
-                      <use xlink:href="#icon-CheckmarkSmall"/>
-                    </svg>
-                  </span>
+                        <svg class="spectrum-Icon spectrum-UIIcon-Checkmark100 spectrum-Checkbox-checkmark"
+                             focusable="false" aria-hidden="true">
+                          <use xlink:href="#spectrum-css-icon-Checkmark100"/>
+                        </svg>
+                      </span>
                 </label>
               </div>
             </div>
             <div class="spectrum-Form-item">
-              <label for="input-book-skip-structure" class="spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Skip structure analysis</label>
+              <label for="input-book-skip-structure"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Skip
+                structure analysis</label>
               <div class="spectrum-Form-itemField">
-                <label class="spectrum-Checkbox" for="input-book-skip-structure">
-                  <input type="checkbox" name="input-book-skip-structure" id="input-book-skip-structure" class="spectrum-Checkbox-input" disabled title="Skip the semantic structure analysis, and import the document as is (if possible and supported).">
+                <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized"
+                       for="input-book-skip-structure">
+                  <input type="checkbox" name="input-book-skip-structure" id="input-book-skip-structure"
+                         class="spectrum-Checkbox-input" disabled
+                         title="Skip the semantic structure analysis, and import the document as is (if possible and supported).">
                   <span class="spectrum-Checkbox-box">
-                    <svg class="spectrum-Icon spectrum-UIIcon-CheckmarkSmall spectrum-Checkbox-checkmark" focusable="false">
-                      <use xlink:href="#icon-CheckmarkSmall"/>
-                    </svg>
-                  </span>
+                        <svg class="spectrum-Icon spectrum-UIIcon-Checkmark100 spectrum-Checkbox-checkmark spectrum-Icon--sizeS"
+                             focusable="false" aria-hidden="true">
+                          <use xlink:href="#spectrum-css-icon-Checkmark100"/>
+                        </svg>
+                      </span>
                 </label>
               </div>
             </div>
           </div>
           <div class="form__nav">
-            <button class="spectrum-Button spectrum-Button--cta" id="button-send">
+            <button class="spectrum-Button spectrum-Button--sizeM spectrum-Button--cta" id="button-send">
               <span class="spectrum-Button-label">Upload and convert</span>
             </button>
           </div>
@@ -196,51 +290,60 @@
         <!-- Update or Download panel: download converted files, or update/refresh the local document from the Bookalope server. -->
         <div id="bookalope-update" class="hidden">
           <div class="form__text hidden" id="div-bookflow-type-none">
-            <p class="spectrum-Body4">This is a <strong>test version</strong> of the document. Please&nbsp;
-              <a href="#" id="a-purchase" class="spectrum-Link">
-                <svg class="spectrum-Icon spectrum-Icon--sizeXS" focusable="false">
-                  <use xlink:href="#icon-LinkOut"/>
+            <p class="spectrum-Body spectrum-Body--sizeS">This is a <strong>test version</strong> of the document. Please&nbsp;
+              <a href="#" id="a-purchase" class="spectrum-Link spectrum-Link--quiet">
+                <svg class="spectrum-Icon spectrum-Icon--sizeS" focusable="false">
+                  <use xlink:href="#spectrum-icon-18-LinkOut"/>
                 </svg>
                 purchase a plan
               </a> to upgrade to the full versions!
             </p>
           </div>
           <div class="form__text hidden" id="div-bookflow-type-basic">
-            <p class="spectrum-Body4">This is a <strong>test version</strong> of the document; a full version is not covered by the Basic plan.</p>
+            <p class="spectrum-Body spectrum-Body--sizeS">This is a <strong>test version</strong> of the document; a full version is not
+              covered by the Basic plan.</p>
           </div>
           <div class="form__text">
-            <p class="spectrum-Body4">Edit this document in&nbsp;
-              <a href="#" id="a-bookalope" class="spectrum-Link">
-                <svg class="spectrum-Icon spectrum-Icon--sizeXS" focusable="false">
-                  <use xlink:href="#icon-LinkOut"/>
+            <p class="spectrum-Body spectrum-Body--sizeS">Edit this document in&nbsp;
+              <a href="#" id="a-bookalope" class="spectrum-Link spectrum-Link--quiet">
+                <svg class="spectrum-Icon spectrum-Icon--sizeS" focusable="false">
+                  <use xlink:href="#spectrum-icon-18-LinkOut"/>
                 </svg>
                 Bookalope
               </a>, and then refresh the changes in a new local document.
             </p>
           </div>
           <div class="form__nav">
-            <button class="spectrum-Button spectrum-Button--cta" id="button-refresh">
+            <button class="spectrum-Button spectrum-Button--sizeM spectrum-Button--cta" id="button-refresh">
               <span class="spectrum-Button-label">Refresh from server</span>
             </button>
           </div>
 
-          <hr class="spectrum-Rule spectrum-Rule--small"/>
+          <hr class="spectrum-Divider spectrum-Divider--sizeS">
 
           <div class="spectrum-Form spectrum-Form--small">
             <div class="spectrum-Form-item">
-              <label for="input-book-download" class="spectrum-Form-itemLabel spectrum-FieldLabel--left">Download as</label>
+              <label for="input-book-download"
+                     class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">Download as</label>
               <div class="spectrum-Form-itemField">
                 <div class="spectrum-FieldGroup spectrum-FieldGroup--horizontal">
-                  <select id="input-book-download" name="input-book-download" data-placeholder="Choose Format" class="spectrum-Textfield spectrum-Dropdown-select">
-                    <option value="epub3" selected>Ebook</option>
-                    <option value="mobi">Ebook (Kindle)</option>
-                    <option value="pdf">Print PDF</option>
-                    <option data-divider="true"></option>
-                    <option value="docbook">DocBook XML</option>
-                    <option value="htmlbook">HTMLBook XML</option>
-                  </select>
-                  <button class="spectrum-Button spectrum-Button--small spectrum-Button--primary spectrum-FieldGroup-Button" id="button-download">
-                    Download
+                  <div class="spectrum-FieldGroup-item spectrum-FieldGroup-Item--full">
+                    <div class="spectrum-Textfield">
+                      <select id="input-book-download" name="input-book-download" data-placeholder="Choose Format"
+                              class="spectrum-Textfield-input spectrum-Picker-select">
+                        <option value="epub3" selected>Ebook</option>
+                        <option value="mobi">Ebook (Kindle)</option>
+                        <option value="pdf">Print PDF</option>
+                        <option data-divider="true"></option>
+                        <option value="docbook">DocBook XML</option>
+                        <option value="htmlbook">HTMLBook XML</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                      class="spectrum-Button spectrum-Button--sizeM spectrum-Button--primary spectrum-FieldGroup-Button"
+                      id="button-download">
+                    <span class="spectrum-Button-label">Download</span>
                   </button>
                 </div>
               </div>
@@ -253,24 +356,24 @@
 
     <!-- The status footer at the bottom of both panels. -->
     <div class="panel__footer spectrum hostBgd">
-      <hr class="panel__footer-rule spectrum-Rule spectrum-Rule--medium"/>
-      <div id="status-message-box" class="panel__footer-status spectrum-StatusLight spectrum-StatusLight--celery"></div>
+      <hr class="panel__footer-divider spectrum-Divider spectrum-Divider--sizeM">
+      <div id="status-message-box" class="panel__footer-status spectrum-StatusLight spectrum-StatusLight--sizeS spectrum-StatusLight--celery">sdfs</div>
     </div>
   </div>
 
   <!-- Spinner atop of everything to indicate that the Bookalope server is busy noodling. -->
   <div id="spinner" class="spinner__wrapper hidden">
-    <div class="spinner spectrum-CircleLoader spectrum-CircleLoader--indeterminate">
-      <div class="spectrum-CircleLoader-track"></div>
-      <div class="spectrum-CircleLoader-fills">
-        <div class="spectrum-CircleLoader-fillMask1">
-          <div class="spectrum-CircleLoader-fillSubMask1">
-            <div class="spectrum-CircleLoader-fill"></div>
+    <div class="spinner spectrum-ProgressCircle spectrum-ProgressCircle--indeterminate">
+      <div class="spectrum-ProgressCircle-track"></div>
+      <div class="spectrum-ProgressCircle-fills">
+        <div class="spectrum-ProgressCircle-fillMask1">
+          <div class="spectrum-ProgressCircle-fillSubMask1">
+            <div class="spectrum-ProgressCircle-fill"></div>
           </div>
         </div>
-        <div class="spectrum-CircleLoader-fillMask2">
-          <div class="spectrum-CircleLoader-fillSubMask2">
-            <div class="spectrum-CircleLoader-fill"></div>
+        <div class="spectrum-ProgressCircle-fillMask2">
+          <div class="spectrum-ProgressCircle-fillSubMask2">
+            <div class="spectrum-ProgressCircle-fill"></div>
           </div>
         </div>
       </div>

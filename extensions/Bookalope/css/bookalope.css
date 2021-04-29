@@ -1,5 +1,11 @@
 @charset "utf-8";
 
+.spectrum {
+    --spectrum-global-font-family-base: adobe-clean, "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --spectrum-alias-body-text-font-family: var(--spectrum-global-font-family-base);
+    --spectrum-fieldlabel-side-m-asterisk-margin-y: 0;
+}
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 200;
@@ -7,13 +13,15 @@
     font-stretch: normal;
     src: url("../fonts/SourceSansPro-ExtraLight.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 200;
     font-style: italic;
     font-stretch: normal;
-    src: url("../fonts/SourceSansPro-ExtraLightIt.oft.woff2") format("woff2");
+    src: url("../fonts/SourceSansPro-ExtraLightIt.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 300;
@@ -21,13 +29,15 @@
     font-stretch: normal;
     src: url("../fonts/SourceSansPro-Light.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 300;
     font-style: italic;
     font-stretch: normal;
-    src: url("../fonts/SourceSansPro-LightIt.oft.woff2") format("woff2");
+    src: url("../fonts/SourceSansPro-LightIt.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 400;
@@ -35,6 +45,7 @@
     font-stretch: normal;
     src: url("../fonts/SourceSansPro-Regular.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 400;
@@ -42,6 +53,7 @@
     font-stretch: normal;
     src: url("../fonts/SourceSansPro-It.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 600;
@@ -49,6 +61,7 @@
     font-stretch: normal;
     src: url("../fonts/SourceSansPro-Semibold.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 600;
@@ -56,6 +69,7 @@
     font-stretch: normal;
     src: url("../fonts/SourceSansPro-SemiboldIt.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 700;
@@ -63,6 +77,7 @@
     font-stretch: normal;
     src: url("../fonts/SourceSansPro-Bold.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 700;
@@ -70,6 +85,7 @@
     font-stretch: normal;
     src: url("../fonts/SourceSansPro-BoldIt.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 900;
@@ -77,6 +93,7 @@
     font-stretch: normal;
     src: url("../fonts/SourceSansPro-Black.otf.woff2") format("woff2");
 }
+
 @font-face {
     font-family: "Source Sans Pro";
     font-weight: 900;
@@ -129,25 +146,34 @@ html, body {
     width: 10px;
 }
 
-.panel__footer-rule {
+.panel__footer {
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+}
+
+.panel__footer-divider {
     margin: 0;
 }
 
-.panel__footer-status {
-    padding: 5px 10px;
+.panel__footer-status.spectrum-StatusLight {
     min-height: 0;
     font-size: 12px;
     line-height: 12px;
+    --spectrum-statuslight-info-padding-top: 5px;
+    --spectrum-statuslight-info-padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.panel__footer-status.spectrum-StatusLight:before {
+    --spectrum-statuslight-info-padding-bottom: 2px;
+    --spectrum-statuslight-info-padding-top: 0;
+    margin-left: 0;
 }
 
 .panel__footer-status:empty {
     display: none;
 }
-
-.panel__footer-status:before {
-    margin-left: 0;
-}
-
 
 /* Customize components of the Spectrum-CSS. */
 
@@ -158,13 +184,13 @@ html, body {
     margin: -5px 0;
 }
 
-.spectrum-Form-itemField .spectrum-Dropdown-popover,
+.spectrum-Form-itemField .dropdown-select__popover,
 .spectrum-Form-itemField .spectrum-Textfield,
-.spectrum-Form-itemField .spectrum-Dropdown {
+.spectrum-Form-itemField .dropdown-select {
     width: 100%;
 }
 
-.spectrum-Form-itemField .spectrum-Dropdown-popover {
+.spectrum-Form-itemField .dropdown-select__popover {
     max-width: 100%;
 }
 
@@ -188,7 +214,11 @@ html, body {
     width: 70%;
 }
 
-.spectrum-Textfield {
+.spectrum-Textfield:not(.is-invalid) .spectrum-Textfield-validationIcon {
+    display: none;
+}
+
+.spectrum-Textfield-input {
     font-family: inherit;
 }
 
@@ -258,17 +288,33 @@ html, body {
     margin-right: 0;
 }
 
-.spectrum-FieldGroup--horizontal .spectrum-FieldGroup-Button {
-    -webkit-box-flex: 0;
-    -ms-flex: none;
-    flex: none;
+.spectrum-FieldGroup--horizontal .spectrum-FieldGroup-Item--full {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
 }
 
-.spectrum-Dropdown-label + .spectrum-Dropdown-label {
+.spectrum-FieldGroup--horizontal .spectrum-FieldGroup-Button {
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+}
+
+.spectrum-Picker-label.is-placeholder {
+    font-weight: 400;
+}
+
+.spectrum-Picker-label.is-placeholder:not(:hover) {
+    opacity: 0.7;
+}
+
+.dropdown-select__trigger {
+    width: 100%;
+}
+
+.dropdown-select__label + .dropdown-select__label {
     margin-left: 8px;
 }
 
-.spectrum-Dropdown-popover {
+.dropdown-select__popover {
     z-index: 9;
     max-height: 200px;
     overflow: hidden;
@@ -277,15 +323,15 @@ html, body {
     display: none;
 }
 
-.spectrum-Dropdown-popover.is-open {
+.dropdown-select__popover.is-open {
     display: block;
 }
 
-.spectrum-Dropdown-popover .spectrum-Menu {
+.dropdown-select__popover .spectrum-Menu {
     display: block;
 }
 
-.spectrum-Dropdown .spectrum-Dropdown-icon {
+.dropdown-select .dropdown-select__icon {
     -webkit-transition: -webkit-transform 130ms ease-in-out;
     transition: -webkit-transform 130ms ease-in-out;
     -o-transition: transform 130ms ease-in-out;
@@ -293,20 +339,20 @@ html, body {
     transition: transform 130ms ease-in-out, -webkit-transform 130ms ease-in-out;
 }
 
-.spectrum-Dropdown.is-open .spectrum-Dropdown-icon {
-    -webkit-transform: rotate(-180deg);
-    -ms-transform: rotate(-180deg);
-    transform: rotate(-180deg);
+.dropdown-select.is-open .dropdown-select__icon {
+    -webkit-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    transform: rotate(-90deg);
 }
 
-.spectrum-Dropdown.is-dropup .spectrum-Dropdown-popover {
+.dropdown-select.is-dropup .dropdown-select__popover {
     top: auto;
     bottom: 100%;
     margin-bottom: 0;
     margin-top: 5px;
 }
 
-.spectrum-Dropdown:not(.is-invalid) .spectrum-UIIcon-Alert {
+.spectrum-Picker:not(.is-invalid) .spectrum-Picker-validationIcon {
     display: none;
 }
 
@@ -348,6 +394,21 @@ html, body {
 .file__wrapper {
     position: relative;
     max-width: 100%;
+    width: 100%;
+}
+
+.file__wrapper.spectrum-Picker {
+    --spectrum-picker-textonly-padding-left: 0;
+    --spectrum-picker-textonly-padding-right: 0;
+    --spectrum-picker-border-size: 0;
+    --spectrum-picker-m-background-color: transparent;
+    --spectrum-picker-m-background-color-hover: transparent;
+    --spectrum-picker-m-background-color-focus: transparent;
+    --spectrum-picker-m-background-color-active: transparent;
+}
+
+.file__btn:not(.is-invalid) .spectrum-Picker-validationIcon {
+    display: none;
 }
 
 .file__wrapper .spectrum-Icon {
@@ -356,7 +417,7 @@ html, body {
     flex-shrink: 0;
 }
 
-.file__wrapper .spectrum-Dropdown-icon {
+.file__wrapper .dropdown-select__icon {
     margin-top: 0;
     margin-bottom: 0;
 }
@@ -392,4 +453,8 @@ html, body {
     -webkit-transform: translateY(-50%);
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
+}
+
+.spectrum-Icon + .file__label {
+    margin-left: 8px;
 }

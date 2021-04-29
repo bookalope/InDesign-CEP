@@ -1,5 +1,9 @@
 @charset "utf-8";
 
+.spectrum--dark {
+    --spectrum-fieldlabel-m-asterisk-color: inherit;
+}
+
 .panel__body::-webkit-scrollbar-track {
     background: rgb(62, 62, 62);  /* --spectrum-scrollbar-track-color */
 }
