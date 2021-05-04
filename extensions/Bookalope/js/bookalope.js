@@ -108,6 +108,12 @@ function setBookalopeAPIToken(token, beta) {
 function showUpload() {
 
     // Reset configuration fields.
+    document.querySelectorAll('input[name="input-file-type"]').forEach((radio) => {
+        radio.checked = radio.value === "new";
+        if (radio.checked) {
+            radio.dispatchEvent(new Event("change"));
+        }
+    });
     document.getElementById("input-file").value = "";
     document.getElementById("input-file").dispatchEvent(new Event("change"));
     document.getElementById("input-book-name").value = "";
@@ -391,6 +397,7 @@ function askSaveBookflowFile(bookflow, format, style) {
     var bookalopeBetaHost;
 
     // Tis where we keep the current inputs from the panel.
+    var bookFileType;
     var bookFile;
     var bookName;
     var bookAuthor;
@@ -482,6 +489,10 @@ function askSaveBookflowFile(bookflow, format, style) {
         addClickListener(document.getElementById("button-refresh"), function () {
             showSpinner();
             convert(bookflow);
+            return false;
+        });
+        addClickListener(document.getElementById("button-push-active-document"), function () {
+            //TODO: clickListener logic
             return false;
         });
 
@@ -692,6 +703,7 @@ function askSaveBookflowFile(bookflow, format, style) {
         setBookalopeAPIToken(bookalopeToken, bookalopeBetaHost);
 
         // Get the values from the form fields.
+        bookFileType = document.querySelector('input[name="input-file-type"]:checked').value;
         bookFile = document.getElementById("input-file").files[0];
         bookName = document.getElementById("input-book-name").value;
         bookAuthor = document.getElementById("input-book-author").value;
@@ -714,12 +726,17 @@ function askSaveBookflowFile(bookflow, format, style) {
             showElementError(document.getElementById("input-bookalope-token"), "Field is required");
             document.getElementById("input-bookalope-token").scrollIntoView(false);
         }
-        else if (bookFile === undefined) {
+        else if (bookFileType === 'new' && bookFile === undefined) {
             showElementError(document.getElementById("input-file"), "Field is required");
             document.getElementById("input-book-name").scrollIntoView(false);
         }
-        else if (bookFile.size > 268435456) { // 256MiB
+        else if (bookFileType === 'new' && bookFile.size > 268435456) { // 256MiB
             showElementError(document.getElementById("input-file"), "File size exceeded 12Mb");
+            document.getElementById("input-book-name").scrollIntoView(false);
+        }
+        else if(bookFileType === 'active') {
+            // TODO: validate the active document
+            showElementError(document.getElementById("button-push-active-document"), "Field is required");
             document.getElementById("input-book-name").scrollIntoView(false);
         }
         else if (bookName.length === 0) {
@@ -891,6 +908,16 @@ function askSaveBookflowFile(bookflow, format, style) {
             // Register the callback for the Convert button.
             document.getElementById("button-send").addEventListener("click", function () {
                 uploadAndConvertDocument();
+            });
+
+            // Register the callback for change the 'Document type' field
+            document.querySelectorAll('input[name="input-file-type"]').forEach((radio) => {
+                radio.addEventListener("change", function (event) {
+                    var value = event.target.value;
+
+                    document.getElementById("button-push-active-document").closest('.spectrum-FieldGroup-item').classList[value === "active" ? "remove" : 'add']("hidden");
+                    document.getElementById("input-file").closest(".spectrum-FieldGroup-item").classList[value === "active" ? "add" : "remove"]("hidden");
+                });
             });
 
             // Register the callback for the File selection field that shows the selected

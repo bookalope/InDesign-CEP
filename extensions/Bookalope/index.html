@@ -56,6 +56,23 @@
         <div id="bookalope-upload" class="hidden">
           <div class="spectrum-Form">
             <div class="spectrum-Form-item">
+              <label class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">Document type</label>
+              <div class="spectrum-Form-itemField">
+                <div class="spectrum-FieldGroup spectrum-FieldGroup--horizontal">
+                  <div class="spectrum-Radio spectrum-Radio--emphasized spectrum-FieldGroup-item">
+                    <input type="radio" name="input-file-type" class="spectrum-Radio-input" id="input-file-new" value="new" checked>
+                    <span class="spectrum-Radio-button"></span>
+                    <label class="spectrum-Radio-label" for="input-file-new">New</label>
+                  </div>
+                  <div class="spectrum-Radio spectrum-Radio--emphasized spectrum-FieldGroup-item">
+                    <input type="radio" name="input-file-type" class="spectrum-Radio-input" id="input-file-active" value="active">
+                    <span class="spectrum-Radio-button"></span>
+                    <label class="spectrum-Radio-label" for="input-file-active">Active</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="spectrum-Form-item">
               <label for="input-file" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">
                 Document
                 <svg class="spectrum-Icon spectrum-UIIcon-Asterisk100 spectrum-FieldLabel-requiredIcon" focusable="false" aria-hidden="true">
@@ -63,17 +80,31 @@
                 </svg>
               </label>
               <div class="spectrum-Form-itemField">
-                <div class="file__wrapper spectrum-Picker spectrum-Picker--sizeM">
-                  <label class="file__btn" for="input-file">
-                    <input type="file" name="input-book-file" id="input-file" class="file__input spectrum-Textfield-input spectrum-Picker-input" data-placeholder="Choose File">
-                    <svg class="spectrum-Icon spectrum-Icon--sizeS" focusable="false">
-                      <use xlink:href="#spectrum-icon-18-Attach"/>
-                    </svg>
-                    <span class="file__label spectrum-Picker-label is-placeholder">Choose File</span>
-                    <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Picker-validationIcon" focusable="false">
-                      <use xlink:href="#spectrum-icon-18-Alert"></use>
-                    </svg>
-                  </label>
+                <div class="spectrum-FieldGroup spectrum-FieldGroup--vertical spectrum-FieldGroup--full">
+                  <div class="spectrum-FieldGroup-item">
+                    <div class="file__wrapper spectrum-Picker spectrum-Picker--sizeM">
+                      <label class="file__btn" for="input-file">
+                        <input type="file" name="input-book-file" id="input-file" class="file__input spectrum-Textfield-input spectrum-Picker-input" data-placeholder="Choose File">
+                        <svg class="spectrum-Icon spectrum-Icon--sizeS" focusable="false">
+                          <use xlink:href="#spectrum-icon-18-Attach"/>
+                        </svg>
+                        <span class="file__label spectrum-Picker-label is-placeholder">Choose File</span>
+                        <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Picker-validationIcon" focusable="false">
+                          <use xlink:href="#spectrum-icon-18-Alert"></use>
+                        </svg>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="spectrum-FieldGroup-item hidden">
+                    <div class="spectrum-Buttonfield">
+                      <button class="spectrum-Button spectrum-Button--primary spectrum-Button--sizeM" id="button-push-active-document">
+                        <span class="spectrum-Button-label">Push active document</span>
+                      </button>
+                      <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Buttonfield-validationIcon" focusable="false">
+                        <use xlink:href="#spectrum-icon-18-Alert"></use>
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -274,7 +305,7 @@
               <label for="input-book-download" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">Download as</label>
               <div class="spectrum-Form-itemField">
                 <div class="spectrum-FieldGroup spectrum-FieldGroup--horizontal">
-                  <div class="spectrum-FieldGroup-item spectrum-FieldGroup-Item--full">
+                  <div class="spectrum-FieldGroup-item spectrum-FieldGroup-item--full">
                     <div class="spectrum-Textfield">
                       <select id="input-book-download" name="input-book-download" data-placeholder="Choose Format" class="spectrum-Textfield-input spectrum-Picker-select">
                         <option value="epub3" selected>Ebook</option>

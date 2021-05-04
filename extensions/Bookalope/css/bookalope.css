@@ -196,7 +196,7 @@ html, body {
 
 .spectrum-Form--small {
     border-spacing: 0 5px;
-    margin: 0px 0;
+    margin: 0;
 }
 
 .spectrum-Form-itemLabel {
@@ -214,12 +214,29 @@ html, body {
     width: 70%;
 }
 
+.spectrum-FieldGroup.spectrum-FieldGroup--full {
+    width: 100%;
+}
+
+.spectrum-FieldGroup--horizontal .spectrum-FieldGroup-item--full {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
 .spectrum-Textfield:not(.is-invalid) .spectrum-Textfield-validationIcon {
     display: none;
 }
 
 .spectrum-Textfield-input {
     font-family: inherit;
+}
+
+.spectrum-Checkbox-input:not(:checked) ~ .spectrum-Checkbox-label {
+    --spectrum-checkbox-m-text-color: var(--spectrum-alias-label-text-color);
+}
+
+.spectrum-Radio-input:not(:checked) ~ .spectrum-Radio-label {
+    --spectrum-radio-m-text-color: var(--spectrum-alias-label-text-color);
 }
 
 .spectrum-Datepicker {
@@ -268,8 +285,27 @@ html, body {
     display: none;
 }
 
-.spectrum-Button--small {
-    font-size: 14px;
+.spectrum-Buttonfield {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+
+.spectrum-Buttonfield .spectrum-Buttonfield-validationIcon {
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.spectrum-Buttonfield.is-invalid .spectrum-Buttonfield-validationIcon {
+    color: var(--spectrum-semantic-negative-color-icon);
+}
+
+.spectrum-Buttonfield:not(.is-invalid) .spectrum-Buttonfield-validationIcon {
+    display: none;
 }
 
 .spectrum-InputGroup {
@@ -286,11 +322,6 @@ html, body {
 
 .spectrum-FieldGroup-Button:last-child {
     margin-right: 0;
-}
-
-.spectrum-FieldGroup--horizontal .spectrum-FieldGroup-Item--full {
-    -ms-flex: 1 1 auto;
-    flex: 1 1 auto;
 }
 
 .spectrum-FieldGroup--horizontal .spectrum-FieldGroup-Button {
@@ -411,6 +442,7 @@ div.spectrum-Picker {
     --spectrum-picker-m-background-color-hover: transparent;
     --spectrum-picker-m-background-color-focus: transparent;
     --spectrum-picker-m-background-color-down: transparent;
+    --spectrum-picker-m-background-color-disabled: transparent;
 }
 
 .file__wrapper .spectrum-Icon {
