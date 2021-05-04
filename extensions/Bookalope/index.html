@@ -2,6 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
+  <title>Bookalope</title>
   <link rel="stylesheet" href="css/normalize.css"/>
   <link rel="stylesheet" href="css/spectrum/spectrum-globals.css"/>
   <link rel="stylesheet" href="css/spectrum/spectrum-medium.css"/>
@@ -62,9 +63,9 @@
                 </svg>
               </label>
               <div class="spectrum-Form-itemField">
-                <button type="button" class="file__wrapper spectrum-Picker spectrum-Picker--sizeM">
+                <div class="file__wrapper spectrum-Picker spectrum-Picker--sizeM">
                   <label class="file__btn" for="input-file">
-                    <input type="file" name="input-book-file" id="input-file" class="file__input spectrum-Textfield-input spectrum-Picker-input" placeholder="Choose File">
+                    <input type="file" name="input-book-file" id="input-file" class="file__input spectrum-Textfield-input spectrum-Picker-input">
                     <svg class="spectrum-Icon spectrum-Icon--sizeS" focusable="false">
                       <use xlink:href="#spectrum-icon-18-Attach"/>
                     </svg>
@@ -73,7 +74,7 @@
                       <use xlink:href="#spectrum-icon-18-Alert"></use>
                     </svg>
                   </label>
-                </button>
+                </div>
               </div>
             </div>
           </div>
@@ -140,7 +141,7 @@
                     <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
                       <use xlink:href="#spectrum-icon-18-Alert"/>
                     </svg>
-                    <input type="date" name="input-book-pubdate" id="input-book-pubdate" class="spectrum-Textfield-input spectrum-Datefield" placeholder="E.g. 16/01/2020">
+                    <input type="date" name="input-book-pubdate" id="input-book-pubdate" class="spectrum-Textfield-input spectrum-Datefield">
                     <svg class="spectrum-Icon spectrum-Icon--sizeS spectrum-Datepicker-Icon" focusable="false">
                       <use xlink:href="#spectrum-icon-18-Calendar"/>
                     </svg>
@@ -279,7 +280,7 @@
                         <option value="epub3" selected>Ebook</option>
                         <option value="mobi">Ebook (Kindle)</option>
                         <option value="pdf">Print PDF</option>
-                        <option data-divider="true"></option>
+                        <option data-divider="true">&nbsp;</option>
                         <option value="docbook">DocBook XML</option>
                         <option value="htmlbook">HTMLBook XML</option>
                       </select>
