@@ -407,10 +407,6 @@ html, body {
     --spectrum-picker-m-background-color-active: transparent;
 }
 
-.file__btn:not(.is-invalid) .spectrum-Picker-validationIcon {
-    display: none;
-}
-
 .file__wrapper .spectrum-Icon {
     max-height: 100%;
     -ms-flex-negative: 0;
