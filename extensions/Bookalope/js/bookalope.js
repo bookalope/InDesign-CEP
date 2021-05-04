@@ -186,19 +186,18 @@ function showMessage(message, msgClass) {
 
 function showElementError(element, text) {
     element.classList.add("is-invalid");
-    if (element.classList.contains("spectrum-Dropdown-input") === true || element.classList.contains("spectrum-Dropdown-select") === true) {
-        var controlDropdown = element.classList.contains("spectrum-Dropdown-input") === true ? element.closest(".spectrum-Dropdown") : element.nextSibling;
-        if (controlDropdown !== null) {
-            controlDropdown.classList.add("is-invalid");
-            controlDropdown.querySelector(".spectrum-Dropdown-trigger").classList.add("is-invalid");
-        }
+
+    var field = element.parentNode;
+    if (element.classList.contains("spectrum-Picker-select") === true || element.classList.contains("spectrum-Picker-input") === true) {
+        field = element.closest(".spectrum-Picker");
     }
     else if (element.classList.contains("spectrum-Checkbox-input") === true) {
-        var controlCheckbox = element.closest(".spectrum-Checkbox");
-        if (controlCheckbox !== null) {
-            controlCheckbox.classList.add("is-invalid");
-        }
+        field = element.closest(".spectrum-Checkbox");
     }
+    if (field !== null) {
+        field.classList.add("is-invalid");
+    }
+
     showMessage("Error: " + text, "spectrum-StatusLight--negative");
 }
 
@@ -886,7 +885,7 @@ function askSaveBookflowFile(bookflow, format, style) {
             });
 
             // Register the callback for the File selection field that shows the selected
-            // file name or, if no file was selected, a default placeholder string.
+            // file name or, if no file was selected, a default string from data-placeholder attribute.
             document.getElementById("input-file").addEventListener("change", function (event) {
                 var label = this.parentNode.querySelector(".file__label");
                 if (this.files.length) {
@@ -894,15 +893,15 @@ function askSaveBookflowFile(bookflow, format, style) {
                     label.textContent = event.target.value.split("\\").pop();
                 } else {
                     label.classList.add("is-placeholder");
-                    label.textContent = this.getAttribute("placeholder");
+                    label.textContent = this.getAttribute("data-placeholder");
                 }
             });
 
             // Alright this is a funky Adobe Spectrum thing. Looking at the documentation for
-            // Dropdown elements: http://opensource.adobe.com/spectrum-css/2.13.0/docs/#dropdown
+            // Picker elements: https://opensource.adobe.com/spectrum-css/picker.html
             // then Spectrum switches a <select> element to `hidden` and instead uses its own
             // implementation; however, it's required to keep the <select> element and to sync
-            // its <option> values with the Spectrum Dropdown to make sure that forms continue
+            // its <option> values with the Spectrum Picker to make sure that forms continue
             // to work. A bit spunky, but that's how they do it, I guess 😳
             // Note: we use the Javascript idiom here that declares an anonymous function and
             // executes it, in order to use the function's closure.
@@ -939,10 +938,12 @@ function askSaveBookflowFile(bookflow, format, style) {
                 function closeDropdown(dropdown) {
                     dropdown.classList.remove("is-open");
                     dropdown.classList.remove("is-dropup");
-                    var dropdownPopover = dropdown.querySelector(".spectrum-Dropdown-popover");
+                    var dropdownPopover = dropdown.querySelector(".dropdown-select__popover");
                     if (dropdownPopover !== null) {
                         // This should always exist, no?
                         dropdownPopover.classList.remove("is-open");
+                        dropdown.classList.remove("spectrum-Popover--top");
+                        dropdown.classList.add("spectrum-Popover--bottom");
                     }
                 }
 
@@ -953,7 +954,7 @@ function askSaveBookflowFile(bookflow, format, style) {
                  */
 
                 function closeAllDropdowns(exception) {
-                    document.querySelectorAll(".spectrum-Dropdown").forEach(function (dropdown) {
+                    document.querySelectorAll(".dropdown-select").forEach(function (dropdown) {
                         if (dropdown !== exception) {
                             closeDropdown(dropdown);
                         }
@@ -961,9 +962,9 @@ function askSaveBookflowFile(bookflow, format, style) {
                 }
 
                 // Here it goes. Iterate over all <select> elements in the documents (assuming
-                // that they have a class 'spectrum-Dropdown-select') and hide them; then
+                // that they have a class 'spectrum-Picker-select') and hide them; then
                 // create the Adobe Spectrum specific Dropdowns in their stead.
-                document.querySelectorAll(".spectrum-Dropdown-select").forEach(function (select) {
+                document.querySelectorAll(".spectrum-Picker-select").forEach(function (select) {
 
                     /**
                      * Change the current label of a Dropdown.
@@ -1030,14 +1031,14 @@ function askSaveBookflowFile(bookflow, format, style) {
                     //   http://opensource.adobe.com/spectrum-css/2.13.0/docs/#dropdown
                     // When done, add the HTML into the DOM right after the original <select> element.
                     var dropdownHTML = "";
-                    dropdownHTML += "<div class='spectrum-Dropdown' data-id='" + selectId + "'>";
-                    dropdownHTML += "<button class='spectrum-FieldButton spectrum-Dropdown-trigger'>" +
-                                    "<span class='spectrum-Dropdown-label is-placeholder'>" + selectPlaceholder + "</span>" +
-                                    "<svg class='spectrum-Icon spectrum-Icon--sizeS spectrum-UIIcon-Alert' focusable='false'><use xlink:href='#icon-AlertMedium'></use></svg>" +
-                                    "<svg class='spectrum-Icon spectrum-UIIcon-ChevronDownMedium spectrum-Dropdown-icon' focusable='false'><use xlink:href='#icon-ChevronDownMedium'/></svg>" +
-                                    "</button>";
-                    dropdownHTML += "<div class='spectrum-Popover spectrum-Dropdown-popover'>" +
-                                    "<ul class='spectrum-Menu' role='listbox'>";
+                    dropdownHTML += "<div class='dropdown-select' data-id='" + selectId + "'>";
+                    dropdownHTML += "<button class='spectrum-Picker spectrum-Picker--sizeM dropdown-select__trigger'>" +
+                        "<span class='spectrum-Picker-label dropdown-select__label is-placeholder'>" + selectPlaceholder + "</span>" +
+                        "<svg class='spectrum-Icon spectrum-Icon--sizeM spectrum-Picker-validationIcon' focusable='false' aria-hidden='true' aria-label='Alert'><use xlink:href='#spectrum-icon-18-Alert'></use></svg>" +
+                        "<svg class='spectrum-Icon spectrum-UIIcon-ChevronDown100 spectrum-Picker-menuIcon dropdown-select__icon' focusable='false' aria-hidden='true'><use xlink:href='#spectrum-css-icon-Chevron100'/></svg>" +
+                        "</button>";
+                    dropdownHTML += "<div class='spectrum-Popover spectrum-Popover--bottom spectrum-Picker-popover dropdown-select__popover'>" +
+                        "<ul class='spectrum-Menu' role='listbox'>";
                     Array.from(selectOptions).forEach(function (option) {
                         var isPlaceholder = option.getAttribute("data-placeholder") === "true",
                             isDivider = option.getAttribute("data-divider") === "true";
@@ -1055,9 +1056,10 @@ function askSaveBookflowFile(bookflow, format, style) {
                         var optionText = option.textContent,
                             optionValue = option.getAttribute("value");
                         dropdownHTML += "<li class='" + cssItemClasses + "' data-value='" + optionValue + "' " +
-                                        "role='" + (isDivider ? "separator" : "option") + "'>";
+                            "role='" + (isDivider ? "separator" : "option") + "'>";
                         if (!isDivider) {
                             dropdownHTML += "<span class='spectrum-Menu-itemLabel'>" + optionText + "</span>";
+                            dropdownHTML += "<svg class='spectrum-Icon spectrum-UIIcon-Checkmark100 spectrum-Menu-checkmark spectrum-Menu-itemIcon' focusable='false' aria-hidden='true'><use xlink:href='#spectrum-css-icon-Checkmark100'></use></svg>";
                         }
                         dropdownHTML += "</li>";
                     });
@@ -1066,11 +1068,11 @@ function askSaveBookflowFile(bookflow, format, style) {
 
                     // Now that the Dropdown is inserted into the DOM, attach the required event handlers
                     // so that it behaves like a proper replacement for the <select> element.
-                    var dropdown = document.querySelector(".spectrum-Dropdown[data-id='" + selectId + "']");
-                    var dropdownPopover = dropdown.querySelector(".spectrum-Dropdown-popover"),
+                    var dropdown = document.querySelector(".dropdown-select[data-id='" + selectId + "']");
+                    var dropdownPopover = dropdown.querySelector(".dropdown-select__popover"),
                         dropdownItems = dropdown.querySelectorAll(".spectrum-Menu-item"),
-                        dropdownLabel = dropdown.querySelector(".spectrum-Dropdown-label"),
-                        dropdownTrigger = dropdown.querySelector(".spectrum-Dropdown-trigger");
+                        dropdownLabel = dropdown.querySelector(".dropdown-select__label"),
+                        dropdownTrigger = dropdown.querySelector(".dropdown-select__trigger");
 
                     // Iterate over the Dropdown's menu items, bind click handlers to each of them,
                     // and set the Dropdown's label to the selected option.
@@ -1094,7 +1096,7 @@ function askSaveBookflowFile(bookflow, format, style) {
                         var value = dropdownItem.getAttribute("data-value");
                         if (value === select.value) {
                             changeDropdownLabel(value, dropdownItem.textContent,
-                                                dropdownItem.classList.contains("is-placeholder"));
+                                dropdownItem.classList.contains("is-placeholder"));
                         }
                     });
 
@@ -1150,16 +1152,18 @@ function askSaveBookflowFile(bookflow, format, style) {
 
                                 // Make sure that the popover shows correctly in the ancestor's panel <div>.
                                 var panel = dropdown.closest(".panel__body");  // Or use <body>.
-                                var dropdownPopover = dropdown.querySelector(".spectrum-Dropdown-popover");
+                                var dropdownPopover = dropdown.querySelector(".dropdown-select__popover");
 
                                 // Check whether there is enough room below the Dropdown to open the
                                 // popover below; if there is not, then open the popover above the Dropdown.
                                 // TODO The popover is always not displayed yet, simplify getHeight() function!
                                 var popoverHeight = getHeight(dropdownPopover);
-                                if (dropdown.offsetTop > popoverHeight) {
-                                    var top = dropdown.offsetTop + dropdown.offsetHeight + popoverHeight;
+                                if (dropdown.parentNode.offsetTop > popoverHeight) {
+                                    var top = dropdown.parentNode.offsetTop + dropdown.offsetHeight + popoverHeight;
                                     if (top > panel.offsetHeight + panel.scrollTop) {
                                         dropdown.classList.add("is-dropup");
+                                        dropdownPopover.classList.remove("spectrum-Popover--bottom");
+                                        dropdownPopover.classList.add("spectrum-Popover--top");
                                     }
                                 }
 
@@ -1173,7 +1177,7 @@ function askSaveBookflowFile(bookflow, format, style) {
 
                 // Clicking outside of the Dropdown or its popover closes any open popover.
                 document.addEventListener("click", function (event) {
-                    if (!isAncestorOf(event.target, ".spectrum-Dropdown")) {
+                    if (!isAncestorOf(event.target, ".dropdown-select")) {
                         closeAllDropdowns();
                     }
                 });
@@ -1188,5 +1192,5 @@ function askSaveBookflowFile(bookflow, format, style) {
     });
 
     // Load all SVG icons used by the extension so that they become available to the <svg> elements.
-    loadIcons("images/sprite-icons.svg");
+    loadIcons("images/spectrum-icons.svg");
 }());
