@@ -885,7 +885,7 @@ function askSaveBookflowFile(bookflow, format, style) {
             });
 
             // Register the callback for the File selection field that shows the selected
-            // file name or, if no file was selected, a default placeholder string.
+            // file name or, if no file was selected, a default string from data-placeholder attribute.
             document.getElementById("input-file").addEventListener("change", function (event) {
                 var label = this.parentNode.querySelector(".file__label");
                 if (this.files.length) {
@@ -893,7 +893,7 @@ function askSaveBookflowFile(bookflow, format, style) {
                     label.textContent = event.target.value.split("\\").pop();
                 } else {
                     label.classList.add("is-placeholder");
-                    label.textContent = this.getAttribute("placeholder");
+                    label.textContent = this.getAttribute("data-placeholder");
                 }
             });
 

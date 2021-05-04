@@ -356,6 +356,12 @@ html, body {
     display: none;
 }
 
+div.spectrum-Picker {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+
 .spectrum-Menu-item.is-selected {
     cursor: default;
 }
@@ -404,7 +410,7 @@ html, body {
     --spectrum-picker-m-background-color: transparent;
     --spectrum-picker-m-background-color-hover: transparent;
     --spectrum-picker-m-background-color-focus: transparent;
-    --spectrum-picker-m-background-color-active: transparent;
+    --spectrum-picker-m-background-color-down: transparent;
 }
 
 .file__wrapper .spectrum-Icon {
