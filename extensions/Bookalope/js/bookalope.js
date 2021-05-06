@@ -470,7 +470,7 @@ function askSaveBookflowFile(bookflow, format, style) {
         });
         addClickListener(document.getElementById("a-purchase"), function () {
             var bookalope = getBookalope();
-            var url = bookalope.getHost() + "/billing";
+            var url = bookalope.getHost() + "/plans";
             openURL(url);
             return false;
         });
