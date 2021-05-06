@@ -86,16 +86,21 @@ function bookalopeAddDocumentData(doc, key, value) {
     // Get private Bookalope data stored with the document. If none existed yet,
     // create an empty dictionary. Then add the given key:value to the dictionary,
     // or update the value if the key already existed.
-    var data = bookalopeGetDocumentData(doc) || {};
-    data[key] = value;
-
-    // Add the data back to the document.
-    bookalopeSetDocumentData(doc, data);
+    var data = bookalopeGetDocumentData(doc);
+    if (data && data.bookalope) {
+        var bookalopeData = data.bookalope;
+    }
+    else {
+        var bookalopeData = {};
+    }
+    bookalopeData[key] = value;
+    bookalopeSetDocumentData(doc, bookalopeData);
 }
 
 
 /**
- * Get the given document's Bookalope data store, or null if there was none.
+ * Get information from the given document; if the document contains a Bookalope data
+ * store then return that, too.
  *
  * @param {Document} doc - The InDesign document whose data store we want to return.
  * @returns {Object | null}
@@ -106,13 +111,22 @@ function bookalopeGetDocumentData(doc) {
     // Safeguard, because this might be called with an invalid document.
     if (doc && doc.isValid) {
 
+        // The document data.
+        var data = {
+            "doc": {
+                "name": doc.name
+            },
+            "bookalope": null
+        };
+
         // Return the private Bookalope data stored with the document as a dictionary,
         // or null if the document doesn't have any (i.e. is not a document generated
         // by Bookalope).
-        var jsonData = doc.extractLabel("privateBookalopeDataStore");
-        if (0 !== jsonData.length) {
-            return JSON.parse(jsonData);
+        var bookalopeData = doc.extractLabel("privateBookalopeDataStore");
+        if (bookalopeData.length !== 0) {
+            data.bookalope = JSON.parse(bookalopeData);
         }
+        return data;
     }
     return null;
 }

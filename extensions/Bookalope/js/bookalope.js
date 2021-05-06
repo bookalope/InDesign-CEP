@@ -745,43 +745,52 @@ function askSaveBookflowFile(bookflow, format, style) {
         // Get the private Bookalope data from the now active document.
         csInterface.evalScript("bookalopeGetDocumentDataFromActive();", function (result) {
 
-            // The result is either an empty string or a JSON string that contains
-            // a dictionary with the bookflow id. If InDesign switches to a document
-            // with a bookflow id, then show the Update panel; else show the Upload
-            // panel from which we create a new document.
-            var bookalopeDocData = JSON.parse(result);
-            if (bookalopeDocData) {
+            // The result is either null or a JSON serialized dictionary with information
+            // about the currently active InDesign document as well as Bookalope data
+            // (including the bookflow id). When InDesign switches to a document with a
+            // bookflow id, then show the Update panel; else show the Upload panel from
+            // which we create a new document.
+            var documentData = JSON.parse(result);
+            if (documentData) {
 
-                // Get Book and Bookflow IDs, as well as beta host information.
-                var bookId = bookalopeDocData["book-id"];
-                var bookflowId = bookalopeDocData["bookflow-id"];
-                // TODO Paranoid: (/^[0-9a-fA-F]{32}$/).test(bookId), (/^[0-9a-fA-F]{32}$/).test(bookflowId)
+                // Fetch the Bookalope specific data.
+                var bookalopeData = documentData.bookalope;
+                if (bookalopeData) {
 
-                // Handle beta host information from the document.
-                if (bookalopeBetaHost !== bookalopeDocData["beta"]) {
-                    showClientError("Document " + (bookalopeDocData["beta"] ? "uses" : "doesn't use") + " beta server, please check token");
-                }
+                    // Get Book and Bookflow IDs, as well as beta host information.
+                    var bookId = bookalopeData["book-id"];
+                    var bookflowId = bookalopeData["bookflow-id"];
+                    // TODO Paranoid: (/^[0-9a-fA-F]{32}$/).test(bookId), (/^[0-9a-fA-F]{32}$/).test(bookflowId)
 
-                // Create a new Book and Bookflow object. Note that creating them does not
-                // talk with the Bookalope server, it merely instantiates the corresponding
-                // objects with enough information to talk with the Bookalope server.
-                var bookalope = getBookalope();
-                var book = new Book(bookalope, bookId);
-                var bookflow = new Bookflow(bookalope, book, bookflowId);
+                    // Handle beta host information from the document.
+                    if (bookalopeBetaHost !== bookalopeData["beta"]) {
+                        showClientError("Document " + (bookalopeData["beta"] ? "uses" : "doesn't use") + " beta server, please check token");
+                    }
 
-                // Update the local Bookflow object with data from the Bookalope server. If that
-                // succeeds then bind the correct handlers to the links and show the Update panel;
-                // if updating the Bookflow failed then show the Upload panel and error message.
-                bookflow.update()
-                .then(function (bookflow) {
-                    setBookalopeLinks(bookflow);
-                    showUpdate();
-                    showStatusOk();
-                })
-                .catch(function (error) {
+                    // Create a new Book and Bookflow object. Note that creating them does not
+                    // talk with the Bookalope server, it merely instantiates the corresponding
+                    // objects with enough information to talk with the Bookalope server.
+                    var bookalope = getBookalope();
+                    var book = new Book(bookalope, bookId);
+                    var bookflow = new Bookflow(bookalope, book, bookflowId);
+
+                    // Update the local Bookflow object with data from the Bookalope server. If that
+                    // succeeds then bind the correct handlers to the links and show the Update panel;
+                    // if updating the Bookflow failed then show the Upload panel and error message.
+                    bookflow.update()
+                    .then(function (bookflow) {
+                        setBookalopeLinks(bookflow);
+                        showUpdate();
+                        showStatusOk();
+                    })
+                    .catch(function (error) {
+                        showUpload();
+                        showServerError(error.message);
+                    });
+                } else {
                     showUpload();
-                    showServerError(error.message);
-                });
+                    showStatusOk();
+                }
             } else {
                 showUpload();
                 showStatusOk();
