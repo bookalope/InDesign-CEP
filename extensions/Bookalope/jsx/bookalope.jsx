@@ -60,6 +60,20 @@ function getConfiguration() {
 
 
 /**
+ * Write the given object to the given document's Bookalope data store.
+ *
+ * @param {Document} doc - The InDesign document whose data store we want to use.
+ * @param {Object} data - An object that's stored into the document's data store.
+ */
+
+function bookalopeSetDocumentData(doc, data) {
+
+    // Add the data to the document.
+    doc.insertLabel("privateBookalopeDataStore", JSON.stringify(data));
+}
+
+
+/**
  * Add the given key:value pair to the given document's Bookalope data store.
  *
  * @param {Document} doc - The InDesign document whose data store we want to use.
@@ -76,7 +90,7 @@ function bookalopeAddDocumentData(doc, key, value) {
     data[key] = value;
 
     // Add the data back to the document.
-    doc.insertLabel("privateBookalopeDataStore", JSON.stringify(data));
+    bookalopeSetDocumentData(doc, data);
 }
 
 
@@ -159,7 +173,9 @@ function bookalopeCreateDocument(idmlFileName, bookId, bookflowId, betaHost) {
     var bookalopeDocument = app.open(idmlFile);
 
     // Bookalope keeps some private data alongside the document.
-    bookalopeAddDocumentData(bookalopeDocument, "book-id", bookId);
-    bookalopeAddDocumentData(bookalopeDocument, "bookflow-id", bookflowId);
-    bookalopeAddDocumentData(bookalopeDocument, "beta", betaHost);
+    bookalopeSetDocumentData(bookalopeDocument, {
+        "book-id": bookId,
+        "bookflow-id": bookflowId,
+        "beta": betaHost
+    });
 }
