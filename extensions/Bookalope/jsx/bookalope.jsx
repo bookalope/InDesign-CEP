@@ -193,3 +193,51 @@ function bookalopeCreateDocument(idmlFileName, bookId, bookflowId, betaHost) {
         "beta": betaHost
     });
 }
+
+
+/**
+ * Create an RTF file from the document with the given name, and save that to the given path.
+ *
+ * @param {string} docName - Name of the document for which the RTF is created.
+ * @param {string} rtfFileName - Path and file name to save the created RTF file.
+ * @returns {boolean} True if the RTF was created successfully; false otherwise.
+ */
+
+function bookalopeDocumentByNameToRTF(docName, rtfFileName) {
+
+    var doc = app.documents.itemByName(docName);
+    return bookalopeDocumentToRTF(doc, rtfFileName);
+}
+
+
+/**
+ * Create an RTF file from the currently active document, and save that to the given path.
+ *
+ * @param {string} rtfFileName - Path and file name to save the created RTF file.
+ * @returns {boolean} True if the RTF was created successfully; false otherwise.
+ */
+
+function bookalopeActiveDocumentToRTF(rtfFileName) {
+
+    var doc = app.documents.length !== 0 ? app.activeDocument : undefined;
+    return bookalopeDocumentToRTF(doc, rtfFileName);
+}
+
+
+/**
+ * Create an RTF file from the given document, and save that to the given path.
+ *
+ * @param {Document} doc - The InDesign document for which the RTF is created.
+ * @param {string} rtfFileName - Path and file name to save the created RTF file.
+ * @returns {boolean} True if the RTF was created successfully; false otherwise.
+ */
+
+function bookalopeDocumentToRTF(doc, rtfFileName) {
+
+    if (doc && doc.isValid) {
+
+        // TODO
+        // return true;
+    }
+    return false;
+}

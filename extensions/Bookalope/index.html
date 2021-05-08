@@ -56,29 +56,29 @@
         <div id="bookalope-upload" class="hidden">
           <div class="spectrum-Form">
             <div class="spectrum-Form-item">
-              <label class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">Document type</label>
-              <div class="spectrum-Form-itemField">
-                <div class="spectrum-FieldGroup spectrum-FieldGroup--horizontal">
-                  <div class="spectrum-Radio spectrum-Radio--emphasized spectrum-FieldGroup-item">
-                    <input type="radio" name="input-file-type" class="spectrum-Radio-input" id="input-file-new" value="new" checked>
-                    <span class="spectrum-Radio-button"></span>
-                    <label class="spectrum-Radio-label" for="input-file-new">New</label>
-                  </div>
-                  <div class="spectrum-Radio spectrum-Radio--emphasized spectrum-FieldGroup-item">
-                    <input type="radio" name="input-file-type" class="spectrum-Radio-input" id="input-file-active" value="active">
-                    <span class="spectrum-Radio-button"></span>
-                    <label class="spectrum-Radio-label" for="input-file-active">Active</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="spectrum-Form-item">
-              <label for="input-file" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">
+              <label class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left">
                 Document
                 <svg class="spectrum-Icon spectrum-UIIcon-Asterisk100 spectrum-FieldLabel-requiredIcon" focusable="false" aria-hidden="true">
                   <use xlink:href="#spectrum-css-icon-Asterisk100"/>
                 </svg>
               </label>
+              <div class="spectrum-Form-itemField">
+                <div class="spectrum-FieldGroup spectrum-FieldGroup--horizontal">
+                  <div class="spectrum-Radio spectrum-Radio--emphasized spectrum-FieldGroup-item">
+                    <input type="radio" name="input-file-type" class="spectrum-Radio-input" id="input-file-open" value="open-file" checked>
+                    <span class="spectrum-Radio-button"></span>
+                    <label class="spectrum-Radio-label" for="input-file-open">Open File</label>
+                  </div>
+                  <div class="spectrum-Radio spectrum-Radio--emphasized spectrum-FieldGroup-item">
+                    <input type="radio" name="input-file-type" class="spectrum-Radio-input" id="input-file-active" value="active-document">
+                    <span class="spectrum-Radio-button"></span>
+                    <label class="spectrum-Radio-label" for="input-file-active">Active Document</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="spectrum-Form-item">
+              <label class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left"></label>
               <div class="spectrum-Form-itemField">
                 <div class="spectrum-FieldGroup spectrum-FieldGroup--vertical spectrum-FieldGroup--full">
                   <div class="spectrum-FieldGroup-item">
@@ -96,13 +96,11 @@
                     </div>
                   </div>
                   <div class="spectrum-FieldGroup-item hidden">
-                    <div class="spectrum-Buttonfield">
-                      <button class="spectrum-Button spectrum-Button--primary spectrum-Button--sizeM" id="button-push-active-document">
-                        <span class="spectrum-Button-label">Push active document</span>
-                      </button>
-                      <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Buttonfield-validationIcon" focusable="false">
-                        <use xlink:href="#spectrum-icon-18-Alert"></use>
+                    <div class="spectrum-Textfield spectrum-Textfield--quiet is-disabled">
+                      <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
+                        <use xlink:href="#spectrum-icon-18-Alert"/>
                       </svg>
+                      <input type="text" name="input-book-active-document" id="input-active-document" value="" class="spectrum-Textfield-input" placeholder="No active document" disabled>
                     </div>
                   </div>
                 </div>
