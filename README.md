@@ -8,7 +8,7 @@ This repository contains the complete source code for [Bookalope](https://bookal
 
 ## Requirements
 
-The extension requires and supports Adobe InDesign versions 13–14, which relates to CC 2018-9. However, while the extension may run on older versions that hasn’t been tested in depth.
+The extension requires and supports Adobe InDesign versions 13–15, which relates to CC 2018-20. However, while the extension may run on older versions that hasn’t been tested in depth.
 
 ## Coding
 
@@ -32,7 +32,7 @@ Then start InDesign, and the extension should be available from the _Window_ men
 
 First of all, make sure that the extension’s `CSXS/manifest.xml` contains valid XML; follow the instructions [here](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_9.x/Documentation/CEP%209.0%20HTML%20Extension%20Cookbook.md#extension-manifest-xsd). Note that the _order_ of elements in `<Geometry>` actually seems to matter!
 
-Debugging the ExtendScript side of the extension doesn’t really work. However, I found it helpful to use the [ExtendScript Toolkit](http://www.adobe.com/au/products/extendscript-toolkit.html), connect it to a running InDesign instance, and prototype the code there before using it for the Bookalope extension.
+Debugging the ExtendScript side of the extension doesn’t really work in an integrated environment. The [ExtendScript Toolkit](https://github.com/Adobe-CEP/CEP-Resources/tree/master/ExtendScript-Toolkit) has been retired, and in its stead you can use the [ExtendScript Debugger](https://marketplace.visualstudio.com/items?itemName=Adobe.extendscript-debug) for [VisualStudio Code](https://code.visualstudio.com/). I found it helpful to connect it to a running InDesign instance, and prototype the code there before using it for the Bookalope extension itself.
 
 Debugging the Javascript side is easier. The file `extensions/Bookalope/.debug` configures a remote debugger which can connect to a running InDesign instance. Once the extension panel is open, navigate the [Chrome web browser](https://www.google.com/chrome/) (or alternatively, the [Adobe cef-client](https://github.com/Adobe-CEP/CEP-Resources)) to `localhost:8001` and enjoy…
 
@@ -77,9 +77,9 @@ From here, you can open the document on the Bookalope website to revisit and adj
 
 Writing an Adobe CEP extension requires documentation which is not always readily available. However, some useful resources are:
 
- - The Adobe CEP resources on Github is [here](https://github.com/Adobe-CEP/CEP-Resources);
- - The Adobe CEP extensions’s UI is styled using [Adobe’s Spectrum CSS](https://github.com/adobe/spectrum-css).
+ - The Adobe CEP resources on Github are [here](https://github.com/Adobe-CEP/CEP-Resources), and more ExtendScript resources are [here](https://github.com/ExtendScript), including a [Wiki](https://github.com/ExtendScript/wiki/wiki);
+ - The Adobe CEP extensions’s UI is styled using [Adobe’s Spectrum CSS](https://github.com/adobe/spectrum-css);
  - The ExtendScript documentation is [here](http://www.indesignjs.de/extendscriptAPI/indesign-latest/);
- - Davide Barranca’s [blog](https://www.davidebarranca.com/category/code/) contains useful tips;
+ - Davide Barranca’s [blog](https://www.davidebarranca.com/category/code/) contains useful tips, and [here](http://grefel.github.io/indesignjs-resources/) is a great collection of additional resources.
 
-In addition to the above, the [InDesign Scripting Forum](https://forums.adobe.com/community/indesign/indesign_scripting) might be useful, or the [#cep channel on Slack](https://adobedevs.slack.com/messages/C1FKLQ63F) is a playground to many experienced developers.
+In addition to the above, the [InDesign Scripting Forum](https://forums.adobe.com/community/indesign/indesign_scripting) might be useful, or the [#cep channel on Slack](https://adobedevs.slack.com/messages/C1FKLQ63F) is a playground for many experienced developers.
