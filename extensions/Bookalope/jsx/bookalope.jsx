@@ -234,10 +234,223 @@ function bookalopeActiveDocumentToRTF(rtfFileName) {
 
 function bookalopeDocumentToRTF(doc, rtfFileName) {
 
-    if (doc && doc.isValid) {
+	//functions
+	function uniqueName(base, type) {
+		function strip_base (s) {
+			return s.replace(/_\d+$/,'');
+		}
+		var n = 0;
+		while (File (base+type).exists) {
+			base = strip_base (base) + '_' + String (++n);
+		}
+		return base+type;
+	}
 
-        // TODO
-        // return true;
+	
+	//adding includes method to the array object
+	Array.prototype.includes = function(item) {
+		var index = 0, length = this.length;
+		for ( ; index < length; index++ ) {
+			if ( this[index] === item ) {
+				return true;
+			}
+		}
+		return false;
+	};
+	
+	//anchors image in the page
+	function anchorImage(doc, textFrame, imageRect) {
+		var myAnchoredFrame = createAnchor(doc, textFrame);
+		var imBounds = imageRect.geometricBounds;
+		var frBounds = textFrame.geometricBounds
+		// Copy image into the anchored frame. Didn't find a better way  
+		var imagePath = imageRect.images[0].itemLink.filePath;
+		var image = imageRect.images[0];
+		myAnchoredFrame.place(File(imagePath));
+		myAnchoredFrame.geometricBounds = [imBounds[0] - frBounds[0], imBounds[1] - frBounds[1],
+			imBounds[2] - frBounds[0], imBounds[3] - frBounds[1]
+		];
+		// Resize image  
+		var newImBoundX = myAnchoredFrame.geometricBounds[1] - (imageRect.geometricBounds[1] - image.geometricBounds[1]);
+		var newImBoundY = myAnchoredFrame.geometricBounds[0] - (imageRect.geometricBounds[0] - image.geometricBounds[0]);
+		var newImBoundX1 = newImBoundX + (image.geometricBounds[3] - image.geometricBounds[1]);
+		var newImBoundY1 = newImBoundY + (image.geometricBounds[2] - image.geometricBounds[0]);
+		myAnchoredFrame.images[0].geometricBounds = [newImBoundY, newImBoundX, newImBoundY1, newImBoundX1];
+		//Set textWrapPreferences of the images  
+		myAnchoredFrame.textWrapPreferences.textWrapMode = imageRect.textWrapPreferences.textWrapMode;
+		myAnchoredFrame.textWrapPreferences.textWrapOffset = imageRect.textWrapPreferences.textWrapOffset;
+		return myAnchoredFrame;
+	}
+
+	//creates the anchor where it links the image
+	function createAnchor(doc, textFrame) {
+		var inPoint = textFrame.insertionPoints[0];
+		var anchProps = doc.anchoredObjectDefaults.properties;
+		var anchCont = anchProps.anchorContent;
+		var myAO = inPoint.rectangles.add();
+		// Make new object with correct default settings  
+		// Make new object right kind of object  
+		myAO.contentType = ContentType.graphicType;
+		// Recompose parent story so geometricBounds make sense  
+		inPoint.parentStory.recompose();
+		//save users measurement preferences  
+		userHoriz = doc.viewPreferences.horizontalMeasurementUnits;
+		userVert = doc.viewPreferences.verticalMeasurementUnits;
+		doc.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.points;
+		doc.viewPreferences.verticalMeasurementUnits = MeasurementUnits.points;
+		doc.viewPreferences.horizontalMeasurementUnits = userHoriz;
+		doc.viewPreferences.verticalMeasurementUnits = userVert;
+		myAO.applyObjectStyle(anchProps.anchoredObjectStyle);
+		if (anchProps.anchorContent == ContentType.textType) {
+			try { // might be null  
+				myAO.parentStory.appliedParagraphStyle = anchProps.anchoredParagraphStyle;
+			} catch (e) {}
+		}
+		myAO.anchoredObjectSettings.properties = doc.anchoredObjectSettings.properties;
+		myAO.anchoredObjectSettings.anchoredPosition = AnchorPosition.anchored;
+		myAO.anchoredObjectSettings.pinPosition = false;
+		return myAO
+	}
+
+	//here the script starts
+    if (doc && doc.isValid) {
+    
+    	//checking if the document is saved
+    	if(!doc.saved || doc.modified) {
+			alert("Please save the file");
+			return false;
+		}
+		
+		//checking if all links exist
+		for (i = 0; i < doc.links.length; i++) {
+			var link = doc.links.item(i);
+			if(link.status == LinkStatus.LINK_INACCESSIBLE || link.status == LinkStatus.LINK_MISSING || link.status == LinkStatus.LINK_OUT_OF_DATE) {
+				alert("Please check links: some are not updated or missed");
+				return false;
+			}
+		}
+
+		//creating a temporary copy and opening it
+        tmp_path = app.createTemporaryCopy(doc.fullName);
+        //todo: switch to showingWindow=false
+        app.open(tmp_path, showingWindow=false);
+        doc = app.activeDocument;
+        
+		//step 1.1: add text condition and style
+		var stylePN = "bookalope-page-number";
+		var pages = doc.pages;
+		try {
+			myCharacterStyle = app.activeDocument.characterStyles.item(stylePN);
+			myName = myCharacterStyle.name;
+
+		} catch (myError) {
+			myCharacterStyle = app.activeDocument.characterStyles.add({ name: stylePN });
+		}
+		myCharacterStyle.pointSize = 0.1;
+		
+		//step 1.2: set page numbers – preferences
+		var w = new Window('palette', 'Adding page number references...');
+		w.pbar = w.add('progressbar', undefined, 0, pages.length);
+		w.pbar.preferredSize.width = 300;
+		w.show();
+		for (var i = 0; i < pages.length; i++) {
+			var myObjectList = new Array;
+			var items = pages[i].textFrames;
+			if (items.length !== 0) {
+				for (var j = 0; j < items.length; j++) {
+					if (items[j].parent.constructor.name === "Spread") {
+						if (items[j].contents !== "" && (items[j].nextTextFrame || items[j].previousTextFrame)) {
+							myObjectList.push(items[j]);
+						}
+					}
+				}
+				if (myObjectList.length !== 0) {
+					myObjectList.sort(function (a,b) { return (a.geometricBounds[0] < b.geometricBounds[0]) || (a.geometricBounds[0] == b.geometricBounds[0] && a.geometricBounds[1] < b.geometricBounds[1]) ? -1 : 1; } );
+					myTextFrame = myObjectList[0];
+					var myInsertionPoint = myTextFrame.insertionPoints.item(0),
+						myCharacterStyle = app.activeDocument.characterStyles.item(stylePN);
+
+					myInsertionPoint.contents = "" + pages[i].name;
+					myInsertionPoint.applyCharacterStyle(myCharacterStyle, true);
+				}
+			}
+			w.pbar.value = i;
+		}
+		
+		//step 2: dumpPastedImages – exports images that are embedded
+		var g = doc.allGraphics;
+		var outfolder = File(tmp_path).path;
+		for (var i = 0; i < g.length; i++) {
+			if (g[i].itemLink == null) {
+				image_file = File (uniqueName(outfolder+'/img', '.png'));
+				export_other (g[i], ExportFormat.PNG_FORMAT, image_file);
+				g[i].parent.place (image_file);
+			} else if (g[i].itemLink.status === LinkStatus.linkEmbedded) {
+				app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
+				g[i].itemLink.unembed(outfolder);
+				app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+			}
+		}
+		
+		//step 3: anchorImages
+		for (i = 0; i < doc.pages.length; i++) {
+			var page = doc.pages.item(i);
+			if (page.textFrames.length < 1) continue;
+			var textFrame = page.textFrames.item(0);
+			if (page.rectangles.length < 1) continue;
+			// loop through all rectangles in the page  
+			for (j = 0; j < page.rectangles.length; j++) {
+				var imageRect = page.rectangles[j];
+				if (imageRect.images.length < 1) continue;
+				var myAnchoredFrame = anchorImage(doc, textFrame, imageRect);
+				var pos = [imageRect.geometricBounds[1], imageRect.geometricBounds[0]];
+				imageRect.remove();
+				j--;
+				textFrame.recompose();
+				var k = 0;
+				// Reposition the anchored image. This is done repeatedly because the first call not moves the frame to the correct position  
+				do { myAnchoredFrame.move(pos); k++; } while (k != 5);
+			}
+		}
+		
+		//order stories
+		var stories = [];
+		var stories_id = [];
+
+		//loop on all pages
+		for(t = 0; t < app.activeDocument.pages.length; t++){
+			page = app.activeDocument.pages.item(t);
+	
+			//if we have multiple frames in the same page, we order it
+			var frames = [];
+			for(u = 0; u < page.textFrames.length; u++){
+				frames.push(page.textFrames.item(u))
+			}
+			//https://indesignsecrets.com/topic/thread-text-frames-by-name#post-124286
+			frames.sort(function (a,b) { return (a.geometricBounds[0] < b.geometricBounds[0]) || (a.geometricBounds[0] == b.geometricBounds[0] && a.geometricBounds[1] < b.geometricBounds[1]) ? -1 : 1; } ); 
+	
+			//for each frame, if the story is not already in the order we add it
+			for(u = 0; u < frames.length; u++){
+				frame = frames[u];
+				if(!stories_id.includes(frame.parentStory.id)) {
+					stories.push(frame.parentStory);
+					stories_id.push(frame.parentStory.id);
+				}
+			}
+		}
+		
+		//we create a new story where we copy-paste all contents in the correct order
+		var allContent = app.activeDocument.textFrames.add();
+		for(t = 0; t < stories.length; t++){
+			story = stories[t];
+			story.duplicate(LocationOptions.AT_END, allContent.parentStory);
+			allContent.parentStory.insertionPoints[-1].contents = SpecialCharacters.FRAME_BREAK;
+		}
+		allContent.parentStory.exportFile(ExportFormat.RTF, rtfFileName);
+		
+		//close the document
+		app.activeDocument.close(SaveOptions.NO);
+		return true;
     }
     return false;
 }
