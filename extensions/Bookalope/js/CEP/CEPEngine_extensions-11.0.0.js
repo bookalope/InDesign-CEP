@@ -1,7 +1,7 @@
 /**************************************************************************************************
 *
 * ADOBE SYSTEMS INCORPORATED
-* Copyright 2013 Adobe Systems Incorporated
+* Copyright 2020 Adobe Systems Incorporated
 * All Rights Reserved.
 *
 * NOTICE:  Adobe permits you to use, modify, and distribute this file in accordance with the
@@ -16,7 +16,7 @@
 //
 // Note: So far all native file i/o functions are synchronous, and aynchronous file i/o is TBD.
 
-/** Version v8.0.0 */
+/** Version v11.0.0 */
 
 /*jslint vars: true, plusplus: true, devel: true, browser: true, nomen: true, indent: 4, forin: true, maxerr: 50, regexp: true */
 /*global define, native */
@@ -116,10 +116,10 @@ if (!cep.util) {
      * @constant Invalid URL.
      */
     cep.util.ERR_INVALID_URL = 201;
-    
+
     /**
      * @constant deprecated API.
-     */         
+     */
      cep.util.DEPRECATED_API = 202;
 
     /**
@@ -174,7 +174,7 @@ if (!cep.util) {
      *      of files that can be selected. Ignored when chooseDirectory=true.
      * @param friendlyFilePrefix {string} String to put in front of the extensions
      *      of files that can be selected. Ignored when chooseDirectory=true. (win only)
-     *      For example: 
+     *      For example:
      *          fileTypes = ["gif", "jpg", "jpeg", "png", "bmp", "webp", "svg"];
      *          friendlyFilePrefix = "Images (*.gif;*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.svg)";
      * @param prompt {string} String for OK button (mac only, default is "Open" on mac, "Open" or "Select Folder" on win).
@@ -208,7 +208,7 @@ if (!cep.util) {
      *      of files that can be selected.
      * @param defaultName {string} String to start with for the file name.
      * @param friendlyFilePrefix {string} String to put in front of the extensions of files that can be selected. (win only)
-     *      For example: 
+     *      For example:
      *          fileTypes = ["gif", "jpg", "jpeg", "png", "bmp", "webp", "svg"];
      *          friendlyFilePrefix = "Images (*.gif;*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.svg)";
      * @param prompt {string} String for Save button (mac only, default is "Save" on mac and win).
@@ -649,9 +649,9 @@ if (!cep.util) {
      **/
     native function OpenURLInDefaultBrowser();
     cep.util.openURLInDefaultBrowser = function (url) {
-        if (url && (url.indexOf("http://") === 0 || 
-                    url.indexOf("https://") === 0 || 
-                    url.indexOf("file://") === 0 || 
+        if (url && (url.indexOf("http://") === 0 ||
+                    url.indexOf("https://") === 0 ||
+                    url.indexOf("file://") === 0 ||
                     url.indexOf("mailto:") === 0)) {
             OpenURLInDefaultBrowser(url);
             return getErrorResult();
@@ -677,7 +677,7 @@ if (!cep.util) {
     cep.util.registerExtensionUnloadCallback = function (callback) {
         return { err : cep.util.DEPRECATED_API };
     };
-    
+
     /**
      * Stores the user's proxy credentials
      *
@@ -695,5 +695,5 @@ if (!cep.util) {
            StoreProxyCredentials(username, password);
            return getErrorResult();
     };
-    
+
 })();

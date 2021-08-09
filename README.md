@@ -8,7 +8,7 @@ This repository contains the complete source code for [Bookalope](https://bookal
 
 ## Requirements
 
-The extension requires and supports Adobe InDesign versions 13–15, which relates to CC 2018-20. However, while the extension may run on older versions that hasn’t been tested in depth.
+The extension requires and supports Adobe InDesign versions 13–16, which relates to CC 2018-21. However, while the extension may run on older versions that hasn’t been tested in depth.
 
 ## Coding
 
