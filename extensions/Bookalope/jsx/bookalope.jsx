@@ -311,6 +311,21 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
 		myAO.anchoredObjectSettings.pinPosition = false;
 		return myAO
 	}
+	
+	function export_other (im, type, f) {
+		try {
+			var duped = im.duplicate();
+			try {
+				duped.images[0].clearTransformations();
+				duped.images[0].fit (FitOptions.FRAME_TO_CONTENT);
+			} catch (_) {
+			}
+			duped.exportFile (type, f, false);
+			duped.remove();
+		} catch (e) {
+			problems += 1;
+		}
+	}
 
 	//here the script starts
     if (doc && doc.isValid) {
