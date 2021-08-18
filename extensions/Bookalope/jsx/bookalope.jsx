@@ -326,6 +326,8 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
 			problems += 1;
 		}
 	}
+	
+	debug = false;
 
 	//here the script starts
     if (doc && doc.isValid) {
@@ -348,18 +350,27 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
 		//creating a temporary copy and opening it
         tmp_path = app.createTemporaryCopy(doc.fullName);
         //todo: switch to showingWindow=false
-        app.open(tmp_path, showingWindow=false);
-        doc = app.activeDocument;
+        showingWindow = false;
+        if (debug) {
+        	showingWindow = true;
+        }
+        doc = app.open(tmp_path, showingWindow=true);
+        
+        //unlocks all layers
+        doc.layers.everyItem().locked = false;
+        
+        //unlock all elements
+        doc.pageItems.everyItem().locked = false;
         
 		//step 1.1: add text condition and style
 		var stylePN = "bookalope-page-number";
 		var pages = doc.pages;
 		try {
-			myCharacterStyle = app.activeDocument.characterStyles.item(stylePN);
+			myCharacterStyle = doc.characterStyles.item(stylePN);
 			myName = myCharacterStyle.name;
 
 		} catch (myError) {
-			myCharacterStyle = app.activeDocument.characterStyles.add({ name: stylePN });
+			myCharacterStyle = doc.characterStyles.add({ name: stylePN });
 		}
 		myCharacterStyle.pointSize = 0.1;
 		
@@ -383,7 +394,7 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
 					myObjectList.sort(function (a,b) { return (a.geometricBounds[0] < b.geometricBounds[0]) || (a.geometricBounds[0] == b.geometricBounds[0] && a.geometricBounds[1] < b.geometricBounds[1]) ? -1 : 1; } );
 					myTextFrame = myObjectList[0];
 					var myInsertionPoint = myTextFrame.insertionPoints.item(0),
-						myCharacterStyle = app.activeDocument.characterStyles.item(stylePN);
+						myCharacterStyle = doc.characterStyles.item(stylePN);
 
 					myInsertionPoint.contents = "" + pages[i].name;
 					myInsertionPoint.applyCharacterStyle(myCharacterStyle, true);
@@ -391,6 +402,7 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
 			}
 			w.pbar.value = i;
 		}
+		w.hide();
 		
 		//step 2: dumpPastedImages – exports images that are embedded
 		var g = doc.allGraphics;
@@ -433,8 +445,8 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
 		var stories_id = [];
 
 		//loop on all pages
-		for(t = 0; t < app.activeDocument.pages.length; t++){
-			page = app.activeDocument.pages.item(t);
+		for(t = 0; t < doc.pages.length; t++){
+			page = doc.pages.item(t);
 	
 			//if we have multiple frames in the same page, we order it
 			var frames = [];
@@ -455,7 +467,7 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
 		}
 		
 		//we create a new story where we copy-paste all contents in the correct order
-		var allContent = app.activeDocument.textFrames.add();
+		var allContent = doc.textFrames.add();
 		for(t = 0; t < stories.length; t++){
 			story = stories[t];
 			story.duplicate(LocationOptions.AT_END, allContent.parentStory);
@@ -464,7 +476,10 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
 		allContent.parentStory.exportFile(ExportFormat.RTF, rtfFileName);
 		
 		//close the document
-		app.activeDocument.close(SaveOptions.NO);
+		if(!debug) {
+			doc.close(SaveOptions.NO);
+		}
+		
 		return true;
     }
     return false;
