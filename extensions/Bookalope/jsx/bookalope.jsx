@@ -404,7 +404,25 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
 		}
 		w.hide();
 		
-		//step 2: dumpPastedImages – exports images that are embedded
+		//step 2.0: deletes empty or invisible images
+		var g = doc.allGraphics;
+		to_delete = [];
+		for (var i = 0; i < g.length; i++) {
+			graphic = g[i];
+			try {
+				area = (graphic.visibleBounds[2] - graphic.visibleBounds[0]) * (graphic.visibleBounds[3] - graphic.visibleBounds[1])
+				if (area == 0) {
+					to_delete.push(graphic);
+				}
+			} catch(e) {
+				to_delete.push(graphic);
+			}
+		}
+		for (var t = 0; t < to_delete.length; t++) {
+			to_delete[t].remove();
+		}
+		
+		//step 2.1: dumpPastedImages – exports images that are embedded
 		var g = doc.allGraphics;
 		var outfolder = File(tmp_path).path;
 		for (var i = 0; i < g.length; i++) {
