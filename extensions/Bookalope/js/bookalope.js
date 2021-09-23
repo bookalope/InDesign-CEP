@@ -410,6 +410,7 @@ function askSaveBookflowFile(bookflow, format, style) {
 
     // Tis where we keep the current inputs from the panel.
     var bookFileType;
+    var bookFileName;
     var bookFilePath;
     var bookFile;
     var bookName;
@@ -602,7 +603,7 @@ function askSaveBookflowFile(bookflow, format, style) {
             // base-64 encoded binary, so we have to decode it before passing it to the
             // Bookalope wrapper. The wrapper will then encode it (again) before shipping
             // it off to the server.
-            bookflow.setDocument(bookFile.name, atob(result.data), undefined, bookSkipStructure)
+            bookflow.setDocument(bookFileName, atob(result.data), undefined, bookSkipStructure)
             .then(function (bookflow) {
 
                 // Periodically poll the Bookalope server to update the Bookflow. Then check
@@ -700,6 +701,7 @@ function askSaveBookflowFile(bookflow, format, style) {
     function createBookFromSelectedFile() {
         showSpinner();
 
+        bookFileName = bookFile.name;
         bookFilePath = bookFile.path;
         createBook();
     }
@@ -716,12 +718,14 @@ function askSaveBookflowFile(bookflow, format, style) {
         showStatus("Preparing active document");
 
         // Produce a random file name in the host's temp folder for the RTF file.
-        bookFilePath = config.fs.tmp + config.fs.separator + makeUUID4() + ".rtf";
+        bookFileName = makeUUID4() + ".rtf";
+        bookFilePath = config.fs.tmp + config.fs.separator + bookFileName;
 
         // Noodle through the active document to create an RTF file, and save that.
         // If everything went well, create the Book and upload the file.
         csInterface.evalScript("bookalopeActiveDocumentToRTF('" + bookFilePath + "');", function (result) {
-            if (result === true) {
+            var success = JSON.parse(result);
+            if (success === true) {
                 createBook();
             } else {
                 showElementError(document.getElementById("input-active-document"), "Failed to prepare active document");
@@ -747,6 +751,7 @@ function askSaveBookflowFile(bookflow, format, style) {
 
         // Get the values from the form fields.
         bookFileType = document.querySelector("input[name='input-file-type']:checked").value;
+        bookFileName = undefined;
         bookFilePath = undefined;
         bookFile = document.getElementById("input-file").files[0];
         bookActiveDocument = document.getElementById("input-active-document").value;
