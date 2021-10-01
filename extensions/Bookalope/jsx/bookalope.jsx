@@ -234,271 +234,306 @@ function bookalopeActiveDocumentToRTF(rtfFileName) {
 
 function bookalopeDocumentToRTF(doc, rtfFileName) {
 
-	//functions
-	function uniqueName(base, type) {
-		function strip_base (s) {
-			return s.replace(/_\d+$/,'');
-		}
-		var n = 0;
-		while (File (base+type).exists) {
-			base = strip_base (base) + '_' + String (++n);
-		}
-		return base+type;
-	}
-
-	
-	//adding includes method to the array object
-	Array.prototype.includes = function(item) {
-		var index = 0, length = this.length;
-		for ( ; index < length; index++ ) {
-			if ( this[index] === item ) {
-				return true;
-			}
-		}
-		return false;
-	};
-	
-	//anchors image in the page
-	function anchorImage(doc, textFrame, imageRect) {
-		var myAnchoredFrame = createAnchor(doc, textFrame);
-		var imBounds = imageRect.geometricBounds;
-		var frBounds = textFrame.geometricBounds
-		// Copy image into the anchored frame. Didn't find a better way  
-		var imagePath = imageRect.images[0].itemLink.filePath;
-		var image = imageRect.images[0];
-		myAnchoredFrame.place(File(imagePath));
-		myAnchoredFrame.geometricBounds = [imBounds[0] - frBounds[0], imBounds[1] - frBounds[1],
-			imBounds[2] - frBounds[0], imBounds[3] - frBounds[1]
-		];
-		// Resize image  
-		var newImBoundX = myAnchoredFrame.geometricBounds[1] - (imageRect.geometricBounds[1] - image.geometricBounds[1]);
-		var newImBoundY = myAnchoredFrame.geometricBounds[0] - (imageRect.geometricBounds[0] - image.geometricBounds[0]);
-		var newImBoundX1 = newImBoundX + (image.geometricBounds[3] - image.geometricBounds[1]);
-		var newImBoundY1 = newImBoundY + (image.geometricBounds[2] - image.geometricBounds[0]);
-		myAnchoredFrame.images[0].geometricBounds = [newImBoundY, newImBoundX, newImBoundY1, newImBoundX1];
-		//Set textWrapPreferences of the images  
-		myAnchoredFrame.textWrapPreferences.textWrapMode = imageRect.textWrapPreferences.textWrapMode;
-		myAnchoredFrame.textWrapPreferences.textWrapOffset = imageRect.textWrapPreferences.textWrapOffset;
-		return myAnchoredFrame;
-	}
-
-	//creates the anchor where it links the image
-	function createAnchor(doc, textFrame) {
-		var inPoint = textFrame.insertionPoints[0];
-		var anchProps = doc.anchoredObjectDefaults.properties;
-		var anchCont = anchProps.anchorContent;
-		var myAO = inPoint.rectangles.add();
-		// Make new object with correct default settings  
-		// Make new object right kind of object  
-		myAO.contentType = ContentType.graphicType;
-		// Recompose parent story so geometricBounds make sense  
-		inPoint.parentStory.recompose();
-		//save users measurement preferences  
-		userHoriz = doc.viewPreferences.horizontalMeasurementUnits;
-		userVert = doc.viewPreferences.verticalMeasurementUnits;
-		doc.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.points;
-		doc.viewPreferences.verticalMeasurementUnits = MeasurementUnits.points;
-		doc.viewPreferences.horizontalMeasurementUnits = userHoriz;
-		doc.viewPreferences.verticalMeasurementUnits = userVert;
-		myAO.applyObjectStyle(anchProps.anchoredObjectStyle);
-		if (anchProps.anchorContent == ContentType.textType) {
-			try { // might be null  
-				myAO.parentStory.appliedParagraphStyle = anchProps.anchoredParagraphStyle;
-			} catch (e) {}
-		}
-		myAO.anchoredObjectSettings.properties = doc.anchoredObjectSettings.properties;
-		myAO.anchoredObjectSettings.anchoredPosition = AnchorPosition.anchored;
-		myAO.anchoredObjectSettings.pinPosition = false;
-		return myAO
-	}
-	
-	function export_other (im, type, f) {
-		try {
-			var duped = im.duplicate();
-			try {
-				duped.images[0].clearTransformations();
-				duped.images[0].fit (FitOptions.FRAME_TO_CONTENT);
-			} catch (_) {
-			}
-			duped.exportFile (type, f, false);
-			duped.remove();
-		} catch (e) {
-			problems += 1;
-		}
-	}
-	
-	debug = false;
-
-	//here the script starts
-    if (doc && doc.isValid) {
-    
-    	//checking if the document is saved
-    	if(!doc.saved || doc.modified) {
-			alert("Please save the file");
-			return false;
-		}
-		
-		//checking if all links exist
-		for (i = 0; i < doc.links.length; i++) {
-			var link = doc.links.item(i);
-			if(link.status == LinkStatus.LINK_INACCESSIBLE || link.status == LinkStatus.LINK_MISSING || link.status == LinkStatus.LINK_OUT_OF_DATE) {
-				alert("Please check links: some are not updated or missed");
-				return false;
-			}
-		}
-
-		//creating a temporary copy and opening it
-        tmp_path = app.createTemporaryCopy(doc.fullName);
-        //todo: switch to showingWindow=false
-        showingWindow = false;
-        if (debug) {
-        	showingWindow = true;
-        }
-        doc = app.open(tmp_path, showingWindow=true);
-        
-        //unlocks all layers
-        doc.layers.everyItem().locked = false;
-        
-        //unlock all elements
-        doc.pageItems.everyItem().locked = false;
-        
-		//step 1.1: add text condition and style
-		var stylePN = "bookalope-page-number";
-		var pages = doc.pages;
-		try {
-			myCharacterStyle = doc.characterStyles.item(stylePN);
-			myName = myCharacterStyle.name;
-
-		} catch (myError) {
-			myCharacterStyle = doc.characterStyles.add({ name: stylePN });
-		}
-		myCharacterStyle.pointSize = 0.1;
-		
-		//step 1.2: set page numbers – preferences
-		var w = new Window('palette', 'Adding page number references...');
-		w.pbar = w.add('progressbar', undefined, 0, pages.length);
-		w.pbar.preferredSize.width = 300;
-		w.show();
-		for (var i = 0; i < pages.length; i++) {
-			var myObjectList = new Array;
-			var items = pages[i].textFrames;
-			if (items.length !== 0) {
-				for (var j = 0; j < items.length; j++) {
-					if (items[j].parent.constructor.name === "Spread") {
-						if (items[j].contents !== "" && (items[j].nextTextFrame || items[j].previousTextFrame)) {
-							myObjectList.push(items[j]);
-						}
-					}
-				}
-				if (myObjectList.length !== 0) {
-					myObjectList.sort(function (a,b) { return (a.geometricBounds[0] < b.geometricBounds[0]) || (a.geometricBounds[0] == b.geometricBounds[0] && a.geometricBounds[1] < b.geometricBounds[1]) ? -1 : 1; } );
-					myTextFrame = myObjectList[0];
-					var myInsertionPoint = myTextFrame.insertionPoints.item(0),
-						myCharacterStyle = doc.characterStyles.item(stylePN);
-
-					myInsertionPoint.contents = "" + pages[i].name;
-					myInsertionPoint.applyCharacterStyle(myCharacterStyle, true);
-				}
-			}
-			w.pbar.value = i;
-		}
-		w.hide();
-		
-		//step 2.0: deletes empty or invisible images
-		var g = doc.allGraphics;
-		to_delete = [];
-		for (var i = 0; i < g.length; i++) {
-			graphic = g[i];
-			try {
-				area = (graphic.visibleBounds[2] - graphic.visibleBounds[0]) * (graphic.visibleBounds[3] - graphic.visibleBounds[1])
-				if (area == 0) {
-					to_delete.push(graphic);
-				}
-			} catch(e) {
-				to_delete.push(graphic);
-			}
-		}
-		for (var t = 0; t < to_delete.length; t++) {
-			to_delete[t].remove();
-		}
-		
-		//step 2.1: dumpPastedImages – exports images that are embedded
-		var g = doc.allGraphics;
-		var outfolder = File(tmp_path).path;
-		for (var i = 0; i < g.length; i++) {
-			if (g[i].itemLink == null) {
-				image_file = File (uniqueName(outfolder+'/img', '.png'));
-				export_other (g[i], ExportFormat.PNG_FORMAT, image_file);
-				g[i].parent.place (image_file);
-			} else if (g[i].itemLink.status === LinkStatus.linkEmbedded) {
-				app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
-				g[i].itemLink.unembed(outfolder);
-				app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
-			}
-		}
-		
-		//step 3: anchorImages
-		for (i = 0; i < doc.pages.length; i++) {
-			var page = doc.pages.item(i);
-			if (page.textFrames.length < 1) continue;
-			var textFrame = page.textFrames.item(0);
-			if (page.rectangles.length < 1) continue;
-			// loop through all rectangles in the page  
-			for (j = 0; j < page.rectangles.length; j++) {
-				var imageRect = page.rectangles[j];
-				if (imageRect.images.length < 1) continue;
-				var myAnchoredFrame = anchorImage(doc, textFrame, imageRect);
-				var pos = [imageRect.geometricBounds[1], imageRect.geometricBounds[0]];
-				imageRect.remove();
-				j--;
-				textFrame.recompose();
-				var k = 0;
-				// Reposition the anchored image. This is done repeatedly because the first call not moves the frame to the correct position  
-				do { myAnchoredFrame.move(pos); k++; } while (k != 5);
-			}
-		}
-		
-		//order stories
-		var stories = [];
-		var stories_id = [];
-
-		//loop on all pages
-		for(t = 0; t < doc.pages.length; t++){
-			page = doc.pages.item(t);
-	
-			//if we have multiple frames in the same page, we order it
-			var frames = [];
-			for(u = 0; u < page.textFrames.length; u++){
-				frames.push(page.textFrames.item(u))
-			}
-			//https://indesignsecrets.com/topic/thread-text-frames-by-name#post-124286
-			frames.sort(function (a,b) { return (a.geometricBounds[0] < b.geometricBounds[0]) || (a.geometricBounds[0] == b.geometricBounds[0] && a.geometricBounds[1] < b.geometricBounds[1]) ? -1 : 1; } ); 
-	
-			//for each frame, if the story is not already in the order we add it
-			for(u = 0; u < frames.length; u++){
-				frame = frames[u];
-				if(!stories_id.includes(frame.parentStory.id)) {
-					stories.push(frame.parentStory);
-					stories_id.push(frame.parentStory.id);
-				}
-			}
-		}
-		
-		//we create a new story where we copy-paste all contents in the correct order
-		var allContent = doc.textFrames.add();
-		for(t = 0; t < stories.length; t++){
-			story = stories[t];
-			story.duplicate(LocationOptions.AT_END, allContent.parentStory);
-			allContent.parentStory.insertionPoints[-1].contents = SpecialCharacters.FRAME_BREAK;
-		}
-		allContent.parentStory.exportFile(ExportFormat.RTF, rtfFileName);
-		
-		//close the document
-		if(!debug) {
-			doc.close(SaveOptions.NO);
-		}
-		
-		return true;
+    // Check that we work with a valid document.
+    if (!doc || !doc.isValid) {
+        alert("Unable to export invalid document to Bookalope");
+        return false;
     }
-    return false;
+
+    // When we export the RTF we want to make sure that the original active
+    // document and its resources have also been saved.
+    if (!doc.saved || doc.modified) {
+        alert("Please save this document before exporting it to Bookalope");
+        return false;
+    }
+
+    // Make sure that all links in the document are valid. TODO doc.links.forEach()
+    for (var i = 0; i < doc.links.length; i++) {
+        var link = doc.links.item(i);
+        if (link.status === LinkStatus.LINK_INACCESSIBLE || link.status === LinkStatus.LINK_MISSING || link.status === LinkStatus.LINK_OUT_OF_DATE) {
+            alert("Please check the links in this document: some are not up-to-date or are missing");
+            return false;
+        }
+    }
+
+    // A polyfill of Array.prototype.includes, although this may not be
+    // necessary at some point for new versions of InDesign anymore.
+    if (!Array.prototype.includes) {
+        Array.prototype.includes = function(item) {
+            for (var i = 0; i < this.length; i++) {
+                if (this[i] === item) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    // Generate a unique filename. TODO Consider using a UUID4 filename.
+    //
+    // @param {string} base - The path and base name of the filename.
+    // @param {string} ext - The filename extension, including dot.
+    // @return {string} The unique path and filename.
+    function createUniqueName(base, ext) {
+        for (var i = 0; File(base + ext).exists; i++) {
+            base = base.replace(/_\d+$/, "") + "_" + String(i);
+        }
+        return base + ext;
+    }
+
+    // Given a text frame and an image, duplicate image near to the text
+    // frame for export.
+    //
+    // @param {TextFram} textFrame - Target text frame where to anchor the image.
+    // @param {Rectangle} imageRect -
+    // @return {Rectangle} The anchored new image.
+    function anchorImage(textFrame, imageRect) {
+
+        // Create an anchor in the given text frame for the image.
+        var insertionPoint = textFrame.insertionPoints[0];
+        var anchor = insertionPoint.rectangles.add();
+        anchor.contentType = ContentType.graphicType;
+
+        // Recompose the parent story so that the geometricBounds make sense.
+        insertionPoint.parentStory.recompose();
+
+        // Save the user's measurement preferences, and then switch to points unit.
+        const userHoriz = tmpDoc.viewPreferences.horizontalMeasurementUnits;
+        const userVert = tmpDoc.viewPreferences.verticalMeasurementUnits;
+        tmpDoc.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.points;
+        tmpDoc.viewPreferences.verticalMeasurementUnits = MeasurementUnits.points;
+
+        // Configure the custom anchor.
+        var anchorProps = tmpDoc.anchoredObjectDefaults.properties;
+        anchor.applyObjectStyle(anchorProps.anchoredObjectStyle);
+        if (anchorProps.anchorContent == ContentType.textType) {
+            try {
+                anchor.parentStory.appliedParagraphStyle = anchorProps.anchoredParagraphStyle;
+            } catch (_) {
+                // Might be null, and we do nothing in that case.
+            }
+        }
+        anchor.anchoredObjectSettings.properties = doc.anchoredObjectSettings.properties;
+        anchor.anchoredObjectSettings.anchoredPosition = AnchorPosition.anchored;
+        anchor.anchoredObjectSettings.pinPosition = false;
+
+        // Get the geometric boundaries for both objects.
+        var frameBounds = textFrame.geometricBounds;
+        var imageBounds = imageRect.geometricBounds;
+
+        // Copy image into the anchored frame and resize its bounds.
+        var image = imageRect.images[0];
+        var imagePath = image.itemLink.filePath;
+        anchor.place(File(imagePath));
+        anchor.geometricBounds = [
+            imageBounds[0] - frameBounds[0],
+            imageBounds[1] - frameBounds[1],
+            imageBounds[2] - frameBounds[0],
+            imageBounds[3] - frameBounds[1]
+        ];
+
+        // Then resize the image itself.
+        const newImageBoundY = anchor.geometricBounds[0] - (imageBounds[0] - imageBounds[0]);
+        const newImageBoundX = anchor.geometricBounds[1] - (imageBounds[1] - imageBounds[1]);
+        anchor.images[0].geometricBounds = [
+            newImageBoundY,
+            newImageBoundX,
+            newImageBoundY + (image.geometricBounds[2] - image.geometricBounds[0]),
+            newImageBoundX + (image.geometricBounds[3] - image.geometricBounds[1])
+        ];
+
+        // Adjust the textWrapPreferences for the anchored image.
+        anchor.textWrapPreferences.textWrapMode = imageRect.textWrapPreferences.textWrapMode;
+        anchor.textWrapPreferences.textWrapOffset = imageRect.textWrapPreferences.textWrapOffset;
+        return anchor;
+    }
+
+    // Write the given Image object to disk using the given path and file name.
+    //
+    // @param {Graphic} graphic - The Graphic object to export.
+    // @param {File} file - The File object represents a local host file.
+    function exportPNG(graphic, file) {
+        try {
+            var other = graphic.duplicate();
+            try {
+                // FIXME Where's images documented?
+                // https://www.indesignjs.de/extendscriptAPI/indesign-latest/#Graphic.html
+                other.images[0].clearTransformations();
+                other.images[0].fit(FitOptions.FRAME_TO_CONTENT);
+            } catch (_) {
+                // Ignore any problem and try to export the image anyway.
+            }
+            other.exportFile(ExportFormat.PNG_FORMAT, file);
+            other.remove();
+        } catch (_) {
+            // TODO Notify caller/user that exporting the image failed.
+        }
+    }
+
+    // Compare the locations of two text frames based on their respective geometric
+    // boundaries (which have the format [y1, x1, y2, x2]). Returns -1 if frameA
+    // is above or left of frameB (i.e. is "smaller"); returns 1 otherwise.
+    //
+    // @param {TextFrame} frameA - A TextFrame object reference.
+    // @param {TextFrame} frameB - A TextFrame object reference.
+    // @return {Number} -1 if frameA is smaller than frameB, 1 otherwise.
+    function cmpFrames(frameA, frameB) {
+        if (frameA.geometricBounds[0] < frameB.geometricBounds[0]) {
+            return -1;
+        }
+        if (frameA.geometricBounds[0] == frameB.geometricBounds[0]) {
+            return (frameA.geometricBounds[1] < frameB.geometricBounds[1]) ? -1 : 1;
+        }
+        return 1;
+    }
+
+    // Create a temporary copy of the document that we want to export.
+    const tmpFile = File(app.createTemporaryCopy(doc.fullName))
+    const tmpDoc = app.open(tmpFile, false);
+    const tmpPath = tmpFile.path;
+
+    // Step 1: unlock all layers and elements in the document.
+    tmpDoc.layers.everyItem().locked = false;
+    tmpDoc.pageItems.everyItem().locked = false;
+
+    // Step 2: add a character style for page numbers that we'll inject
+    // into the text further down. Bookalope will know what to do with
+    // that extra goodness.
+    const pgnrCharacterStyleName = "bookalope-page-number";
+    var pgnrCharacterStyle = tmpDoc.characterStyles.itemByName(pgnrCharacterStyleName);
+    if (!pgnrCharacterStyle.isValid) {
+        pgnrCharacterStyle = tmpDoc.characterStyles.add({
+            name: pgnrCharacterStyleName,
+            pointSize: 0.1
+        });
+    }
+
+    // Step 3: insert into the text and where the text flow breaks onto the
+    // next page and using our special character style the page name of the
+    // current page.
+    var win = new Window("palette", "Processing document page numbers...");
+    win.pbar = win.add("progressbar", undefined, 0, tmpDoc.pages.length);
+    win.pbar.preferredSize.width = 300;
+    win.show();
+    for (var i = 0; i < tmpDoc.pages.length; i++) {
+        var pageTextFrames = [];
+        var page = tmpDoc.pages[i];
+        var textFrames = page.textFrames;
+        for (var j = 0; j < textFrames.length; j++) {
+            var textFrame = textFrames[j];
+            if (textFrame.parent.constructor.name === "Spread") {
+                if (textFrame.contents !== "" && (textFrame.nextTextFrame || textFrame.previousTextFrame)) {
+                    pageTextFrames.push(textFrame);
+                }
+            }
+        }
+        if (pageTextFrames.length !== 0) {
+            pageTextFrames.sort(cmpFrames);
+            var textFrame = pageTextFrames[0];
+            var insertionPoint = textFrame.insertionPoints.item(0);
+            insertionPoint.contents = "" + page.name;
+            insertionPoint.applyCharacterStyle(pgnrCharacterStyle, true);
+        }
+        win.pbar.value = i;
+    }
+    win.hide();
+
+    // Step 4: delete empty graphics, and then export the embedded images.
+    var docGraphics = tmpDoc.allGraphics;
+    var emptyGraphics = [];
+    for (var i = 0; i < docGraphics.length; i++) {
+        var graphic = docGraphics[i];
+        try {
+            const area = (graphic.visibleBounds[2] - graphic.visibleBounds[0]) * (graphic.visibleBounds[3] - graphic.visibleBounds[1])
+            if (area === 0) {
+                emptyGraphics.push(graphic);
+            }
+        } catch(_) {
+            emptyGraphics.push(graphic);
+        }
+    }
+    for (var i = 0; i < emptyGraphics.length; i++) {
+        emptyGraphics[i].remove();
+    }
+    docGraphics = tmpDoc.allGraphics;
+    for (var i = 0; i < docGraphics.length; i++) {
+        var graphic = docGraphics[i];
+        if (graphic.itemLink == null) {
+            var tmpFile = File(createUniqueName(tmpPath + "/img", ".png"));
+            exportPNG(graphic, tmpFile);
+            graphic.parent.place(tmpFile);
+        } else if (graphic.itemLink.status === LinkStatus.linkEmbedded) {
+            app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
+            graphic.itemLink.unembed(tmpPath);
+            app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
+        } else {
+            // TODO Ignore or handle other link statuses?
+        }
+    }
+
+    // Step 5: anchor images on document pages.
+    for (var i = 0; i < tmpDoc.pages.length; i++) {
+        var page = tmpDoc.pages.item(i);
+        if (page.textFrames.length >= 1) {
+            // TODO What about text frames at index 1 and more?
+            var textFrame = page.textFrames.item(0);
+            if (page.rectangles.length >= 1) {
+                for (var j = 0; j < page.rectangles.length; j++) {
+                    var imageRect = page.rectangles[j];
+                    if (imageRect.images.length >= 1) {
+                        var anchoredFrame = anchorImage(tmpDoc, textFrame, imageRect);
+                        var pos = [
+                            imageRect.geometricBounds[1],
+                            imageRect.geometricBounds[0]
+                        ];
+                        imageRect.remove();
+                        j--;
+                        textFrame.recompose();
+                        // Reposition the anchored image. This is done repeatedly because the
+                        // first call doesn't move the frame to the correct position. TODO Revisit.
+                        for (var k = 0; k != 5; k++) {
+                            anchoredFrame.move(pos);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Step 6: order stories so we can export them in sequence. So we loop over all pages,
+    // and over all frames on a single page, and order the frames.
+    var stories = [];
+    var storiesId = [];
+    for (var i = 0; i < tmpDoc.pages.length; i++) {
+        var page = tmpDoc.pages.item(i);
+        var frames = [];
+        for (var j = 0; j < page.textFrames.length; j++) {
+            frames.push(page.textFrames.item(j))
+        }
+        frames.sort(cmpFrames);
+
+        // For each frame, if its story is not already in the ordered list, we add it.
+        for (var j = 0; j < frames.length; j++) {
+            var frame = frames[j];
+            var story = frame.parentStory;
+            var storyId = story.id;
+            if (!storiesId.includes(storyId)) {
+                stories.push(story);
+                storiesId.push(storyId);
+            }
+        }
+    }
+
+    // Step 7: create a new story where we copy-paste all contents in the correct order.
+    var newContent = tmpDoc.textFrames.add();
+    for (var i = 0; i < stories.length; i++) {
+        var story = stories[i];
+        story.duplicate(LocationOptions.AT_END, newContent.parentStory);
+        newContent.parentStory.insertionPoints[-1].contents = SpecialCharacters.FRAME_BREAK;
+    }
+    newContent.parentStory.exportFile(ExportFormat.RTF, rtfFileName);
+
+    // Step 8: close the active, temporary document.
+    tmpDoc.close(SaveOptions.NO);
+    return true;
 }
