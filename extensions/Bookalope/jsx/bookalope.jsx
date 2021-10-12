@@ -247,7 +247,7 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         return false;
     }
 
-    // Make sure that all links in the document are valid. TODO doc.links.forEach()
+    // Make sure that all links in the document are valid.
     for (var i = 0; i < doc.links.length; i++) {
         var link = doc.links.item(i);
         if (link.status === LinkStatus.LINK_INACCESSIBLE || link.status === LinkStatus.LINK_MISSING || link.status === LinkStatus.LINK_OUT_OF_DATE) {
@@ -269,7 +269,7 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         }
     }
 
-    // Generate a unique filename. TODO Consider using a UUID4 filename.
+    // Generate a unique filename.
     //
     // @param {string} base - The path and base name of the filename.
     // @param {string} ext - The filename extension, including dot.
@@ -366,7 +366,8 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
             other.exportFile(ExportFormat.PNG_FORMAT, file);
             other.remove();
         } catch (_) {
-            // TODO Notify caller/user that exporting the image failed.
+            // Notify caller/user that exporting the image failed:
+            // https://github.com/bookalope/InDesign-CEP/pull/13#issuecomment-938668459
         }
     }
 
@@ -487,7 +488,8 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
             graphic.itemLink.unembed(tmpPath);
             app.scriptPreferences.userInteractionLevel = UserInteractionLevels.INTERACT_WITH_ALL;
         } else {
-            // TODO Ignore or handle other link statuses?
+            // Ignore other link statuses:
+            // https://github.com/bookalope/InDesign-CEP/pull/13#issuecomment-938669971
         }
         pbarVal += pbarInc;
         progressWin.pbar.value = Math.round(pbarVal);
@@ -499,7 +501,10 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
     for (var i = 0; i < tmpDoc.pages.length; i++) {
         var page = tmpDoc.pages.item(i);
         if (page.textFrames.length >= 1) {
-            // TODO What about text frames at index 1 and more?
+            // Each image must be anchored in order to be exported correctly to RTF,
+            // so we anchor them to the first text box on the page. We can tell the
+            // user that if they have unexpected results (images anchored in incorrect
+            // places) they can anchor images manually before running the script.
             var textFrame = page.textFrames.item(0);
             if (page.rectangles.length >= 1) {
                 for (var j = 0; j < page.rectangles.length; j++) {
