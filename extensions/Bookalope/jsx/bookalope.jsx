@@ -392,9 +392,22 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
     const tmpDoc = app.open(tmpFile, false);
     const tmpPath = tmpFile.path;
 
+    // Open a progress bar window, where max progress is defined by the 8 steps
+    // (i.e. progress 0 through 7) for this RTF conversion. Then, times 100 because
+    // we'll track progress per step in percent, too. Note that `pbarInc` can become
+    // `Infinity` if the number of processed items (e.g. pages.length) is zero. In
+    // that case it won't matter because `pbarInc` isn't used.
+    const progressWin = new Window("palette", "Preparing document for Bookalope...");
+    progressWin.pbar = progressWin.add("progressbar", undefined, 0, 7 * 100);
+    progressWin.pbar.preferredSize.width = 300;
+    progressWin.pbar.value = 0;
+    progressWin.show();
+    var pbarVal, pbarInc;  // To update the progress bar during each step.
+
     // Step 1: unlock all layers and elements in the document.
     tmpDoc.layers.everyItem().locked = false;
     tmpDoc.pageItems.everyItem().locked = false;
+    progressWin.pbar.value = pbarVal = 100;
 
     // Step 2: add a character style for page numbers that we'll inject
     // into the text further down. Bookalope will know what to do with
@@ -407,14 +420,12 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
             pointSize: 0.1
         });
     }
+    progressWin.pbar.value = pbarVal = 200;
 
     // Step 3: insert into the text and where the text flow breaks onto the
     // next page and using our special character style the page name of the
     // current page.
-    var win = new Window("palette", "Processing document page numbers...");
-    win.pbar = win.add("progressbar", undefined, 0, tmpDoc.pages.length);
-    win.pbar.preferredSize.width = 300;
-    win.show();
+    pbarInc = (1 / tmpDoc.pages.length) * 100;
     for (var i = 0; i < tmpDoc.pages.length; i++) {
         var pageTextFrames = [];
         var page = tmpDoc.pages[i];
@@ -434,13 +445,15 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
             insertionPoint.contents = "" + page.name;
             insertionPoint.applyCharacterStyle(pgnrCharacterStyle, true);
         }
-        win.pbar.value = i;
+        pbarVal += pbarInc;
+        progressWin.pbar.value = Math.round(pbarVal);
     }
-    win.hide();
+    progressWin.pbar.value = pbarVal = 300;
 
     // Step 4: delete empty graphics, and then export the embedded images.
     var docGraphics = tmpDoc.allGraphics;
     var emptyGraphics = [];
+    pbarInc = (1 / docGraphics.length) * 100 * (1/3);
     for (var i = 0; i < docGraphics.length; i++) {
         var graphic = docGraphics[i];
         try {
@@ -451,11 +464,18 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         } catch(_) {
             emptyGraphics.push(graphic);
         }
+        pbarVal += pbarInc;
+        progressWin.pbar.value = Math.round(pbarVal);
     }
+    pbarInc = (1 / emptyGraphics.length) * 100 * (1/3);
     for (var i = 0; i < emptyGraphics.length; i++) {
         emptyGraphics[i].remove();
+
+        pbarVal += pbarInc;
+        progressWin.pbar.value = Math.round(pbarVal);
     }
     docGraphics = tmpDoc.allGraphics;
+    pbarInc = (1 / docGraphics.length) * 100 * (1/3);
     for (var i = 0; i < docGraphics.length; i++) {
         var graphic = docGraphics[i];
         if (graphic.itemLink == null) {
@@ -469,9 +489,13 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         } else {
             // TODO Ignore or handle other link statuses?
         }
+        pbarVal += pbarInc;
+        progressWin.pbar.value = Math.round(pbarVal);
     }
+    progressWin.pbar.value = pbarVal = 400;
 
     // Step 5: anchor images on document pages.
+    pbarInc = (1 / tmpDoc.pages.length) * 100;
     for (var i = 0; i < tmpDoc.pages.length; i++) {
         var page = tmpDoc.pages.item(i);
         if (page.textFrames.length >= 1) {
@@ -498,12 +522,16 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
                 }
             }
         }
+        pbarVal += pbarInc;
+        progressWin.pbar.value = Math.round(pbarVal);
     }
+    progressWin.pbar.value = pbarVal = 500;
 
     // Step 6: order stories so we can export them in sequence. So we loop over all pages,
     // and over all frames on a single page, and order the frames.
     var stories = [];
     var storiesId = [];
+    pbarInc = (1 / tmpDoc.pages.length) * 100;
     for (var i = 0; i < tmpDoc.pages.length; i++) {
         var page = tmpDoc.pages.item(i);
         var frames = [];
@@ -522,18 +550,27 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
                 storiesId.push(storyId);
             }
         }
+        pbarVal += pbarInc;
+        progressWin.pbar.value = Math.round(pbarVal);
     }
+    progressWin.pbar.value = pbarVal = 600;
 
     // Step 7: create a new story where we copy-paste all contents in the correct order.
     var newContent = tmpDoc.textFrames.add();
+    pbarInc = (1 / stories.length) * 100;
     for (var i = 0; i < stories.length; i++) {
         var story = stories[i];
         story.duplicate(LocationOptions.AT_END, newContent.parentStory);
         newContent.parentStory.insertionPoints[-1].contents = SpecialCharacters.FRAME_BREAK;
+
+        pbarVal += pbarInc;
+        progressWin.pbar.value = Math.round(pbarVal);
     }
     newContent.parentStory.exportFile(ExportFormat.RTF, rtfFileName);
+    progressWin.pbar.value = pbarVal = 700;
 
-    // Step 8: close the active, temporary document.
+    // Step 8: close the active & temporary document and the progress window, and return.
     tmpDoc.close(SaveOptions.NO);
+    progressWin.hide();  // Dispose of the window?
     return true;
 }
