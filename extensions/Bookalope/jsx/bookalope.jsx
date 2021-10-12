@@ -269,11 +269,13 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         }
     }
 
-    // Generate a unique filename.
-    //
-    // @param {string} base - The path and base name of the filename.
-    // @param {string} ext - The filename extension, including dot.
-    // @return {string} The unique path and filename.
+    /**
+     * Generate a unique filename.
+     *
+     * @param {string} base - The path and base name of the filename.
+     * @param {string} ext - The filename extension, including dot.
+     * @return {string} The unique path and filename.
+     */
     function createUniqueName(base, ext) {
         for (var i = 0; File(base + ext).exists; i++) {
             base = base.replace(/_\d+$/, "") + "_" + String(i);
@@ -281,12 +283,14 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         return base + ext;
     }
 
-    // Given a text frame and an image, duplicate image near to the text
-    // frame for export.
-    //
-    // @param {TextFram} textFrame - Target text frame where to anchor the image.
-    // @param {Rectangle} imageRect -
-    // @return {Rectangle} The anchored new image.
+    /**
+     * Given a text frame and an image, duplicate image near to the text
+     * frame for export.
+     *
+     * @param {TextFram} textFrame - Target text frame where to anchor the image.
+     * @param {Rectangle} imageRect - The image that's duplicated and anchored.
+     * @return {Rectangle} The anchored new image.
+     */
     function anchorImage(textFrame, imageRect) {
 
         // Create an anchor in the given text frame for the image.
@@ -348,10 +352,12 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         return anchor;
     }
 
-    // Write the given Image object to disk using the given path and file name.
-    //
-    // @param {Graphic} graphic - The Graphic object to export.
-    // @param {File} file - The File object represents a local host file.
+    /**
+     * Write the given Image object to disk using the given path and file name.
+     *
+     * @param {Graphic} graphic - The Graphic object to export.
+     * @param {File} file - The File object represents a local host file.
+     */
     function exportPNG(graphic, file) {
         try {
             var other = graphic.duplicate();
@@ -371,13 +377,15 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         }
     }
 
-    // Compare the locations of two text frames based on their respective geometric
-    // boundaries (which have the format [y1, x1, y2, x2]). Returns -1 if frameA
-    // is above or left of frameB (i.e. is "smaller"); returns 1 otherwise.
-    //
-    // @param {TextFrame} frameA - A TextFrame object reference.
-    // @param {TextFrame} frameB - A TextFrame object reference.
-    // @return {Number} -1 if frameA is smaller than frameB, 1 otherwise.
+    /**
+     * Compare the locations of two text frames based on their respective geometric
+     * boundaries (which have the format [y1, x1, y2, x2]). Returns -1 if frameA
+     * is above or left of frameB (i.e. is "smaller"); returns 1 otherwise.
+     *
+     * @param {TextFrame} frameA - A TextFrame object reference.
+     * @param {TextFrame} frameB - A TextFrame object reference.
+     * @return {Number} -1 if frameA is smaller than frameB, 1 otherwise.
+     */
     function cmpFrames(frameA, frameB) {
         if (frameA.geometricBounds[0] < frameB.geometricBounds[0]) {
             return -1;
