@@ -349,7 +349,6 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         // Adjust the textWrapPreferences for the anchored image.
         anchor.textWrapPreferences.textWrapMode = imageRect.textWrapPreferences.textWrapMode;
         anchor.textWrapPreferences.textWrapOffset = imageRect.textWrapPreferences.textWrapOffset;
-        return anchor;
     }
 
     /**
@@ -518,19 +517,7 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
                 for (var j = 0; j < page.rectangles.length; j++) {
                     var imageRect = page.rectangles[j];
                     if (imageRect.images.length >= 1) {
-                        var anchoredFrame = anchorImage(tmpDoc, textFrame, imageRect);
-                        var pos = [
-                            imageRect.geometricBounds[1],
-                            imageRect.geometricBounds[0]
-                        ];
-                        imageRect.remove();
-                        j--;
-                        textFrame.recompose();
-                        // Reposition the anchored image. This is done repeatedly because the
-                        // first call doesn't move the frame to the correct position. TODO Revisit.
-                        for (var k = 0; k != 5; k++) {
-                            anchoredFrame.move(pos);
-                        }
+                        anchorImage(tmpDoc, textFrame, imageRect);
                     }
                 }
             }
