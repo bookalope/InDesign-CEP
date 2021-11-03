@@ -205,7 +205,7 @@ function bookalopeCreateDocument(idmlFileName, bookId, bookflowId, betaHost) {
 function bookalopeDocumentByNameToRTF(docName) {
 
     var doc = app.documents.itemByName(docName);
-    return bookalopeDocumentToRTF(doc, rtfFileName);
+    return bookalopeDocumentToRTF(doc);
 }
 
 
