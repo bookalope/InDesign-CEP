@@ -199,11 +199,10 @@ function bookalopeCreateDocument(idmlFileName, bookId, bookflowId, betaHost) {
  * Create an RTF file from the document with the given name, and save that to the given path.
  *
  * @param {string} docName - Name of the document for which the RTF is created.
- * @param {string} rtfFileName - Path and file name to save the created RTF file.
- * @returns {boolean} True if the RTF was created successfully; false otherwise.
+ * @returns {string,bool} False if an error occurred, otherwise the complete path to the RTF file.
  */
 
-function bookalopeDocumentByNameToRTF(docName, rtfFileName) {
+function bookalopeDocumentByNameToRTF(docName) {
 
     var doc = app.documents.itemByName(docName);
     return bookalopeDocumentToRTF(doc, rtfFileName);
@@ -213,14 +212,13 @@ function bookalopeDocumentByNameToRTF(docName, rtfFileName) {
 /**
  * Create an RTF file from the currently active document, and save that to the given path.
  *
- * @param {string} rtfFileName - Path and file name to save the created RTF file.
- * @returns {boolean} True if the RTF was created successfully; false otherwise.
+ * @returns {string,bool} False if an error occurred, otherwise the complete path to the RTF file.
  */
 
-function bookalopeActiveDocumentToRTF(rtfFileName) {
+function bookalopeActiveDocumentToRTF() {
 
     var doc = app.documents.length !== 0 ? app.activeDocument : undefined;
-    return bookalopeDocumentToRTF(doc, rtfFileName);
+    return bookalopeDocumentToRTF(doc);
 }
 
 
@@ -228,23 +226,22 @@ function bookalopeActiveDocumentToRTF(rtfFileName) {
  * Create an RTF file from the given document, and save that to the given path.
  *
  * @param {Document} doc - The InDesign document for which the RTF is created.
- * @param {string} rtfFileName - Path and file name to save the created RTF file.
- * @returns {boolean} True if the RTF was created successfully; false otherwise.
+ * @returns {string,bool} False if an error occurred, otherwise the complete path to the RTF file.
  */
 
-function bookalopeDocumentToRTF(doc, rtfFileName) {
+function bookalopeDocumentToRTF(doc) {
 
     // Check that we work with a valid document.
     if (!doc || !doc.isValid) {
         alert("Unable to export invalid document to Bookalope");
-        return false;
+        return JSON.stringify(false);
     }
 
     // When we export the RTF we want to make sure that the original active
     // document and its resources have also been saved.
     if (!doc.saved || doc.modified) {
         alert("Please save this document before exporting it to Bookalope");
-        return false;
+        return JSON.stringify(false);
     }
 
     // Make sure that all links in the document are valid.
@@ -252,7 +249,7 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         var link = doc.links.item(i);
         if (link.status === LinkStatus.LINK_INACCESSIBLE || link.status === LinkStatus.LINK_MISSING || link.status === LinkStatus.LINK_OUT_OF_DATE) {
             alert("Please check the links in this document: some are not up-to-date or are missing");
-            return false;
+            return JSON.stringify(false);
         }
     }
 
@@ -566,11 +563,12 @@ function bookalopeDocumentToRTF(doc, rtfFileName) {
         pbarVal += pbarInc;
         progressWin.pbar.value = Math.round(pbarVal);
     }
-    newContent.parentStory.exportFile(ExportFormat.RTF, rtfFileName);
+    var rtfFile = new File(createUniqueName(tmpPath + "/bookalope-document", ".rtf"));
+    newContent.parentStory.exportFile(ExportFormat.RTF, rtfFile)
     progressWin.pbar.value = pbarVal = 700;
 
     // Step 8: close the active & temporary document and the progress window, and return.
     tmpDoc.close(SaveOptions.NO);
     progressWin.hide();  // Dispose of the window?
-    return true;
+    return JSON.stringify(rtfFile.fsName);
 }

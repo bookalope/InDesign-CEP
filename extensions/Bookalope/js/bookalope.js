@@ -717,19 +717,16 @@ function askSaveBookflowFile(bookflow, format, style) {
         showSpinner();
         showStatus("Preparing active document");
 
-        // Produce a random file name in the host's temp folder for the RTF file.
-        bookFileName = makeUUID4() + ".rtf";
-        bookFilePath = config.fs.tmp + config.fs.separator + bookFileName;
-
         // Noodle through the active document to create an RTF file, and save that.
         // If everything went well, create the Book and upload the file.
-        csInterface.evalScript("bookalopeActiveDocumentToRTF('" + bookFilePath + "');", function (result) {
-            var success = JSON.parse(result);
-            if (success === true) {
-                createBook();
-            } else {
+        csInterface.evalScript("bookalopeActiveDocumentToRTF();", function (result) {
+            bookFilePath = JSON.parse(result);
+            if (bookFilePath === false) {
                 showElementError(document.getElementById("input-active-document"), "Failed to prepare active document");
                 hideSpinner();
+            } else {
+                bookFileName = bookFilePath.split("/").pop().split("\\").pop();
+                createBook();
             }
         });
     }
