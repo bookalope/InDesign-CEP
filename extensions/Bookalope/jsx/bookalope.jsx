@@ -46,14 +46,14 @@ function getConfiguration() {
         app: {
             version: app.version,
             user: app.userName,
-            win: Folder.fs == "Windows",
+            win: Folder.fs == "Windows"
         },
         fs: {
             data: Folder.userData.fsName,
             desktop: Folder.desktop.fsName,
             tmp: Folder.temp.fsName,
-            separator: Folder.fs == "Windows" ? "\\" : "/",
-        },
+            separator: Folder.fs == "Windows" ? "\\" : "/"
+        }
     };
     return JSON.stringify(config);
 }
@@ -183,7 +183,7 @@ function bookalopeGetDocumentDataFromActive() {
 function bookalopeCreateDocument(idmlFileName, bookId, bookflowId, betaHost) {
 
     // Open the document in default mode, and display it.
-    var idmlFile = new File(idmlFileName)
+    var idmlFile = new File(idmlFileName);
     var bookalopeDocument = app.open(idmlFile);
 
     // Bookalope keeps some private data alongside the document.
@@ -263,7 +263,7 @@ function bookalopeDocumentToRTF(doc) {
                 }
             }
             return false;
-        }
+        };
     }
 
     /**
@@ -393,7 +393,7 @@ function bookalopeDocumentToRTF(doc) {
     }
 
     // Create a temporary copy of the document that we want to export.
-    const tmpFile = File(app.createTemporaryCopy(doc.fullName))
+    const tmpFile = File(app.createTemporaryCopy(doc.fullName));
     const tmpDoc = app.open(tmpFile, false);
     const tmpPath = tmpFile.path;
 
@@ -462,7 +462,7 @@ function bookalopeDocumentToRTF(doc) {
     for (var i = 0; i < docGraphics.length; i++) {
         var graphic = docGraphics[i];
         try {
-            const area = (graphic.visibleBounds[2] - graphic.visibleBounds[0]) * (graphic.visibleBounds[3] - graphic.visibleBounds[1])
+            var area = (graphic.visibleBounds[2] - graphic.visibleBounds[0]) * (graphic.visibleBounds[3] - graphic.visibleBounds[1]);
             if (area === 0) {
                 emptyGraphics.push(graphic);
             }
@@ -533,7 +533,7 @@ function bookalopeDocumentToRTF(doc) {
         var page = tmpDoc.pages.item(i);
         var frames = [];
         for (var j = 0; j < page.textFrames.length; j++) {
-            frames.push(page.textFrames.item(j))
+            frames.push(page.textFrames.item(j));
         }
         frames.sort(cmpFrames);
 
@@ -564,7 +564,7 @@ function bookalopeDocumentToRTF(doc) {
         progressWin.pbar.value = Math.round(pbarVal);
     }
     var rtfFile = new File(createUniqueName(tmpPath + "/bookalope-document", ".rtf"));
-    newContent.parentStory.exportFile(ExportFormat.RTF, rtfFile)
+    newContent.parentStory.exportFile(ExportFormat.RTF, rtfFile);
     progressWin.pbar.value = pbarVal = 700;
 
     // Step 8: close the active & temporary document and the progress window, and return.
