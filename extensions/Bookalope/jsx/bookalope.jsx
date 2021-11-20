@@ -484,9 +484,9 @@ function bookalopeDocumentToRTF(doc) {
     for (var i = 0; i < docGraphics.length; i++) {
         var graphic = docGraphics[i];
         if (graphic.itemLink == null) {
-            var tmpFile = File(createUniqueName(tmpPath + "/img", ".png"));
-            exportPNG(graphic, tmpFile);
-            graphic.parent.place(tmpFile);
+            var tmpImgFile = new File(createUniqueName(tmpPath + "/img", ".png"));
+            exportPNG(graphic, tmpImgFile);
+            graphic.parent.place(tmpImgFile);
         } else if (graphic.itemLink.status === LinkStatus.linkEmbedded) {
             app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
             graphic.itemLink.unembed(tmpPath);
