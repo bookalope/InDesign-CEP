@@ -274,7 +274,7 @@ function bookalopeDocumentToRTF(doc) {
      * @return {string} The unique path and filename.
      */
     function createUniqueName(base, ext) {
-        for (var i = 0; File(base + ext).exists; i++) {
+        for (var i = 0; new File(base + ext).exists; i++) {
             base = base.replace(/_\d+$/, "") + "_" + String(i);
         }
         return base + ext;
@@ -325,7 +325,7 @@ function bookalopeDocumentToRTF(doc) {
         // Copy image into the anchored frame and resize its bounds.
         var image = imageRect.images[0];
         var imagePath = image.itemLink.filePath;
-        anchor.place(File(imagePath));
+        anchor.place(new File(imagePath));
         anchor.geometricBounds = [
             imageBounds[0] - frameBounds[0],
             imageBounds[1] - frameBounds[1],
@@ -393,7 +393,7 @@ function bookalopeDocumentToRTF(doc) {
     }
 
     // Create a temporary copy of the document that we want to export.
-    const tmpFile = File(app.createTemporaryCopy(doc.fullName));
+    const tmpFile = new File(app.createTemporaryCopy(doc.fullName));
     const tmpDoc = app.open(tmpFile, false);
     const tmpPath = tmpFile.path;
 
