@@ -46,13 +46,13 @@ function getConfiguration() {
         app: {
             version: app.version,
             user: app.userName,
-            win: Folder.fs == "Windows"
+            win: Folder.fs === "Windows"
         },
         fs: {
             data: Folder.userData.fsName,
             desktop: Folder.desktop.fsName,
             tmp: Folder.temp.fsName,
-            separator: Folder.fs == "Windows" ? "\\" : "/"
+            separator: Folder.fs === "Windows" ? "\\" : "/"
         }
     };
     return JSON.stringify(config);
