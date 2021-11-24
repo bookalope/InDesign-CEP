@@ -299,8 +299,8 @@ function bookalopeDocumentToRTF(doc) {
         insertionPoint.parentStory.recompose();
 
         // Save the user's measurement preferences, and then switch to points unit.
-        const userHoriz = tmpDoc.viewPreferences.horizontalMeasurementUnits;
-        const userVert = tmpDoc.viewPreferences.verticalMeasurementUnits;
+        var userHoriz = tmpDoc.viewPreferences.horizontalMeasurementUnits;
+        var userVert = tmpDoc.viewPreferences.verticalMeasurementUnits;
         tmpDoc.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.points;
         tmpDoc.viewPreferences.verticalMeasurementUnits = MeasurementUnits.points;
 
@@ -334,8 +334,8 @@ function bookalopeDocumentToRTF(doc) {
         ];
 
         // Then resize the image itself.
-        const newImageBoundY = anchor.geometricBounds[0] - (imageBounds[0] - imageBounds[0]);
-        const newImageBoundX = anchor.geometricBounds[1] - (imageBounds[1] - imageBounds[1]);
+        var newImageBoundY = anchor.geometricBounds[0] - (imageBounds[0] - imageBounds[0]);
+        var newImageBoundX = anchor.geometricBounds[1] - (imageBounds[1] - imageBounds[1]);
         anchor.images[0].geometricBounds = [
             newImageBoundY,
             newImageBoundX,
@@ -393,16 +393,16 @@ function bookalopeDocumentToRTF(doc) {
     }
 
     // Create a temporary copy of the document that we want to export.
-    const tmpFile = new File(app.createTemporaryCopy(doc.fullName));
-    const tmpDoc = app.open(tmpFile, false);
-    const tmpPath = tmpFile.path;
+    var tmpFile = new File(app.createTemporaryCopy(doc.fullName));
+    var tmpDoc = app.open(tmpFile, false);
+    var tmpPath = tmpFile.path;
 
     // Open a progress bar window, where max progress is defined by the 8 steps
     // (i.e. progress 0 through 7) for this RTF conversion. Then, times 100 because
     // we'll track progress per step in percent, too. Note that `pbarInc` can become
     // `Infinity` if the number of processed items (e.g. pages.length) is zero. In
     // that case it won't matter because `pbarInc` isn't used.
-    const progressWin = new Window("palette", "Preparing document for Bookalope...");
+    var progressWin = new Window("palette", "Preparing document for Bookalope...");
     progressWin.pbar = progressWin.add("progressbar", undefined, 0, 7 * 100);
     progressWin.pbar.preferredSize.width = 300;
     progressWin.pbar.value = 0;
@@ -417,7 +417,7 @@ function bookalopeDocumentToRTF(doc) {
     // Step 2: add a character style for page numbers that we'll inject
     // into the text further down. Bookalope will know what to do with
     // that extra goodness.
-    const pgnrCharacterStyleName = "bookalope-page-number";
+    var pgnrCharacterStyleName = "bookalope-page-number";
     var pgnrCharacterStyle = tmpDoc.characterStyles.itemByName(pgnrCharacterStyleName);
     if (!pgnrCharacterStyle.isValid) {
         pgnrCharacterStyle = tmpDoc.characterStyles.add({
