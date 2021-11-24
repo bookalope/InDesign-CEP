@@ -769,7 +769,7 @@ function askSaveBookflowFile(bookflow, format, style) {
 
         // Check for errors of the input fields. If everything is good then
         // upload the document to Bookalope for conversion.
-        if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {
+        if (!isToken(bookalopeToken)) {
             showElementError(document.getElementById("input-bookalope-token"), "Field is required");
             document.getElementById("input-bookalope-token").scrollIntoView(false);
         }
