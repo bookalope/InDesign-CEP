@@ -233,7 +233,7 @@ function bookalopeDocumentToRTF(doc) {
 
     // Check that we work with a valid document.
     if (!doc || !doc.isValid) {
-        alert("Unable to export invalid document to Bookalope");
+        alert("Unable to export an invalid document to Bookalope");
         return JSON.stringify(false);
     }
 
