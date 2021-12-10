@@ -392,10 +392,22 @@ function bookalopeDocumentToRTF(doc) {
         return 1;
     }
 
-    // Create a temporary copy of the document that we want to export.
-    var tmpFile = new File(app.createTemporaryCopy(doc.fullName));
+    // Create a temporary copy of the document that we want to export. It looks like
+    //
+    //     var tmpFile = new File(app.createTemporaryCopy(doc.fullName));
+    //
+    // doesn't work on Windows because `createTemporaryCopy()` doesn't actually create
+    // a temporary copy. so we take the manual approach here. See also this Slack
+    // conversation: https://adobedevs.slack.com/archives/C1FKLQ63F/p1635906342026700
+    var docFile = doc.fullName;
+    var tmpPath = Folder.temp;
+    var tmpFileName = tmpPath + "/" + docFile.name;
+    if (!docFile.copy(tmpFileName)) {
+        alert("Unable to create a temporary copy of the document");
+        return JSON.stringify(false);
+    }
+    var tmpFile = new File(tmpFileName);
     var tmpDoc = app.open(tmpFile, false);
-    var tmpPath = tmpFile.path;
 
     // Open a progress bar window, where max progress is defined by the 8 steps
     // (i.e. progress 0 through 7) for this RTF conversion. Then, times 100 because
