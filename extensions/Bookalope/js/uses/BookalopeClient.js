@@ -1246,7 +1246,7 @@ Bookflow.prototype.getImage = function(name) {
   var bookalope = bookflow._bookalope;
 
   return new Promise(function(resolve, reject) {
-    var url = bookflow.url + "/files/image";
+    var url = bookflow.url + "/upload/image";
     var params = {
       "name": name
     };
@@ -1298,7 +1298,7 @@ Bookflow.prototype.addImage = function(name, filename, file) {
     if (bookflow.step !== "convert") {
       reject(new BookalopeError("Unable to add image if Bookflow is not in 'convert' step."));
     } else {
-      var url = bookflow.url + "/files/image";
+      var url = bookflow.url + "/upload/image";
       var params = {
         "file": btoa(file),
         "filename": filename,
@@ -1329,7 +1329,7 @@ Bookflow.prototype.getDocument = function() {
   var bookalope = bookflow._bookalope;
 
   return new Promise(function(resolve, reject) {
-    var url = bookflow.url + "/files/document";
+    var url = bookflow.url + "/upload/document";
     var params = undefined;
     var options = {
       "responseType": "blob"
@@ -1366,10 +1366,10 @@ Bookflow.prototype.setDocument = function(filename, file, filetype, skip_analysi
   var bookalope = bookflow._bookalope;
 
   return new Promise(function(resolve, reject) {
-    if (bookflow.step !== "files") {
+    if (bookflow.step !== "upload") {
       reject(new BookalopeError("Unable to set document because one is already set"));
     } else {
-      var url = bookflow.url + "/files/document";
+      var url = bookflow.url + "/upload/document";
       var params = {
         "file": btoa(file),
         "filename": filename,
