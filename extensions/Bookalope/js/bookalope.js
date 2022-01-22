@@ -687,7 +687,7 @@ function askSaveBookflowFile(bookflow, format, style) {
     function uploadAndConvertDocument() {
 
         // Store the API authentication key to local storage for later.
-        bookalopeToken = document.getElementById("input-bookalope-token").value.toLowerCase();
+        bookalopeToken = document.getElementById("input-bookalope-token").value;
         bookalopeBetaHost = document.getElementById("input-bookalope-beta").checked;
         setBookalopeAPIToken(bookalopeToken, bookalopeBetaHost);
 
