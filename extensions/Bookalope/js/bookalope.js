@@ -687,7 +687,7 @@ function askSaveBookflowFile(bookflow, format, style) {
     function uploadAndConvertDocument() {
 
         // Store the API authentication key to local storage for later.
-        bookalopeToken = document.getElementById("input-bookalope-token").value.toLowerCase();
+        bookalopeToken = document.getElementById("input-bookalope-token").value;
         bookalopeBetaHost = document.getElementById("input-bookalope-beta").checked;
         setBookalopeAPIToken(bookalopeToken, bookalopeBetaHost);
 
@@ -710,7 +710,7 @@ function askSaveBookflowFile(bookflow, format, style) {
 
         // Check for errors of the input fields. If everything is good then
         // upload the document to Bookalope for conversion.
-        if (!(/^[0-9a-fA-F]{32}$/).test(bookalopeToken)) {
+        if (!isToken(bookalopeToken)) {
             showElementError(document.getElementById("input-bookalope-token"), "Field is required");
             document.getElementById("input-bookalope-token").scrollIntoView(false);
         }
