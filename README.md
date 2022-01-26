@@ -4,15 +4,15 @@
 
 [Adobe CEP](https://github.com/Adobe-CEP), or Common Extensibility Platform, provides a framework to extend Adobe applications like [InDesign](http://www.adobe.com/products/indesign.html) with custom user interfaces and functionality. There is a wealth of useful extensions available on [Adobe’s Extension Marketplace](https://www.adobeexchange.com/creativecloud.html).
 
-This repository contains the complete source code for [Bookalope](https://bookalope.net/)’s InDesign extension. The extension uses the [Bookalope REST API](https://github.com/jenstroeger/Bookalope/blob/master/API.md) and its [Javascript wrapper](https://github.com/jenstroeger/Bookalope/blob/master/clients/javascript/bookalope.js) to integrate the Bookalope toolset into InDesign. For more information on Bookalope and its services, please refer to the [Bookalope](https://bookalope.net) website.
+This repository contains the complete source code for [Bookalope](https://bookalope.net/)’s InDesign extension. The extension uses the [Bookalope REST API](https://github.com/bookalope/Bookalope/blob/master/API.md) and its [Javascript wrapper](https://github.com/bookalope/Bookalope/blob/master/clients/javascript/bookalope.js) to integrate the Bookalope toolset into InDesign. For more information on Bookalope and its services, please refer to the [Bookalope](https://bookalope.net) website.
 
 ## Requirements
 
-The extension requires and supports Adobe InDesign versions 13–16, which relates to CC 2018-21. However, while the extension may run on older versions that hasn’t been tested in depth.
+The extension requires and supports Adobe InDesign versions 13–17, which relates to CC 2018-22. However, while the extension may run on older versions that hasn’t been tested in depth.
 
 ## Coding
 
-Read a general introduction to writing an Adobe CEP extension [here](http://www.adobe.com/devnet/creativesuite/articles/a-short-guide-to-HTML5-extensions.html), and a more in-depth documentation provides the [CEP Extension Cookbook](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_9.x/Documentation/CEP%209.0%20HTML%20Extension%20Cookbook.md). For more information on the Bookalope API please refer to its [documentation on Github](https://github.com/jenstroeger/Bookalope).
+Read a general introduction to writing an Adobe CEP extension [here](http://www.adobe.com/devnet/creativesuite/articles/a-short-guide-to-HTML5-extensions.html), and a more in-depth documentation provides the [CEP Extension Cookbook](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_11.x/Documentation/CEP%2011.1%20HTML%20Extension%20Cookbook.md). For more information on the Bookalope API please refer to its [documentation on Github](https://github.com/bookalope/Bookalope).
 
 InDesign does not load an extension unless the extension has been cryptographically signed. Therefore, in order to run the Bookalope extension from source, you need to switch InDesign to _PlayerDebugMode_:
 
@@ -30,7 +30,7 @@ Then start InDesign, and the extension should be available from the _Window_ men
 
 ### Debugging
 
-First of all, make sure that the extension’s `CSXS/manifest.xml` contains valid XML; follow the instructions [here](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_9.x/Documentation/CEP%209.0%20HTML%20Extension%20Cookbook.md#extension-manifest-xsd). Note that the _order_ of elements in `<Geometry>` actually seems to matter!
+First of all, make sure that the extension’s `CSXS/manifest.xml` contains valid XML; follow the instructions [here](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_11.x/Documentation/CEP%2011.1%20HTML%20Extension%20Cookbook.md#extension-manifest). Note that the _order_ of elements in `<Geometry>` actually seems to matter!
 
 Debugging the ExtendScript side of the extension doesn’t really work in an integrated environment. The [ExtendScript Toolkit](https://github.com/Adobe-CEP/CEP-Resources/tree/master/ExtendScript-Toolkit) has been retired, and in its stead you can use the [ExtendScript Debugger](https://marketplace.visualstudio.com/items?itemName=Adobe.extendscript-debug) for [VisualStudio Code](https://code.visualstudio.com/). I found it helpful to connect it to a running InDesign instance, and prototype the code there before using it for the Bookalope extension itself.
 
@@ -63,13 +63,13 @@ Then start InDesign, and the extension should be available from the panel list u
 
 Once installed, open the extension panel:
 
-<img src="https://bookalope.net/img/idsn-bookalope-1.1.0-upload.jpg" width="50%" alt="Bookalope InDesign: Upload panel">
+<img src="https://bookalope.net/img/idsn-bookalope-1.2.2-upload.jpg" width="50%" alt="Bookalope InDesign: Upload panel">
 
 To use the Bookalope web services, you need a Bookalope API key: you can find the key in the [user profile](https://bookflow.bookalope.net/profile) of your Bookalope account. Then select a book manuscript in Word format (or any other of the [supported document formats](https://github.com/jenstroeger/Bookalope/blob/master/API.md#get-formats)), fill in `Name` and `Author` of the book, and then click the `Upload and convert` button.
 
 The extension uploads the document to the Bookalope server for analysis and conversion. This can take a little while. Once finished, the extension downloads the converted file, creates a new InDesign document, and places the downloaded content into the new InDesign document. The extension’s panel changes now to this:
 
-<img src="https://bookalope.net/img/idsn-bookalope-1.1.0-update.jpg" width="50%" alt="Bookalope InDesign: Update panel">
+<img src="https://bookalope.net/img/idsn-bookalope-1.2.2-update.jpg" width="50%" alt="Bookalope InDesign: Update panel">
 
 From here, you can open the document on the Bookalope website to revisit and adjust the entire analysis and conversion flow (watch the video tutorials on [Youtube](https://www.youtube.com/channel/UCCxR_k6G06qEAj3IjZ9AcoQ)). You can also download the converted document in EPUB, MOBI, or print-ready PDF formats.
 
