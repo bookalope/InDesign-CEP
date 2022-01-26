@@ -194,6 +194,9 @@ function showElementError(element, text) {
     else if (element.classList.contains("spectrum-Checkbox-input") === true) {
         field = element.closest(".spectrum-Checkbox");
     }
+    else if (element.classList.contains("spectrum-Textfield-input") === true) {
+        // Already the correct parent element.
+    }
     if (field !== null) {
         field.classList.add("is-invalid");
     }
@@ -254,6 +257,21 @@ function clearErrors() {
         element.classList.remove("is-invalid");
     });
     showStatusOk();
+}
+
+
+/**
+ * Generate and return a UUID of Variant 1, Version 4, a random UUID.
+ * @returns {string} The random UUID.
+ */
+
+function makeUUID4() {
+    // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid#2117523
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0;
+        var v = c == "x" ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
 }
 
 
@@ -391,6 +409,9 @@ function askSaveBookflowFile(bookflow, format, style) {
     var bookalopeBetaHost;
 
     // Tis where we keep the current inputs from the panel.
+    var bookFileType;
+    var bookFileName;
+    var bookFilePath;
     var bookFile;
     var bookName;
     var bookAuthor;
@@ -511,11 +532,7 @@ function askSaveBookflowFile(bookflow, format, style) {
         showStatus("Converting and downloading file");
 
         // Produce a random file name to unique the IDML file.
-        // TODO Consider using SHA(apiKey + time + rnd) for a unique identifier.
-        var time = Date.now();
-        var rnd = Math.random();
-        var fname = "idsn-" + time.toString(16).slice(-8) + "-" + rnd.toString(16).slice(-8) + ".idml";
-        var fpath = config.fs.tmp + config.fs.separator + fname;
+        var fpath = config.fs.tmp + config.fs.separator + makeUUID4() + ".idml";
 
         // Convert the given Bookflow's document to IDML, and save it as a temporary file.
         saveBookflowFile(bookflow, "idml", "default", fpath)
@@ -574,8 +591,8 @@ function askSaveBookflowFile(bookflow, format, style) {
     function uploadFile(bookflow) {
         showStatus("Uploading and analyzing document");
 
-        // Read the user selected file.
-        var result = window.cep.fs.readFile(bookFile.path, window.cep.encoding.Base64);
+        // Read the book file, either the selected one or the created one.
+        var result = window.cep.fs.readFile(bookFilePath, window.cep.encoding.Base64);
         if (result.err) {
             showElementError(document.getElementById("input-file"), "Unable to load file (" + result.err + ")");
             hideSpinner();
@@ -586,7 +603,7 @@ function askSaveBookflowFile(bookflow, format, style) {
             // base-64 encoded binary, so we have to decode it before passing it to the
             // Bookalope wrapper. The wrapper will then encode it (again) before shipping
             // it off to the server.
-            bookflow.setDocument(bookFile.name, atob(result.data), undefined, bookSkipStructure)
+            bookflow.setDocument(bookFileName, atob(result.data), undefined, bookSkipStructure, bookUploadOptions)
             .then(function (bookflow) {
 
                 // Periodically poll the Bookalope server to update the Bookflow. Then check
@@ -627,7 +644,6 @@ function askSaveBookflowFile(bookflow, format, style) {
      */
 
     function createBook() {
-        showSpinner();
         showStatus("Creating Book and Bookflow");
 
         // Get the BookalopeClient object.
@@ -678,6 +694,46 @@ function askSaveBookflowFile(bookflow, format, style) {
 
 
     /**
+     * The user has selected an existing file, so use its path and create the new Book and
+     * Bookflow using the selected file.
+     */
+
+    function createBookFromSelectedFile() {
+        showSpinner();
+
+        bookFileName = bookFile.name;
+        bookFilePath = bookFile.path;
+        createBook();
+    }
+
+
+    /**
+     * The user wants to upload the currently active document. Because Bookalope doesn't
+     * support InDesign file formats (will it ever?) we first save the active document as
+     * a local RTF file and then upload that RTF file to Bookalope.
+     */
+
+    function createBookFromActiveDocument() {
+        showSpinner();
+        showStatus("Preparing active document");
+
+        // Noodle through the active document to create an RTF file, and save that.
+        // If everything went well, create the Book and upload the file.
+        csInterface.evalScript("bookalopeActiveDocumentToRTF();", function (result) {
+            bookFilePath = JSON.parse(result);
+            if (bookFilePath === false) {
+                showElementError(document.getElementById("input-active-document"), "Failed to prepare active document");
+                hideSpinner();
+            } else {
+                bookFileName = bookFilePath.split("/").pop().split("\\").pop();
+                bookUploadOptions = {"ignore_pagebreaks": true};
+                createBook();
+            }
+        });
+    }
+
+
+    /**
      * When the user clicks the "Upload and Convert", then we create a new Book and Bookflow
      * for the given document, upload the given file, and when converted, download the IDML
      * and open it in a new InDesign document. All that is being kicked off by this handler
@@ -692,7 +748,11 @@ function askSaveBookflowFile(bookflow, format, style) {
         setBookalopeAPIToken(bookalopeToken, bookalopeBetaHost);
 
         // Get the values from the form fields.
+        bookFileType = document.querySelector("input[name='input-file-type']:checked").value;
+        bookFileName = undefined;
+        bookFilePath = undefined;
         bookFile = document.getElementById("input-file").files[0];
+        bookActiveDocument = document.getElementById("input-active-document").value;
         bookName = document.getElementById("input-book-name").value;
         bookAuthor = document.getElementById("input-book-author").value;
         bookCopyright = document.getElementById("input-book-copyright").value;
@@ -704,6 +764,7 @@ function askSaveBookflowFile(bookflow, format, style) {
         bookAutoClean = document.getElementById("input-book-autoclean").checked;
         bookHighlightIssues = document.getElementById("input-book-highlight-issues").checked;
         bookSkipStructure = document.getElementById("input-book-skip-structure").checked;
+        bookUploadOptions = undefined;
 
         // Hide error messages and clear out highlighted fields, if there are any.
         clearErrors();
@@ -714,21 +775,34 @@ function askSaveBookflowFile(bookflow, format, style) {
             showElementError(document.getElementById("input-bookalope-token"), "Field is required");
             document.getElementById("input-bookalope-token").scrollIntoView(false);
         }
-        else if (bookFile === undefined) {
-            showElementError(document.getElementById("input-file"), "Field is required");
-            document.getElementById("input-book-name").scrollIntoView(false);
-        }
-        else if (bookFile.size > 268435456) { // 256MiB
-            showElementError(document.getElementById("input-file"), "File size exceeded 12Mb");
-            document.getElementById("input-book-name").scrollIntoView(false);
-        }
         else if (bookName.length === 0) {
             showElementError(document.getElementById("input-book-name"), "Field is required");
             document.getElementById("input-book-name").scrollIntoView(false);
         }
+        else if (bookFileType === "open-file") {
+            if (bookFile === undefined) {
+              showElementError(document.getElementById("input-file"), "Field is required");
+              document.getElementById("input-file").scrollIntoView(false);
+            }
+            else if (bookFile.size > 268435456) { // 256MiB
+                showElementError(document.getElementById("input-file"), "File size exceeded 12Mb");
+                document.getElementById("input-file").scrollIntoView(false);
+            }
+            else {
+                createBookFromSelectedFile();
+            }
+        }
+        else if (bookFileType === "active-document") {
+            if (!bookActiveDocument) {
+                showElementError(document.getElementById("input-active-document"), "Field is required");
+                document.getElementById("input-active-document").scrollIntoView(false);
+            }
+            else {
+                createBookFromActiveDocument();
+            }
+        }
         else {
-            // No errors, proceed.
-            createBook();
+            // The above should cover it.
         }
     }
 
@@ -752,6 +826,9 @@ function askSaveBookflowFile(bookflow, format, style) {
             // which we create a new document.
             var documentData = JSON.parse(result);
             if (documentData) {
+
+                // Update the "Active Document" field with the currently active document name.
+                document.getElementById("input-active-document").value = documentData.doc.name;
 
                 // Fetch the Bookalope specific data.
                 var bookalopeData = documentData.bookalope;
@@ -891,6 +968,16 @@ function askSaveBookflowFile(bookflow, format, style) {
             // Register the callback for the Convert button.
             document.getElementById("button-send").addEventListener("click", function () {
                 uploadAndConvertDocument();
+            });
+
+            // Register the callbacks for the Document Type radio buttons.
+            document.getElementById("input-file-open").addEventListener("change", function (event) {
+                document.getElementById("input-file").closest(".spectrum-FieldGroup-item").classList.remove("hidden");
+                document.getElementById("input-active-document").closest(".spectrum-FieldGroup-item").classList.add("hidden");
+            });
+            document.getElementById("input-file-active").addEventListener("change", function (event) {
+                document.getElementById("input-file").closest(".spectrum-FieldGroup-item").classList.add("hidden");
+                document.getElementById("input-active-document").closest(".spectrum-FieldGroup-item").classList.remove("hidden");
             });
 
             // Register the callback for the File selection field that shows the selected
