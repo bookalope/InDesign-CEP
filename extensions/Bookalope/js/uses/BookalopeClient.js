@@ -67,7 +67,7 @@ var BookalopeClient = function(token, betaHost, version) {
   if (version) {
     this._version = version;
   } else {
-    this._version = "1.2.0";
+    this._version = "2.0.0";
   }
 };
 

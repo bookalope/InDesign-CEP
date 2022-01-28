@@ -243,7 +243,7 @@ function showStatus(text) {
  */
 
 function showStatusOk() {
-    showStatus("Ok (v1.2.2)");
+    showStatus("Ok (v1.3.0)");
 }
 
 
