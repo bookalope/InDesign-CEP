@@ -526,7 +526,7 @@ function bookalopeDocumentToRTF(doc) {
                 for (var j = 0; j < page.rectangles.length; j++) {
                     var imageRect = page.rectangles[j];
                     if (imageRect.images.length >= 1) {
-                        anchorImage(tmpDoc, textFrame, imageRect);
+                        anchorImage(textFrame, imageRect);
                     }
                 }
             }
