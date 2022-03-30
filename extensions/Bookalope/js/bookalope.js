@@ -857,6 +857,7 @@ function askSaveBookflowFile(bookflow, format, style) {
                     bookflow.update()
                     .then(function (bookflow) {
                         setBookalopeLinks(bookflow);
+			populateMetadataLanguagePicker();
                         showUpdate();
                         showStatusOk();
                     })
@@ -910,6 +911,48 @@ function askSaveBookflowFile(bookflow, format, style) {
             });
         }
     }
+
+
+    /**
+	* Retrieve the supported languages, and populate the metadata language picker
+     */
+
+	function populateMetadataLanguagePicker() {
+		var languagePicker = document.getElementById("input-book-language");
+		
+		// TODO remove all items.
+		
+		// Temporarely use a dummy object
+		var languagesList = [{
+		"code": "en-US",
+		"name": "English (US)"
+		}, {
+		"code": "es-ES",
+		"name": "Español (Spain)"
+		}, {
+		"code": "de-DE",
+		"name": "Deutsch"
+		}
+		]
+		
+		// var languagesList = getLanguages(); // returns promise.
+		// TODO ON success
+		languagePicker.setAttribute('data-placeholder', 'Choose language');
+		
+		languagesList.forEach (function (language) {
+			var opt = document.createElement('option');
+			opt.value = language.code;
+			opt.innerHTML = language.name;
+			languagePicker.appendChild(opt);
+			
+			// TODO compatible?
+			//languagePicker.appendChild(new Option(language.name, language.code));
+			}
+		)
+		
+		// TODO ON failure
+		languagePicker.setAttribute('data-placeholder', 'No languages to select yet');
+	}
 
 
     // First things first: get and initialize the Creative Suite Interface. There is much

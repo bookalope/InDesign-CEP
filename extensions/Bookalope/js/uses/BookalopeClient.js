@@ -405,6 +405,37 @@ BookalopeClient.prototype.getImportFormats = function() {
 
 
 /**
+ * Get a list of supported Bookalope languages. Returns a promise that
+ * is fulfilled with a list of language instances or rejected with a BookalopeError.
+ *
+ * @async
+ * @returns {Promise}
+ */
+
+BookalopeClient.prototype.getLanguages = function() {
+  var bookalope = this;
+
+  return new Promise(function(resolve, reject) {
+    var url = "/api/languages";
+    bookalope.httpGET(url)
+    .then(function(response) {
+
+      // Create and populate a list of language instances from the response data.
+      var languagesList = [];
+      response.languages.import.forEach(function(language) {
+        languagesList.push(new Language(language.code, language.name));
+      });
+
+      resolve(languagesList);
+    })
+    .catch(function(error) {
+      reject(error);
+    });
+  });
+};
+
+
+/**
  * Get a list Bookshelves. Returns a promise that is fulfilled with a list of
  * Bookshelf instances or rejected with a BookalopeError.
  *
@@ -590,6 +621,14 @@ var Format = function(name, mime, exts) {
   this.name = name;
   this.mime = mime;
   this.fileExts = exts;
+};
+
+
+/* A Language instance (...) */
+
+var Language = function(code, name) {
+	this.code = code;
+	this.name = name;
 };
 
 
