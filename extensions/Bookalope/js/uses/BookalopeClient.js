@@ -412,9 +412,31 @@ BookalopeClient.prototype.getImportFormats = function() {
  * @returns {Promise}
  */
 
-BookalopeClient.prototype.getLanguages = function() {
-  var bookalope = this;
+//BookalopeClient.prototype.
+getLanguages = function() {
 
+	return new Promise(function(resolve, reject) {
+	// Temporarely use a dummy object
+		var languagesList = [{
+			"code": "en-US",
+			"name": "English (US)"
+			}, {
+			"code": "es-ES",
+			"name": "Español (Spain)"
+			}, {
+			"code": "de-DE",
+			"name": "Deutsch"
+			}
+			];
+		setTimeout(function() {
+			resolve(languagesList);		
+		}, 1000);
+	}).catch(function(error) {
+	  reject(error);
+	});
+
+// This is the final version
+/*
   return new Promise(function(resolve, reject) {
     var url = "/api/languages";
     bookalope.httpGET(url)
@@ -432,6 +454,7 @@ BookalopeClient.prototype.getLanguages = function() {
       reject(error);
     });
   });
+*/
 };
 
 

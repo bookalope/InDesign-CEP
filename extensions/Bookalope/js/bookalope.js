@@ -506,6 +506,7 @@ function askSaveBookflowFile(bookflow, format, style) {
             return false;
         });
 
+
         // Depending on the Bookflow's current credit type, show/hide notes for the user.
         if (bookflow.credit === "pro") {
             document.getElementById("div-bookflow-type-none").classList.add("hidden");
@@ -857,7 +858,6 @@ function askSaveBookflowFile(bookflow, format, style) {
                     bookflow.update()
                     .then(function (bookflow) {
                         setBookalopeLinks(bookflow);
-			populateMetadataLanguagePicker();
                         showUpdate();
                         showStatusOk();
                     })
@@ -917,41 +917,42 @@ function askSaveBookflowFile(bookflow, format, style) {
 	* Retrieve the supported languages, and populate the metadata language picker
      */
 
-	function populateMetadataLanguagePicker() {
+	async function populateMetadataLanguagePicker() {
+		document.getElementById("input-book-name").value = "invoked pmlp";
+
 		var languagePicker = document.getElementById("input-book-language");
-		
-		// TODO remove all items.
-		
-		// Temporarely use a dummy object
-		var languagesList = [{
-		"code": "en-US",
-		"name": "English (US)"
-		}, {
-		"code": "es-ES",
-		"name": "Español (Spain)"
-		}, {
-		"code": "de-DE",
-		"name": "Deutsch"
-		}
-		]
-		
-		// var languagesList = getLanguages(); // returns promise.
-		// TODO ON success
-		languagePicker.setAttribute('data-placeholder', 'Choose language');
-		
-		languagesList.forEach (function (language) {
-			var opt = document.createElement('option');
+		var output;
+
+		output = await getLanguages().catch(
+			(e) => {document.getElementById("input-book-name").value = "error"; }
+		);
+			
+		// Add language options to (hidden) <select>. Todo, add to Adobe's picker.
+		/* In case of compatibility problems, use
 			opt.value = language.code;
 			opt.innerHTML = language.name;
 			languagePicker.appendChild(opt);
-			
-			// TODO compatible?
-			//languagePicker.appendChild(new Option(language.name, language.code));
-			}
-		)
+		*/
+		output.forEach (function (language) {
+			languagePicker.appendChild(new Option(language.name, language.code));
+		});
 		
+
+		document.getElementById("input-book-name").value = "invoked pmlp 2";
+/*
+		response => {
+			document.getElementById("input-book-name").value = "succeeded";
+					
+			//languagePicker.setAttribute('data-placeholder', 'Choose language');
+
+		}).catch(function(e) {
+			document.getElementById("input-book-name").value = "failed";
+			languagePicker.setAttribute('data-placeholder', 'No languages to select yet');
+		});
+	*/
+	
 		// TODO ON failure
-		languagePicker.setAttribute('data-placeholder', 'No languages to select yet');
+		//languagePicker.setAttribute('data-placeholder', 'No languages to select yet');
 	}
 
 
@@ -1035,6 +1036,20 @@ function askSaveBookflowFile(bookflow, format, style) {
                     label.textContent = this.getAttribute("data-placeholder");
                 }
             });
+
+			function test() {
+				var token = document.getElementById("input-bookalope-token").value;
+				if(!isToken(token)) {
+					showElementError(document.getElementById("input-bookalope-token"), "Invalid Token");
+					document.getElementById("input-bookalope-token").scrollIntoView(false);
+				}
+				else
+				{
+					populateMetadataLanguagePicker();
+				}
+			}
+			// register callback token change
+			document.getElementById("input-bookalope-token").addEventListener("blur", test);
 
             // Alright this is a funky Adobe Spectrum thing. Looking at the documentation for
             // Picker elements: https://opensource.adobe.com/spectrum-css/picker.html
