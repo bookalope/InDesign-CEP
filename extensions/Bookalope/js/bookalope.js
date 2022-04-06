@@ -929,47 +929,9 @@ function askSaveBookflowFile(bookflow, format, style) {
     }
 
 
-    /**
-	* Retrieve the supported languages, and populate the metadata language picker
-     */
 
-	async function populateMetadataLanguagePicker() {
-		document.getElementById("input-book-name").value = "invoked pmlp";
+    
 
-		var languagePicker = document.getElementById("input-book-language");
-		var output;
-
-		output = await getLanguages().catch(
-			(e) => {document.getElementById("input-book-name").value = "error"; }
-		);
-			
-		// Add language options to (hidden) <select>. Todo, add to Adobe's picker.
-		/* In case of compatibility problems, use
-			opt.value = language.code;
-			opt.innerHTML = language.name;
-			languagePicker.appendChild(opt);
-		*/
-		output.forEach (function (language) {
-			languagePicker.appendChild(new Option(language.name, language.code));
-		});
-		
-
-		document.getElementById("input-book-name").value = "invoked pmlp 2";
-/*
-		response => {
-			document.getElementById("input-book-name").value = "succeeded";
-					
-			//languagePicker.setAttribute('data-placeholder', 'Choose language');
-
-		}).catch(function(e) {
-			document.getElementById("input-book-name").value = "failed";
-			languagePicker.setAttribute('data-placeholder', 'No languages to select yet');
-		});
-	*/
-	
-		// TODO ON failure
-		//languagePicker.setAttribute('data-placeholder', 'No languages to select yet');
-	}
 
 
     // First things first: get and initialize the Creative Suite Interface. There is much
@@ -1030,6 +992,21 @@ function askSaveBookflowFile(bookflow, format, style) {
                 uploadAndConvertDocument();
             });
 
+            // Register the callback for a change of token
+			document.getElementById("input-bookalope-token").addEventListener("blur", () => {
+                clearErrors();
+                let token = document.getElementById("input-bookalope-token").value;
+
+                if(isToken(token)) {
+                    unblockMetaData();
+                    getUIServerdata();
+                } else {
+                    blockMetaData();
+                    showElementError(document.getElementById("input-bookalope-token"), "Invalid Token");
+					document.getElementById("input-bookalope-token").scrollIntoView(false);
+				}
+            });
+
             // Register the callbacks for the Document Type radio buttons.
             document.getElementById("input-file-open").addEventListener("change", function (event) {
                 document.getElementById("input-file").closest(".spectrum-FieldGroup-item").classList.remove("hidden");
@@ -1053,19 +1030,91 @@ function askSaveBookflowFile(bookflow, format, style) {
                 }
             });
 
-			function test() {
-				var token = document.getElementById("input-bookalope-token").value;
-				if(!isToken(token)) {
-					showElementError(document.getElementById("input-bookalope-token"), "Invalid Token");
-					document.getElementById("input-bookalope-token").scrollIntoView(false);
-				}
-				else
-				{
-					populateMetadataLanguagePicker();
-				}
-			}
-			// register callback token change
-			document.getElementById("input-bookalope-token").addEventListener("blur", test);
+            // On valid token, retrieve server UI data
+            if(isToken(bookalopeToken)) {
+                getUIServerdata();
+            } else {
+                blockMetaData();
+            }
+
+            // build the pickers (true for startup)
+            rebuildPickers(true);
+
+            // And we're ready.
+            showStatusOk();
+
+            // Switch to the correct panel depending on the currently active document.
+            switchPanel();
+        }
+    });
+
+    // Load all SVG icons used by the extension so that they become available to the <svg> elements.
+    loadIcons("images/spectrum-icons.svg");
+}());
+
+
+
+    /**
+	* Retrieve server side UI data (languages) for UI
+    * Async/await are necessary during startup, to await loading serverdata such as languages.
+    * Otherwise rebuildPickers needs to be invoked twice.
+    * TODO: timeout?
+    *
+    * @async
+    *
+    */
+
+	async function getUIServerdata() {
+		document.getElementById("input-book-name").value = "invoked UI";
+
+        // First get language data
+        function populateLanguagePicker (response) {
+            /* In case of compatibility problems, use
+                opt.value = language.code;
+                opt.innerHTML = language.name;
+                languagePicker.appendChild(opt);
+            */
+            let languagePicker = document.getElementById("input-book-language");
+
+            // Clear options
+            // When dealing with many options: https://www.somacon.com/p542.php
+            languagePicker.options.length = 0;
+
+            response.forEach ((language) => {
+                let label = `${language.name} [${language.code}]`;
+                languagePicker.appendChild(new Option(label, language.code));
+            });
+        }
+
+        // See await remark above
+		await getLanguages()
+        .then(response => {
+            populateLanguagePicker(response);
+        })
+        .catch(error => {
+            showWarning(error);
+        });
+
+        // Rebuild here, given await.
+        //rebuildPickers();
+/*
+		//languagePicker.setAttribute('data-placeholder', 'Choose language');
+		// TODO ON failure
+		//languagePicker.setAttribute('data-placeholder', 'No languages to select yet');
+*/
+	}
+
+
+    /**
+	* (re)Build the pickers, see previous comments below.
+    * This code was moved out of the previous body. Two modifications were made:
+    * 1) old pickers are removed (WIP), with a new one constructed in it's place.
+    * 2) startup parameter added, that ensures one eventhandler is created only once
+    *    we could remove it, but it's on document.
+    *
+    * @param {boolean} startup - Whether invoked at startup (passed on to rebuildPickers)
+    *
+    **/
 
             // Alright this is a funky Adobe Spectrum thing. Looking at the documentation for
             // Picker elements: https://opensource.adobe.com/spectrum-css/picker.html
@@ -1075,7 +1124,7 @@ function askSaveBookflowFile(bookflow, format, style) {
             // to work. A bit spunky, but that's how they do it, I guess 😳
             // Note: we use the Javascript idiom here that declares an anonymous function and
             // executes it, in order to use the function's closure.
-            (function () {
+            function rebuildPickers(startup=false) {
 
                 /**
                  * Return true if the `element` itself or any of its ancestor elements match
@@ -1135,6 +1184,28 @@ function askSaveBookflowFile(bookflow, format, style) {
                 // that they have a class 'spectrum-Picker-select') and hide them; then
                 // create the Adobe Spectrum specific Dropdowns in their stead.
                 document.querySelectorAll(".spectrum-Picker-select").forEach(function (select) {
+
+                    // Use to store value of currently selected picker item
+                    let selectedValue = "";
+
+                    // remove previous picker selector
+                    // TODO should always be one.
+                    let currentDropdown = select.parentNode.querySelector("div.dropdown-select");
+
+                    // Check if a dropdown/picker already exists
+                    if(currentDropdown) { // && currentDropdown.length > 0
+
+                        // Store currently selected item
+                        //selectedValue = document.querySelector(".dropdown-select__label").getAttribute("data-value");
+                         selectedItem = select.parentNode.querySelector("ul.spectrum-Menu > li.is-selected");
+                         if(selectedItem) {
+                            selectedValue = selectedItem.getAttribute("data-value");
+                         }
+
+                        // Remove old Picker
+                        currentDropdown.remove();
+                    }
+                    //}
 
                     /**
                      * Change the current label of a Dropdown.
@@ -1343,24 +1414,26 @@ function askSaveBookflowFile(bookflow, format, style) {
                             }
                         }
                     });
-                });
 
-                // Clicking outside of the Dropdown or its popover closes any open popover.
-                document.addEventListener("click", function (event) {
-                    if (!isAncestorOf(event.target, ".dropdown-select")) {
-                        closeAllDropdowns();
+                /*
+                // todo, restore previous item. Seems to be done already?
+                dropdownItems.forEach (item => {
+                    if(item.getAttribute("data-value") == selectedValue) {
+                        ;
                     }
-                });
-            })();
+                })
+                // item.dispatchEvent(new MouseEvent("click", {"view": window, "bubbles": true, "cancelable": false}));
+                */
 
-            // And we're ready.
-            showStatusOk();
+                }); // end of picker iterator
 
-            // Switch to the correct panel depending on the currently active document.
-            switchPanel();
-        }
-    });
-
-    // Load all SVG icons used by the extension so that they become available to the <svg> elements.
-    loadIcons("images/spectrum-icons.svg");
-}());
+                // TODO: This handler should be added only once.
+                if(startup) {
+                    // Clicking outside of the Dropdown or its popover closes any open popover.
+                    document.addEventListener("click", function (event) {
+                        if (!isAncestorOf(event.target, ".dropdown-select")) {
+                            closeAllDropdowns();
+                        }
+                    });
+                }
+            }
