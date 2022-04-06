@@ -161,6 +161,22 @@ function hideSpinner() {
 
 
 /**
+ * Hide the  
+ */
+
+function unblockMetaData() {
+    document.querySelector("div[data-id='input-book-language'] > button").classList.remove("is-disabled");
+}
+
+function blockMetaData() {
+    let node = document.querySelector("#input-book-language").parentNode.querySelector("button");
+    if(node) {
+        node.classList.add("is-disabled");
+    }
+}
+
+
+/**
  * There is a status message box at the bottom of both panels. This function renders
  * a given message of the given class into that message box.
  *
