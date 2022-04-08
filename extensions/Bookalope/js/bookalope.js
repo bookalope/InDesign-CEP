@@ -1032,13 +1032,14 @@ function askSaveBookflowFile(bookflow, format, style) {
 
             // On valid token, retrieve server UI data
             if(isToken(bookalopeToken)) {
-                getUIServerdata();
+                getUIServerdata(true);
             } else {
+                rebuildPickers(true);
                 blockMetaData();
             }
 
             // build the pickers (true for startup)
-            rebuildPickers(true);
+            //
 
             // And we're ready.
             showStatusOk();
@@ -1064,7 +1065,7 @@ function askSaveBookflowFile(bookflow, format, style) {
     *
     */
 
-	async function getUIServerdata() {
+	async function getUIServerdata(startup=false) {
 		document.getElementById("input-book-name").value = "invoked UI";
 
         // First get language data
@@ -1096,7 +1097,7 @@ function askSaveBookflowFile(bookflow, format, style) {
         });
 
         // Rebuild here, given await.
-        //rebuildPickers();
+        rebuildPickers(startup);
 /*
 		//languagePicker.setAttribute('data-placeholder', 'Choose language');
 		// TODO ON failure
