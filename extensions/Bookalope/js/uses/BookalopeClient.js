@@ -413,24 +413,23 @@ BookalopeClient.prototype.getImportFormats = function() {
  */
 
 //BookalopeClient.prototype.
-getLanguages = function() {
+let fetchLanguages = function() {
 
 	return new Promise(function(resolve, reject) {
 	// Temporarely use a dummy object
-		var languagesList = [{
-			"code": "en-US",
+		let languagesList = [{
+			"value": "en-US",
 			"name": "English (US)"
 			}, {
-			"code": "es-ES",
+			"value": "es-ES",
 			"name": "Español (Spain)"
 			}, {
-			"code": "de-DE",
+			"value": "de-DE",
 			"name": "Deutsch"
-			}
-			];
+		}];
 		setTimeout(function() {
 			resolve(languagesList);		
-		}, 1000);
+		}, 2000);
 	}).catch(function(error) {
 	  reject(error);
 	});
