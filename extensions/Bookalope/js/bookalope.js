@@ -446,6 +446,8 @@ function askSaveBookflowFile(bookflow, format, style) {
     var bookHighlightIssues;
     var bookSkipStructure;
 
+    // Other additions
+    let tokenChangeTimeout;
 
     /**
      * Helper function which returns an existing BookalopeClient object, or creates
@@ -1462,9 +1464,27 @@ function askSaveBookflowFile(bookflow, format, style) {
             });
 
             // Register the callbacks for a change of authentication data (token/beta)
-			document.getElementById("input-bookalope-token").addEventListener("blur", () => {
-                authenticationChanged();
-            }); // TODO, add timeout
+            // Listening for "keyup" + "paste" covers most situations, except for a context menu "cut" that
+            // empties the input (or invalidates the token).
+            // That can be listened for using "change" which (like "onblur") triggers when loosing focus;
+            // However, currently it will also run after a completed "keyup" and "paste" event. Therefor, ignore
+            // this rare situation for now. If needed, the user can press 'enter' after a change.
+
+            // Listen for typed tokens
+            document.getElementById("input-bookalope-token").addEventListener("keyup", () => {
+                if(tokenChangeTimeout) {
+                    clearTimeout(tokenChangeTimeout);
+                }
+                tokenChangeTimeout = setTimeout(authenticationChanged, 1000);
+            });
+            // Listen for copy pasted tokens
+            document.getElementById("input-bookalope-token").addEventListener("paste", () => {
+                if(tokenChangeTimeout) {
+                    clearTimeout(tokenChangeTimeout);
+                }
+                tokenChangeTimeout = setTimeout(authenticationChanged, 100);
+            });
+            // Listen for Beta toggle
             document.getElementById("input-bookalope-beta").addEventListener("change", () => {
                 authenticationChanged();
             });
