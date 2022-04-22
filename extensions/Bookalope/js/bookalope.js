@@ -1355,16 +1355,16 @@ function askSaveBookflowFile(bookflow, format, style) {
         .then(response => {
             // Populate the <select> options, and restore selection (if possible).
             populateSelectOptions("input-book-language", response);
-
-            // Construct a new the picker menu based of the <select> options
-            populatePickerItems("input-book-language");
         })
         .catch(error => {
             // Same, but empty the options, thus also clearing the picker menu.
             populateSelectOptions("input-book-language", []);
-            populatePickerItems("input-book-language");
 
             showClientError(error);
+        })
+        .finally(() => {
+            // Construct a new the picker menu based of the <select> options
+            populatePickerItems("input-book-language");
         });
 
         /*
