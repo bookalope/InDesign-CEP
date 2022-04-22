@@ -1351,7 +1351,7 @@ function askSaveBookflowFile(bookflow, format, style) {
         * Get language data
         */
 
-		fetchLanguages()
+        bookalope.fetchLanguages()
         .then(response => {
             // Populate the <select> options, and restore selection (if possible).
             populateSelectOptions("input-book-language", response);
@@ -1389,11 +1389,22 @@ function askSaveBookflowFile(bookflow, format, style) {
         clearErrors();
 
         let token = document.getElementById("input-bookalope-token").value;
+        let beta = document.getElementById("input-bookalope-beta").checked;
 
         if (token === "") {
             // Avoids warning on fresh startup with no token
             blockMetaData();
         } else if (isToken(token)) {
+            // On first startup, bookalope object may be undefined. Create it here.
+            // If it exists, the token/beta state will be updated.
+            bookalopeToken = token;
+            bookalopeBetaHost = beta;
+            bookalope = getBookalope(); // also uses isToken, error condition can be ignored
+
+            // Store new token/beta locally
+            setBookalopeAPIToken(token, beta);
+
+            // Do the actual unblock and data fetching
             unblockMetaData();
             fetchUIServerdata();
         } else {

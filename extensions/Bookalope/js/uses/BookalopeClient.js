@@ -412,8 +412,7 @@ BookalopeClient.prototype.getImportFormats = function() {
  * @returns {Promise}
  */
 
-//BookalopeClient.prototype.
-let fetchLanguages = function() {
+BookalopeClient.prototype.fetchLanguages = function() {
 
 	return new Promise(function(resolve, reject) {
 	// Temporarely use a dummy object
