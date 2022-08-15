@@ -205,7 +205,12 @@ function bookalopeCreateDocument(idmlFileName, bookId, bookflowId, betaHost) {
 function bookalopeDocumentByNameToRTF(docName) {
 
     var doc = app.documents.itemByName(docName);
-    return bookalopeDocumentToRTF(doc);
+    try {
+        return bookalopeDocumentToRTF(doc);
+    } catch (exc) {
+        alert("Failed to export document: " + exc);
+        return JSON.stringify(false);
+    }
 }
 
 
@@ -218,7 +223,12 @@ function bookalopeDocumentByNameToRTF(docName) {
 function bookalopeActiveDocumentToRTF() {
 
     var doc = app.documents.length !== 0 ? app.activeDocument : undefined;
-    return bookalopeDocumentToRTF(doc);
+    try {
+        return bookalopeDocumentToRTF(doc);
+    } catch (exc) {
+        alert("Failed to export document: " + exc);
+        return JSON.stringify(false);
+    }
 }
 
 
