@@ -153,8 +153,8 @@ BookalopeClient.prototype._httpRequest = function(url, method, params, options) 
         reject(new BookalopeError("Server error: " + this.statusText + " (" + this.status + ")"));
       }
     };
-    xhr.onerror = function () {
-      reject(new BookalopeError("Unable to conntect to server"));
+    xhr.onerror = function (ev) {
+      reject(new BookalopeError("Unable to conntect to server: " + ev));
     };
     xhr.setRequestHeader("Authorization", "Basic " + btoa(bookalope._token + ":"));
     xhr.setRequestHeader("Content-type", "application/json");
