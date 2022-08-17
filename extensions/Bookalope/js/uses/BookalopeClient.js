@@ -92,77 +92,82 @@ BookalopeClient.prototype._httpRequest = function(url, method, params, options) 
 
   // Create the Promise, and wrap it around the request.
   return new Promise(function (resolve, reject) {
-    var xhr = new XMLHttpRequest();
-    xhr.open(method, bookalope._host + url);
-    xhr.onload = function () {
+    var token = bookalope._token;
+    if (token === undefined || token === null || token === "" || !isToken(token)) {
+      reject(new BookalopeError("Invalid Bookalope token format"));
+    } else {
+      var xhr = new XMLHttpRequest();
+      xhr.open(method, bookalope._host + url);
+      xhr.onload = function () {
 
-      // Make sure that this client and the server's API version match; if not, then throw an error.
-      if (this.getResponseHeader("X-Bookalope-Api-Version") !== bookalope._version) {
-        reject(new BookalopeError("Invalid API server version, please update this client"));
-      }
-
-      // Status codes 1xx Informational responses.
-      if (this.status < 200) {
-        reject(new BookalopeError("Unexpected server response: " + this.statusText + " (" + this.status + ")"));
-
-      // Status codes 2xx Success.
-      } else if (this.status < 300) {
-        if (this.response instanceof Blob) {
-          resolve(this.response);
-        } else if (typeof this.response === "string") {
-          // TODO Check response Content-Type for JSON.
-          resolve(JSON.parse(this.response));
-        } else {
-          resolve(this.response);
+        // Make sure that this client and the server's API version match; if not, then throw an error.
+        if (this.getResponseHeader("X-Bookalope-Api-Version") !== bookalope._version) {
+          reject(new BookalopeError("Invalid API server version, please update this client"));
         }
 
-      // Status codes 3xx Redirection.
-      } else if (this.status < 400) {
-        reject(new BookalopeError("Unexpected server response: " + this.statusText + " (" + this.status + ")"));
+        // Status codes 1xx Informational responses.
+        if (this.status < 200) {
+          reject(new BookalopeError("Unexpected server response: " + this.statusText + " (" + this.status + ")"));
 
-      // Status codes 4xx Client errors.
-      } else if (this.status < 500) {
-        if (typeof this.response === "string") {
-          try {
-            var json_errors = JSON.parse(this.response);
-            if (json_errors.errors !== undefined) {
-              var errors = json_errors.errors;
-              if (errors.length === 1) {
-                var error = errors[0];
-                if (error.description !== undefined) {
-                  reject(new BookalopeError("Client error: " + error.description));
+        // Status codes 2xx Success.
+        } else if (this.status < 300) {
+          if (this.response instanceof Blob) {
+            resolve(this.response);
+          } else if (typeof this.response === "string") {
+            // TODO Check response Content-Type for JSON.
+            resolve(JSON.parse(this.response));
+          } else {
+            resolve(this.response);
+          }
+
+        // Status codes 3xx Redirection.
+        } else if (this.status < 400) {
+          reject(new BookalopeError("Unexpected server response: " + this.statusText + " (" + this.status + ")"));
+
+        // Status codes 4xx Client errors.
+        } else if (this.status < 500) {
+          if (typeof this.response === "string") {
+            try {
+              var json_errors = JSON.parse(this.response);
+              if (json_errors.errors !== undefined) {
+                var errors = json_errors.errors;
+                if (errors.length === 1) {
+                  var error = errors[0];
+                  if (error.description !== undefined) {
+                    reject(new BookalopeError("Client error: " + error.description));
+                  }
+                } else {
+                  // TODO How should we handle multiple errors?
                 }
               } else {
-                // TODO How should we handle multiple errors?
+                // Unexpected JSON came back from the server.
               }
-            } else {
-              // Unexpected JSON came back from the server.
-            }
-          } catch (e) {
-            // JSON parse failed, so Bookalope responded with HTML. This is a known issue
-            // with failed authorization for a request, and needs to be fixed server-side.
-            if (this.status === 401) {
-              reject(new BookalopeError("Client error: Failed to authenticate, check token"));
+            } catch (e) {
+              // JSON parse failed, so Bookalope responded with HTML. This is a known issue
+              // with failed authorization for a request, and needs to be fixed server-side.
+              if (this.status === 401) {
+                reject(new BookalopeError("Client error: Failed to authenticate, check token"));
+              }
             }
           }
-        }
-        reject(new BookalopeError("Client error: " + this.statusText + " (" + this.status + ")"));
+          reject(new BookalopeError("Client error: " + this.statusText + " (" + this.status + ")"));
 
-      // Status codes 5xx Server error.
-      } else {
-        reject(new BookalopeError("Server error: " + this.statusText + " (" + this.status + ")"));
-      }
-    };
-    xhr.onerror = function (ev) {
-      reject(new BookalopeError("Unable to conntect to server: " + ev));
-    };
-    xhr.setRequestHeader("Authorization", "Basic " + btoa(bookalope._token + ":"));
-    xhr.setRequestHeader("Content-type", "application/json");
-    // Set additional properties for the xhr instance.
-    Object.keys(options).forEach(function(key) {
-      xhr[key] = options[key];
-    });
-    xhr.send(params ? JSON.stringify(params) : null);
+        // Status codes 5xx Server error.
+        } else {
+          reject(new BookalopeError("Server error: " + this.statusText + " (" + this.status + ")"));
+        }
+      };
+      xhr.onerror = function (ev) {
+        reject(new BookalopeError("Unable to conntect to server: " + ev));
+      };
+      xhr.setRequestHeader("Authorization", "Basic " + btoa(token + ":"));
+      xhr.setRequestHeader("Content-type", "application/json");
+      // Set additional properties for the xhr instance.
+      Object.keys(options).forEach(function(key) {
+        xhr[key] = options[key];
+      });
+      xhr.send(params ? JSON.stringify(params) : null);
+    }
   });
 };
 
