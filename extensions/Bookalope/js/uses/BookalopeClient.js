@@ -640,7 +640,7 @@ var Bookshelf = function(bookalope, idOrJson) {
       }, this);
     }
   } else if (typeof idOrJson === "string") {
-    assert(isToken(idOrJson), "Malformed Bookalope token: " + idOrJson);
+    assert(new RegExp("^[0-9a-zA-Z_\-]{32}$").test(idOrJson), "Malformed Bookshelf id: " + idOrJson);
     this.id = idOrJson;
     this.url = "/api/bookhelves/" + this.id;
   } else {
@@ -802,7 +802,7 @@ var Book = function(bookalope, idOrJson) {
       }, this);
     }
   } else if (typeof idOrJson === "string") {
-    assert(isToken(idOrJson), "Malformed Bookalope token: " + idOrJson);
+    assert(new RegExp("^[0-9a-zA-Z_\-]{32}$").test(idOrJson), "Malformed Book id: " + idOrJson);
     this.id = idOrJson;
     this.url = "/api/books/" + this.id;
   } else {
@@ -1037,7 +1037,7 @@ var Bookflow = function(bookalope, book, idOrJson) {
     this.pubdate = undefined;
     this.publisher = undefined;
   } else if (typeof idOrJson === "string") {
-    assert(isToken(idOrJson), "Malformed Bookalope token: " + idOrJson);
+    assert(new RegExp("^[0-9a-zA-Z_\-]{32}$").test(idOrJson), "Malformed Bookflow id: " + idOrJson);
     this.id = idOrJson;
     this.url = "/api/bookflows/" + this.id;
   } else {
