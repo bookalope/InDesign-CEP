@@ -60,9 +60,7 @@ BookalopeError.prototype = Object.create(Error.prototype);
  */
 
 var BookalopeClient = function(token, betaHost, version) {
-  if (token) {
-    this._token = token;
-  }
+  this.setToken(token);
   this.setHost(betaHost);
   if (version) {
     this._version = version;
@@ -262,13 +260,15 @@ BookalopeClient.prototype.getHost = function() {
 /**
  * Set the Bookalope API authentication token.
  *
- * @param {string} newToken - API Token
+ * @param {string} token - API Token
  * @throws {BookalopeError} If the token has an invalid format.
  */
 
 BookalopeClient.prototype.setToken = function(token) {
-  assert(isToken(token), "Malformed Bookalope token: " + token);
-  this._token = token;
+  if (token !== undefined && token !== null && token !== "") {
+    assert(isToken(token), "Malformed Bookalope token: " + token);
+  }
+  this._token = token || undefined;
 };
 
 
