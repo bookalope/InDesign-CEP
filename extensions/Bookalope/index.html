@@ -145,8 +145,7 @@
                   <svg class="spectrum-Icon spectrum-Icon--sizeM spectrum-Textfield-validationIcon" focusable="false" aria-hidden="true" aria-label="Alert">
                     <use xlink:href="#spectrum-icon-18-Alert"/>
                   </svg>
-                  <select id="input-book-language" name="input-book-language" data-placeholder="Choose Language" class="spectrum-Textfield-input spectrum-Picker-select">
-                    <option value="en-US" selected>English (United States)</option>
+                  <select id="input-book-language" name="input-book-language" data-placeholder="Choose a language..." class="spectrum-Textfield-input spectrum-Picker-select">
                   </select>
                 </div>
               </div>
@@ -305,8 +304,8 @@
                 <div class="spectrum-FieldGroup spectrum-FieldGroup--horizontal">
                   <div class="spectrum-FieldGroup-item spectrum-FieldGroup-item--full">
                     <div class="spectrum-Textfield">
-                      <select id="input-book-download" name="input-book-download" data-placeholder="Choose Format" class="spectrum-Textfield-input spectrum-Picker-select">
-                        <option value="epub3" selected>Ebook</option>
+                      <select id="input-book-download" name="input-book-download" data-placeholder="Choose a format..." class="spectrum-Textfield-input spectrum-Picker-select">
+                        <option value="epub3">Ebook</option>
                         <option value="mobi">Ebook (Kindle)</option>
                         <option value="pdf">Print PDF</option>
                         <option data-divider="true">&nbsp;</option>
@@ -362,6 +361,9 @@
 
   <!-- https://github.com/bookalope/Bookalope -->
   <script src="js/uses/BookalopeClient.js"></script>
+
+  <!-- Adobe Spectrum JavaScript helpers. -->
+  <script src="js/uses/Spectrum.js"></script>
 
   <!-- And Bookalope's own script. -->
   <script src="js/bookalope.js"></script>
