@@ -410,6 +410,37 @@ BookalopeClient.prototype.getImportFormats = function() {
 
 
 /**
+ * Get a list of languages supported by Bookalope. Returns a promise that
+ * is fulfilled with a list of Language instances or rejected with a BookalopeError.
+ *
+ * @async
+ * @returns {Promise}
+ */
+
+BookalopeClient.prototype.getLanguages = function() {
+  var bookalope = this;
+
+  return new Promise(function(resolve, reject) {
+    var url = "/api/languages";
+    bookalope.httpGET(url)
+    .then(function(response) {
+
+      // Create and populate a list of language instances from the response data.
+      var languageList = [];
+      response.languages.forEach(function(language) {
+        languageList.push(new Language(language.locale, language.name));
+      });
+
+      resolve(languageList);
+    })
+    .catch(function(error) {
+      reject(error);
+    });
+  });
+};
+
+
+/**
  * Get a list Bookshelves. Returns a promise that is fulfilled with a list of
  * Bookshelf instances or rejected with a BookalopeError.
  *
@@ -614,6 +645,22 @@ var Style = function(format, packed) {
   this.name = packed.info.name;
   this.description = packed.info.description;
   this.apiPrice = packed.info["price-api"];
+};
+
+
+/**
+ * A Language instance consists of the ISO 639-1 locale code of a language
+ * (e.g. "de") which may include an optional territory code (e.g. "de-DE"),
+ * and the native name of the language (e.g. "Deutsch").
+ *
+ * @param {string} locale - The ISO locale code and optional territory of the language.
+ * @param {string} name - The native language name.
+ * @constructor
+ */
+
+var Language = function(locale, name) {
+  this.locale = locale;
+  this.name = name;
 };
 
 
@@ -1038,7 +1085,7 @@ var Bookflow = function(bookalope, book, idOrJson) {
     this.author = undefined;
     this.copyright = undefined;
     this.isbn = undefined;
-    this.language = undefined;
+    this.locale = undefined;
     this.pubdate = undefined;
     this.publisher = undefined;
   } else if (typeof idOrJson === "string") {
@@ -1081,7 +1128,7 @@ Bookflow.prototype.update = function() {
       bookflow.author = response.bookflow.author;
       bookflow.copyright = response.bookflow.copyright;
       bookflow.isbn = response.bookflow.isbn;
-      bookflow.language = response.bookflow.language;
+      bookflow.locale = response.bookflow.locale;
       bookflow.pubdate = response.bookflow.pubdate;
       bookflow.publisher = response.bookflow.publisher;
 
@@ -1182,7 +1229,7 @@ Bookflow.prototype.getMetadata = function() {
     "author": this.author,
     "copyright": this.copyright,
     "isbn": this.isbn,
-    "language": this.language,
+    "locale": this.locale,
     "pubdate": this.pubdate,
     "publisher": this.publisher,
     "title": this.title

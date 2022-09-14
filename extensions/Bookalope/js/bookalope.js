@@ -415,7 +415,7 @@ function askSaveBookflowFile(bookflow, format, style) {
     var bookFile;
     var bookName;
     var bookAuthor;
-    var bookLanguage;
+    var bookLocale;
     var bookCopyright;
     var bookPubDate;
     var bookIsbn;
@@ -660,7 +660,7 @@ function askSaveBookflowFile(bookflow, format, style) {
             bookflow.author = bookAuthor;
             bookflow.copyright = bookCopyright;
             bookflow.isbn = bookIsbn;
-            bookflow.language = bookLanguage;
+            bookflow.locale = bookLocale;
             bookflow.pubdate = bookPubDate;
             bookflow.publisher = bookPublisher;
             bookflow.save()
@@ -756,7 +756,7 @@ function askSaveBookflowFile(bookflow, format, style) {
         bookName = document.getElementById("input-book-name").value;
         bookAuthor = document.getElementById("input-book-author").value;
         bookCopyright = document.getElementById("input-book-copyright").value;
-        bookLanguage = document.getElementById("input-book-language").value;
+        bookLocale = document.getElementById("input-book-language").value;
         bookPubDate = document.getElementById("input-book-pubdate").value;
         bookIsbn = document.getElementById("input-book-isbn").value;
         bookPublisher = document.getElementById("input-book-publisher").value;
