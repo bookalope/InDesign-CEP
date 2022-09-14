@@ -58,39 +58,47 @@ function detectFeatures() {
 
 
 /**
- * Retrieve the user's Bookalope API token and beta host flag that's stored by Chromium,
+ * Retrieve the user's Bookalope API tokens and beta host flag that's stored by Chromium,
  * or return default values if they weren't found.
  *
  * See also: https://developer.mozilla.org/en/docs/Web/API/Window/localStorage
  *
- * @returns {object} The user's Bookalope API token and whether to access Bookalope's beta host.
+ * @returns {object} The user's Bookalope API tokens and whether to access Bookalope's beta host.
  */
 
-function getBookalopeAPIToken() {
-    var token = "";
-    var beta = false;
+function getBookalopeAPITokens() {
+    var tokenProd = "";
+    var tokenBeta = "";
+    var useBetaHost = false;
     if (typeof localStorage === "object") {
-        token = localStorage.getItem("idsn_extension_bookalope_api_token");
-        beta = localStorage.getItem("idsn_extension_bookalope_beta_host") === "true";
+        tokenProd = localStorage.getItem("idsn_extension_bookalope_api_token");
+        tokenBeta = localStorage.getItem("idsn_extension_bookalope_beta_api_token");
+        useBetaHost = localStorage.getItem("idsn_extension_bookalope_beta_host") === "true";
     }
-    return {token: token, beta: beta};
+    return {
+        tokenProd: isToken(tokenProd) ? tokenProd : "",
+        tokenBeta: isToken(tokenBeta) ? tokenBeta : "",
+        useBetaHost: useBetaHost
+    };
 }
 
 
 /**
- * Store the given Bookalope API token and beta host flag for later use. Makes it easier
+ * Store the given Bookalope API tokens and beta host flag for later use. Makes it easier
  * for the user so she doesn't have to keep entering the token between sessions.
  *
  * See also: https://developer.mozilla.org/en/docs/Web/API/Window/localStorage
  *
- * @param {string} token - A valid Bookalope token.
- * @param {boolean} beta - Flag indicating whether the token is valid for the beta host.
+ * @param {string} tokenProd - A valid Bookalope token for the production server.
+ * @param {string} tokenBeta - A valid Bookalope token for the beta server.
+ * @param {boolean} useBetaHost - Flag indicating whether to use the Beta or Production host.
  */
 
-function setBookalopeAPIToken(token, beta) {
+function setBookalopeAPITokens(tokenProd, tokenBeta, useBetaHost) {
     if (typeof localStorage === "object") {
-        localStorage.setItem("idsn_extension_bookalope_api_token", token);
-        localStorage.setItem("idsn_extension_bookalope_beta_host", beta);
+        localStorage.setItem("idsn_extension_bookalope_api_token", isToken(tokenProd) ? tokenProd : "");
+        localStorage.setItem("idsn_extension_bookalope_beta_api_token", isToken(tokenBeta) ? tokenBeta : "");
+        localStorage.setItem("idsn_extension_bookalope_beta_host", useBetaHost);
     }
 }
 
@@ -437,7 +445,10 @@ function askSaveBookflowFile(bookflow, format, style) {
         if (bookalope === undefined) {
             bookalope = new BookalopeClient();
         }
-        bookalope.setToken(bookalopeToken);
+        var token = bookalopeBetaHost ? bookalopeBetaToken : bookalopeProdToken;
+        if (isToken(token)) {
+            bookalope.setToken(token);
+        }
         bookalope.setHost(bookalopeBetaHost);
         return bookalope;
     }
@@ -742,12 +753,9 @@ function askSaveBookflowFile(bookflow, format, style) {
 
     function uploadAndConvertDocument() {
 
-        // Store the API authentication key to local storage for later.
+        // Get the values from the form fields.
         bookalopeToken = document.getElementById("input-bookalope-token").value;
         bookalopeBetaHost = document.getElementById("input-bookalope-beta").checked;
-        setBookalopeAPIToken(bookalopeToken, bookalopeBetaHost);
-
-        // Get the values from the form fields.
         bookFileType = document.querySelector("input[name='input-file-type']:checked").value;
         bookFileName = undefined;
         bookFilePath = undefined;
@@ -948,10 +956,11 @@ function askSaveBookflowFile(bookflow, format, style) {
 
             // Get the Bookalope API token and beta host flag if it's been stored before, and make
             // them the value of their respective elements.
-            var bookalopeTokenInfo = getBookalopeAPIToken();
-            bookalopeToken = bookalopeTokenInfo.token;
-            bookalopeBetaHost = bookalopeTokenInfo.beta;
-            document.getElementById("input-bookalope-token").value = bookalopeToken;
+            var bookalopeTokenInfo = getBookalopeAPITokens();
+            bookalopeProdToken = bookalopeTokenInfo.tokenProd;
+            bookalopeBetaToken = bookalopeTokenInfo.tokenBeta;
+            bookalopeBetaHost = bookalopeTokenInfo.useBetaHost;
+            document.getElementById("input-bookalope-token").value = bookalopeBetaHost ? bookalopeBetaToken : bookalopeProdToken;
             document.getElementById("input-bookalope-beta").checked = bookalopeBetaHost;
 
             // Add a few relevant event handlers to catch changes from the other side.
@@ -990,6 +999,34 @@ function askSaveBookflowFile(bookflow, format, style) {
                 } else {
                     label.classList.add("is-placeholder");
                     label.textContent = this.getAttribute("data-placeholder");
+                }
+            });
+
+            // Register the callback for the Token update that saves changes of the token
+            // field to the localStorage.
+            document.getElementById("input-bookalope-token").addEventListener("change", function (event) {
+                var token = event.currentTarget.value;
+                if (token === "" || isToken(token)) {
+                    var betaHost = document.getElementById("input-bookalope-beta").checked;
+                    if (betaHost) {
+                        bookalopeBetaToken = token;
+                    } else {
+                        bookalopeProdToken = token;
+                    }
+                    setBookalopeAPITokens(bookalopeProdToken, bookalopeBetaToken, bookalopeBetaHost);
+                    clearErrors();
+                } else {
+                    showElementError(event.currentTarget, "Invalid Bookalope token format");
+                }
+            });
+
+            // Register the callback for the Beta checkbox.
+            document.getElementById("input-bookalope-beta").addEventListener("change", function (event) {
+                bookalopeBetaHost = event.currentTarget.checked;
+                if (bookalopeBetaHost) {
+                  document.getElementById("input-bookalope-token").value = bookalopeBetaToken;
+                } else {
+                  document.getElementById("input-bookalope-token").value = bookalopeProdToken;
                 }
             });
 
