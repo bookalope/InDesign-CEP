@@ -1081,6 +1081,15 @@ function askSaveBookflowFile(bookflow, format, style) {
                     }
                     setBookalopeAPITokens(bookalopeProdToken, bookalopeBetaToken, bookalopeBetaHost);
                     clearErrors();
+                    showStatus("Refreshing panels...");
+                    refreshPanelsFromServerConfiguration()
+                    .then(function() {
+                        showStatusOk();
+                    })
+                    .catch(function(error) {
+                        // Don't show an error and default panel elements.
+                        showStatusOk();
+                    });
                 } else {
                     showElementError(event.currentTarget, "Invalid Bookalope token format");
                 }
