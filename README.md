@@ -6,6 +6,8 @@
 
 This repository contains the complete source code for [Bookalope](https://bookalope.net/)’s InDesign extension. The extension uses the [Bookalope REST API](https://github.com/bookalope/Bookalope/blob/master/API.md) and its [Javascript wrapper](https://github.com/bookalope/Bookalope/blob/master/clients/javascript/bookalope.js) to integrate the Bookalope toolset into InDesign. For more information on Bookalope and its services, please refer to the [Bookalope](https://bookalope.net) website.
 
+You can also download and install this extension directly from the [Adobe Exchange](https://exchange.adobe.com/apps/cc/102942/intelligent-import-of-word-documents-and-ebooks).
+
 ## Requirements
 
 The extension requires and supports Adobe InDesign versions 13–17, which relates to CC 2018-22. However, while the extension may run on older versions that hasn’t been tested in depth.
