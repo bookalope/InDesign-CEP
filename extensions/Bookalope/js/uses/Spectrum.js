@@ -2,8 +2,11 @@
 /*global window, document, navigator, atob */
 
 /**
- * Alright this is a funky Adobe Spectrum thing. Looking at the documentation for Picker
- * elements:
+ * Alright this is a funky Adobe Spectrum thing:
+ *
+ *   https://github.com/adobe/spectrum-css#where-is-the-javascript
+ *
+ * Also, looking at the documentation for Picker elements:
  *
  *   https://opensource.adobe.com/spectrum-css/picker.html
  *   https://spectrum.adobe.com/page/picker/
