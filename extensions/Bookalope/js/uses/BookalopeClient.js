@@ -62,10 +62,12 @@ BookalopeError.prototype = Object.create(Error.prototype);
 var BookalopeClient = function(token, betaHost, version) {
   this.setToken(token);
   this.setHost(betaHost);
+
+  // The expected major version from the server, following the semantic versioning scheme.
   if (version) {
     this._version = version;
   } else {
-    this._version = "2.0.0";
+    this._version = 2;
   }
 };
 
@@ -98,9 +100,17 @@ BookalopeClient.prototype._httpRequest = function(url, method, params, options) 
       xhr.open(method, bookalope._host + url);
       xhr.onload = function () {
 
-        // Make sure that this client and the server's API version match; if not, then throw an error.
-        if (this.getResponseHeader("X-Bookalope-Api-Version") !== bookalope._version) {
-          reject(new BookalopeError("Invalid API server version, please update this client"));
+        // Make sure that this client and the server's API version match; if not, then
+        // throw an error. The API version uses semantic versioning, so we check only
+        // the major version (breaking changes): https://semver.org/
+        var apiVersion = this.getResponseHeader("X-Bookalope-Api-Version");
+        if (apiVersion.match(/\d+\.\d+\.\d+/)) {
+          var [major] = apiVersion;
+          if (Number(major) != bookalope._version) {
+            reject(new BookalopeError("Invalid API server version, please update this client"));
+          }
+        } else {
+          reject(new BookalopeError("Unknown API server version '" + apiVersion + "', please contact Bookalope!"));
         }
 
         // Status codes 1xx Informational responses.
