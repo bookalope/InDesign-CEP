@@ -127,9 +127,8 @@ function showUpload() {
     document.getElementById("input-book-isbn").value = "";
     document.getElementById("input-book-publisher").value = "";
     document.getElementById("input-book-credit").checked = false;
-    document.getElementById("input-book-autoclean").checked = true;
-    document.getElementById("input-book-highlight-issues").checked = false;
     document.getElementById("input-book-skip-structure").checked = false;
+    document.getElementById("input-book-skip-inline").checked = false;
 
     document.getElementById("bookalope-upload").classList.remove("hidden");
     document.getElementById("bookalope-update").classList.add("hidden");
@@ -430,9 +429,9 @@ function askSaveBookflowFile(bookflow, format, style) {
     var bookIsbn;
     var bookPublisher;
     var bookVersion;
-    var bookAutoClean;
-    var bookHighlightIssues;
     var bookSkipStructure;
+    var bookSkipInline;
+    var bookSkipPagebreaks;
 
 
     /**
@@ -738,7 +737,6 @@ function askSaveBookflowFile(bookflow, format, style) {
                 hideSpinner();
             } else {
                 bookFileName = bookFilePath.split("/").pop().split("\\").pop();
-                bookUploadOptions = {"ignore_pagebreaks": true};
                 createBook();
             }
         });
@@ -770,10 +768,15 @@ function askSaveBookflowFile(bookflow, format, style) {
         bookIsbn = document.getElementById("input-book-isbn").value;
         bookPublisher = document.getElementById("input-book-publisher").value;
         bookCredit = document.getElementById("input-book-credit").checked;
-        bookAutoClean = document.getElementById("input-book-autoclean").checked;
-        bookHighlightIssues = document.getElementById("input-book-highlight-issues").checked;
         bookSkipStructure = document.getElementById("input-book-skip-structure").checked;
-        bookUploadOptions = undefined;
+        bookSkipInline = document.getElementById("input-book-skip-inline").checked;
+        bookUploadOptions = {
+            // "collapse_space": true,
+            // "fix_quotation_marks": true,
+            // "fix_hyphens": true,
+            "ignore_pagebreaks": true,  // Ignore RTF page breaks, and use only InDesign page breaks.
+            "skip_analysis_inlinestyles": bookSkipInline,
+        };
 
         // Hide error messages and clear out highlighted fields, if there are any.
         clearErrors();

@@ -218,10 +218,10 @@
               </div>
             </div>
             <div class="spectrum-Form-item">
-              <label for="input-book-autoclean" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Automatic cleanup</label>
+              <label for="input-book-skip-structure" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Skip structure analysis</label>
               <div class="spectrum-Form-itemField">
-                <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized" for="input-book-autoclean">
-                  <input type="checkbox" name="input-book-autoclean" id="input-book-autoclean" checked="checked" class="spectrum-Checkbox-input" disabled title="Automatically clean up the content of the document during ingestion.">
+                <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized" for="input-book-skip-structure">
+                  <input type="checkbox" name="input-book-skip-structure" id="input-book-skip-structure" class="spectrum-Checkbox-input" disabled title="Skip the semantic structure analysis, and import the document as is (if possible and supported).">
                   <span class="spectrum-Checkbox-box">
                     <svg class="spectrum-Icon spectrum-UIIcon-Checkmark100 spectrum-Checkbox-checkmark spectrum-Icon--sizeS" focusable="false" aria-hidden="true">
                       <use xlink:href="#spectrum-css-icon-Checkmark100"/>
@@ -231,23 +231,10 @@
               </div>
             </div>
             <div class="spectrum-Form-item">
-              <label for="input-book-highlight-issues" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Highlight issues</label>
+              <label for="input-book-skip-structure" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Skip inline text analysis</label>
               <div class="spectrum-Form-itemField">
-                <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized" for="input-book-highlight-issues">
-                  <input type="checkbox" name="input-book-highlight-issues" id="input-book-highlight-issues" class="spectrum-Checkbox-input" disabled title="Highlight spelling, punctuation, and other issues in the converted document.">
-                  <span class="spectrum-Checkbox-box">
-                    <svg class="spectrum-Icon spectrum-UIIcon-Checkmark100 spectrum-Checkbox-checkmark" focusable="false" aria-hidden="true">
-                      <use xlink:href="#spectrum-css-icon-Checkmark100"/>
-                    </svg>
-                  </span>
-                </label>
-              </div>
-            </div>
-            <div class="spectrum-Form-item">
-              <label for="input-book-skip-structure" class="spectrum-FieldLabel spectrum-Form-itemLabel spectrum-FieldLabel--left for-checkbox">Skip structure analysis</label>
-              <div class="spectrum-Form-itemField">
-                <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized" for="input-book-skip-structure">
-                  <input type="checkbox" name="input-book-skip-structure" id="input-book-skip-structure" class="spectrum-Checkbox-input" disabled title="Skip the semantic structure analysis, and import the document as is (if possible and supported).">
+                <label class="spectrum-Checkbox spectrum-Checkbox--sizeM spectrum-Checkbox--emphasized" for="input-book-skip-inline">
+                  <input type="checkbox" name="input-book-skip-inline" id="input-book-skip-inline" class="spectrum-Checkbox-input" title="Skip the semantic analysis of inline text styles.">
                   <span class="spectrum-Checkbox-box">
                     <svg class="spectrum-Icon spectrum-UIIcon-Checkmark100 spectrum-Checkbox-checkmark spectrum-Icon--sizeS" focusable="false" aria-hidden="true">
                       <use xlink:href="#spectrum-css-icon-Checkmark100"/>
